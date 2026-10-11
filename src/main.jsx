@@ -20,8 +20,6 @@ import impactBeforeRuins from './assets/impact-before-ruins.png'
 import impactRebuildWorker from './assets/impact-rebuild-worker.png'
 import impactFoundationOfHope from './assets/impact-foundation-of-hope.png'
 
-gsap.registerPlugin(ScrollTrigger)
-
 const menu = ['Home', 'About us', 'Our work', 'Current pilots', 'Get involved', 'Contact']
 
 const workServices = [
@@ -119,7 +117,6 @@ function ImpactVisual({ className, label, image, showPlay = false }) {
   return (
     <div className={`impact-visual ${className}`}>
       <img src={image} alt={label} />
-      <span className="impact-visual__ring" aria-hidden="true" />
       {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
     </div>
   )
