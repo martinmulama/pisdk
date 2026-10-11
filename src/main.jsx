@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
 import referenceImage from './assets/pisdk-hero-reference.png'
 import storyDamagedHome from './assets/story-damaged-home.png'
@@ -18,6 +19,8 @@ import workForumsIcon from './assets/work-icon-forums.png'
 import impactBeforeRuins from './assets/impact-before-ruins.png'
 import impactRebuildWorker from './assets/impact-rebuild-worker.png'
 import impactFoundationOfHope from './assets/impact-foundation-of-hope.png'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const menu = ['Home', 'About us', 'Our work', 'Current pilots', 'Get involved', 'Contact']
 
@@ -116,6 +119,7 @@ function ImpactVisual({ className, label, image, showPlay = false }) {
   return (
     <div className={`impact-visual ${className}`}>
       <img src={image} alt={label} />
+      <span className="impact-visual__ring" aria-hidden="true" />
       {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
     </div>
   )
@@ -273,6 +277,7 @@ function App() {
   const [isPreloaderDone, setIsPreloaderDone] = useState(false)
   const [isHeroReady, setIsHeroReady] = useState(false)
   const [heroTarget, setHeroTarget] = useState(null)
+  const pageRef = useRef(null)
 
   const completePreloader = useCallback(() => setIsPreloaderDone(true), [])
 
@@ -323,6 +328,220 @@ function App() {
     }
   }, [])
 
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
+      const impact = scope.querySelector('.impact')
+      const feature = scope.querySelector('.impact-visual--feature')
+      const featureImage = feature?.querySelector('img')
+      const featureRing = feature?.querySelector('.impact-visual__ring')
+      const play = feature?.querySelector('.impact-visual__play')
+      const supportingVisuals = scope.querySelectorAll('.impact-visual--before, .impact-visual--after')
+      const supportingLabels = scope.querySelectorAll('.impact-label')
+      const content = scope.querySelectorAll('.impact-overview, .impact-story, .impact-cta, .impact-tagline, .impact-section-leaf')
+
+      if (!impact || !feature || !featureImage || !featureRing || !play) return undefined
+
+      const revealMask = 'inset(0% 0% 0% 0%)'
+      const hiddenFromTop = 'inset(100% 0% 0% 0%)'
+      const hiddenFromBottom = 'inset(0% 0% 100% 0%)'
+
+      gsap.set(feature, {
+        clipPath: hiddenFromTop,
+        y: () => Math.min(148, window.innerWidth * .07),
+      })
+      gsap.set(featureImage, { scale: 1.08, transformOrigin: '50% 50%' })
+      gsap.set(featureRing, { scale: .94, transformOrigin: '50% 50%' })
+      gsap.set(play, { scale: 0, transformOrigin: '50% 50%' })
+      gsap.set(supportingVisuals, {
+        clipPath: hiddenFromBottom,
+        y: () => Math.min(72, window.innerWidth * .035),
+      })
+      gsap.set(supportingLabels, {
+        clipPath: hiddenFromBottom,
+        y: () => Math.min(30, window.innerWidth * .014),
+      })
+      gsap.set(content, {
+        clipPath: hiddenFromBottom,
+        y: () => Math.min(42, window.innerWidth * .02),
+      })
+
+      const handoff = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: impact,
+          start: 'top 92%',
+          end: 'top 10%',
+          scrub: .7,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      handoff
+        .to(feature, { clipPath: revealMask, y: 0, duration: .58 }, 0)
+        .to(featureImage, { scale: 1, duration: .58 }, 0)
+        .to(featureRing, { scale: 1, duration: .5 }, .05)
+        .to(play, { scale: 1, duration: .18 }, .4)
+        .to(supportingVisuals, { clipPath: revealMask, y: 0, duration: .25, stagger: .06 }, .56)
+        .to(supportingLabels, { clipPath: revealMask, y: 0, duration: .18, stagger: .05 }, .66)
+        .to(content, { clipPath: revealMask, y: 0, duration: .28, stagger: .045 }, .74)
+
+      return () => handoff.kill()
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
+      const heroRings = Array.from(scope.querySelectorAll('.story-image'))
+      const workSection = scope.querySelector('.what-we-do')
+      const workGrid = scope.querySelector('.work-top-grid')
+      const workCards = Array.from(scope.querySelectorAll('.work-top-grid .work-card'))
+      const workRail = scope.querySelector('.work-rail')
+      const workIntro = scope.querySelector('.work-intro')
+      const lowerCards = scope.querySelector('.work-lower-cards')
+      const workSummary = scope.querySelector('.work-summary')
+      const workLeaf = scope.querySelector('.work-section-leaf')
+
+      if (heroRings.length !== 4 || workCards.length !== 4 || !workSection || !workGrid || !workRail || !workIntro || !lowerCards || !workSummary || !workLeaf) return undefined
+
+      const layer = document.createElement('div')
+      layer.className = 'hero-work-handoff'
+      // The travelling copies must never be visible while the hero is at
+      // rest; otherwise they sit on top of the live rings after a refresh.
+      layer.style.visibility = 'hidden'
+      const travellingRings = heroRings.map((ring, index) => {
+        const travellingRing = document.createElement('div')
+        const ringStyle = window.getComputedStyle(ring)
+        travellingRing.className = `hero-work-handoff__ring hero-work-handoff__ring--${index + 1}`
+        travellingRing.style.backgroundImage = ringStyle.backgroundImage
+        travellingRing.style.backgroundPosition = ringStyle.backgroundPosition
+        layer.appendChild(travellingRing)
+        return travellingRing
+      })
+      document.body.appendChild(layer)
+
+      let handoff
+      let geometryRefreshTimer
+      const setHandoffVisibility = (isTravelling) => {
+        layer.style.visibility = isTravelling ? 'visible' : 'hidden'
+        heroRings.forEach((ring) => {
+          ring.style.visibility = isTravelling ? 'hidden' : ''
+        })
+      }
+      const rectAtScroll = (element, scrollPosition) => {
+        const rect = element.getBoundingClientRect()
+        const offset = window.scrollY - scrollPosition
+        return {
+          // Use the on-screen hero size exactly as the visitor sees it. This
+          // size remains fixed for the complete hero-to-work handoff.
+          left: rect.left,
+          top: rect.top + offset,
+          width: rect.width,
+          height: rect.height,
+        }
+      }
+      const startRect = (index) => rectAtScroll(heroRings[index], handoff.scrollTrigger.start)
+      const endRect = (index) => rectAtScroll(workCards[index], handoff.scrollTrigger.end)
+      const endPosition = (index) => {
+        const start = startRect(index)
+        const end = endRect(index)
+
+        // The ring travels to the centre of its service card without changing
+        // diameter. The larger card is then revealed beneath it by clipping.
+        return {
+          left: end.left + ((end.width - start.width) / 2),
+          top: end.top + ((end.height - start.height) / 2),
+        }
+      }
+
+      gsap.set(workGrid, { clipPath: 'inset(0% 100% 0% 0%)' })
+      gsap.set(workCards, {
+        clipPath: 'circle(0% at 50% 50%)',
+        transformOrigin: '50% 50%',
+      })
+      gsap.set(workRail, { clipPath: 'inset(0% 0% 100% 0%)' })
+      gsap.set(workIntro, { clipPath: 'inset(0% 100% 0% 0%)', x: -28 })
+      gsap.set(lowerCards, { clipPath: 'inset(0% 0% 100% 0%)', y: 34 })
+      gsap.set(workSummary, { clipPath: 'inset(0% 0% 100% 0%)', y: 24 })
+      gsap.set(workLeaf, { clipPath: 'circle(0% at 50% 50%)', scale: .72, transformOrigin: '50% 50%' })
+
+      handoff = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: workSection,
+          start: 'top bottom',
+          end: 'top 8%',
+          scrub: .7,
+          invalidateOnRefresh: true,
+          // Swap each layer only when crossing a scroll boundary. Updating
+          // visibility on every sub-pixel scroll caused a rough first frame
+          // after a cold load.
+          onEnter: () => setHandoffVisibility(true),
+          onEnterBack: () => setHandoffVisibility(true),
+          onLeaveBack: () => setHandoffVisibility(false),
+          onRefresh: (trigger) => setHandoffVisibility(trigger.progress > 0),
+        },
+      })
+
+      handoff
+        .fromTo(travellingRings, {
+          x: (index) => startRect(index).left,
+          y: (index) => startRect(index).top,
+          width: (index) => startRect(index).width,
+          height: (index) => startRect(index).height,
+          clipPath: 'circle(50% at 50% 50%)',
+        }, {
+          x: (index) => endPosition(index).left,
+          y: (index) => endPosition(index).top,
+          force3D: true,
+          duration: .66,
+          stagger: .025,
+        }, 0)
+        .to(workGrid, { clipPath: 'inset(0% 0% 0% 0%)', duration: .48 }, .14)
+        .to(workIntro, { clipPath: 'inset(0% 0% 0% 0%)', x: 0, duration: .32 }, .32)
+        .to(workCards, { clipPath: 'circle(75% at 50% 50%)', duration: .24, stagger: .04 }, .57)
+        .to(travellingRings, { clipPath: 'circle(0% at 50% 50%)', duration: .14, stagger: .025 }, .66)
+        .to(workRail, { clipPath: 'inset(0% 0% 0% 0%)', duration: .32 }, .68)
+        .to(lowerCards, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .26 }, .78)
+        .to(workSummary, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .22 }, .86)
+        .to(workLeaf, { clipPath: 'circle(75% at 50% 50%)', scale: 1, duration: .16 }, .92)
+
+      // The hero rings finish their CSS entrance shortly after the preloader
+      // clears. Refresh then so a visitor who scrolls after loading receives
+      // their settled geometry, not an in-flight entry measurement.
+      geometryRefreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 1200)
+
+      return () => {
+        window.clearTimeout(geometryRefreshTimer)
+        handoff.kill()
+        layer.remove()
+        gsap.set([
+          ...heroRings,
+          workGrid,
+          ...workCards,
+          workRail,
+          workIntro,
+          lowerCards,
+          workSummary,
+          workLeaf,
+        ], { clearProps: 'clipPath,transform,visibility' })
+      }
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
   return (
     <>
       {!isPreloaderDone && (
@@ -333,7 +552,7 @@ function App() {
           onExitComplete={completePreloader}
         />
       )}
-      <main id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
+      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
         <section className="hero" aria-labelledby="hero-heading">
         <Brand />
 
