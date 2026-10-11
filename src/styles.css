@@ -194,11 +194,16 @@ h1 {
 
 /* What we do — desktop geometry follows the supplied 1951 × 806 reference. */
 .what-we-do {
+  /* A clean off-white runway gives the Impact film circle room to arrive
+     before the next section's copy begins. Its depth matches the entire
+     upward reach of the film circle, plus a small visual buffer—so the full
+     video never collides with the lower Work cards or summary. */
+  --work-impact-runway: calc(19.6cqw + clamp(1rem, 1.5vw, 2rem));
   position: relative;
   /* Match the hero's centered, height-aware canvas at every desktop aspect. */
   width: min(125vw, 221.475svh);
   height: min(70.55vw, 125svh);
-  margin: 0 auto;
+  margin: 0 auto var(--work-impact-runway);
   overflow: visible;
   background: #f3f4ec;
   container-type: inline-size;
@@ -376,6 +381,7 @@ h1 {
    transition work. */
 .impact {
   position: relative;
+  z-index: 1;
   width: min(125vw, 221.475svh);
   /* The central film circle now shares the lower Work-circle's left edge.
      Grow the canvas by the same ratio so the content keeps its breathing room. */
@@ -389,7 +395,10 @@ h1 {
   container-type: inline-size;
 }
 .impact-visual {
+  --impact-ring-width: 0px;
+  --impact-ring-color: transparent;
   position: absolute;
+  padding: var(--impact-ring-width);
   overflow: hidden;
   border-radius: 50%;
   background-color: #f3f4ec;
@@ -881,6 +890,7 @@ h1 {
     width: 100%;
     height: auto;
     min-height: 0;
+    margin: 0;
     padding: 76px 28px 64px;
     display: flex;
     flex-direction: column;
