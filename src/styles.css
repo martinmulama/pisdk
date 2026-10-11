@@ -1,0 +1,911 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@400;500;600;700&display=swap');
+
+:root {
+  /*
+   * Scale the whole composition to counter browsers that render pages at
+   * 125%. Because this is a layout scale (rather than a transform), the
+   * absolute artwork, type, and fixed navigation stay in the same proportion.
+  */
+  --page-scale: 0.8;
+  --deep-navy-green: #0d4027;
+  --ring-warm: #efa06b;
+  --ring-green: #9caf87;
+  --recovery-orange: var(--ring-warm);
+  color: #245e5c;
+  background: #f3f4ec;
+  font-family: 'Lora', Georgia, serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: #f3f4ec; }
+a { color: inherit; text-decoration: none; }
+
+.page-shell {
+  min-height: 125vh;
+  padding-bottom: 50px;
+  overflow: hidden;
+  background: #f3f4ec;
+  zoom: var(--page-scale);
+}
+
+.hero {
+  position: relative;
+  /* Compensate the shell scale so this canvas still fills the viewport. */
+  width: min(125vw, 221.475svh);
+  height: min(70.55vw, 125svh);
+  margin: 0 auto;
+  container-type: inline-size;
+}
+
+.reference-crop {
+  background-image: var(--reference-image);
+  background-repeat: no-repeat;
+  background-size: 100cqw 56.44cqw;
+}
+
+.brand {
+  position: absolute;
+  top: 1.074cqw;
+  left: calc(50% - 11.515cqw);
+  width: 26.25cqw;
+  height: 4cqw;
+  background-image: var(--reference-image);
+  background-repeat: no-repeat;
+  background-size: 74.7cqw 42.13cqw;
+  background-position: -25.83cqw -1.074cqw;
+}
+
+.desktop-nav {
+  position: fixed;
+  top: 4cqw;
+  right: clamp(34px, 4vw, 72px);
+  display: grid;
+  gap: clamp(11px, 1.65vw, 28px);
+  width: 162px;
+  text-align: right;
+  z-index: 2;
+}
+
+.desktop-nav a {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(8px, .85vw, 16px);
+  font-weight: 500;
+  letter-spacing: .21em;
+  text-transform: uppercase;
+  transition: color .2s ease;
+}
+.desktop-nav a:hover, .desktop-nav .active { color: #e04c30; }
+
+.feature-image {
+  position: absolute;
+  top: 7.49cqw;
+  /* Extend past the centered hero canvas until the image meets the viewport. */
+  left: calc((100cqw - 125vw) / 2);
+  display: block;
+  width: 25.704cqw;
+  height: 38.946cqw;
+}
+.feature-image > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Mask just inside the pale edge baked into the circular source image. */
+  clip-path: ellipse(76.69% 50.62% at 22.66% 50.85%);
+}
+.feature-image::after {
+  position: absolute;
+  /* The hero photo is a clipped portion of a circle. Recreate that exact
+     circle as a CSS border so it matches—and can transition with—the Impact
+     visual rings. */
+  top: .23%;
+  left: -54.03%;
+  width: 153.38%;
+  height: 101.24%;
+  border: 1.02cqw solid var(--ring-warm);
+  border-radius: 50%;
+  box-sizing: border-box;
+  content: '';
+  pointer-events: none;
+}
+
+.intro { position: absolute; top: 14.1%; left: 19.5%; }
+h1 {
+  margin: 0;
+  color: #205f5b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(16px, 1.78cqw, 38px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+
+.story-images { position: absolute; top: calc(39.18% - 2.85cqw); left: 19.5%; display: flex; gap: 4.8cqw; }
+.story-image {
+  position: relative;
+  width: 14.14cqw;
+  height: 14.14cqw;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #d8dfca;
+  background-image: var(--story-image);
+  background-position: center;
+  background-size: cover;
+  flex: 0 0 auto;
+}
+.story-image.damaged { background-position: 57% 52%; }
+.story-image.materials { background-position: 50% 50%; }
+.story-image.rebuilt { background-position: 54% 50%; }
+.story-image.children { background-position: 53% 47%; }
+.story-image::after {
+  position: absolute;
+  inset: 0;
+  border: .78cqw solid var(--ring-green);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+.damaged::after { border-color: var(--ring-warm); }
+
+.mission {
+  position: absolute;
+  top: 68.2%;
+  left: 45.54%;
+  display: grid;
+  grid-template-columns: 1px 1fr;
+  column-gap: 2cqw;
+  width: 40.2%;
+}
+.mission-rule { width: 1px; height: 11cqw; background: #9ba885; }
+.mission p { margin: .22cqw 0 1.3cqw; color: #3d7474; font-size: clamp(9px, 1.05cqw, 18px); line-height: 1.62; }
+.mission p + p { margin-top: 0; }
+
+.tagline {
+  position: absolute;
+  top: 90.6%;
+  bottom: auto;
+  left: 3.5%;
+  display: flex;
+  align-items: center;
+  gap: .82cqw;
+  color: #3e7778;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(6px, .63cqw, 11px);
+  font-weight: 500;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tagline b { color: #7e9485; font-size: .75cqw; font-weight: 400; }
+
+.leaf {
+  position: absolute;
+  left: 94.8%;
+  top: 87.9%;
+  right: auto;
+  bottom: auto;
+  width: 4.55cqw;
+  height: 4.15cqw;
+  background-position: -94.8cqw -49.6cqw;
+}
+
+/* What we do — desktop geometry follows the supplied 1951 × 806 reference. */
+.what-we-do {
+  position: relative;
+  /* Match the hero's centered, height-aware canvas at every desktop aspect. */
+  width: min(125vw, 221.475svh);
+  height: min(70.55vw, 125svh);
+  margin: 0 auto;
+  overflow: visible;
+  background: #f3f4ec;
+  container-type: inline-size;
+}
+.work-intro {
+  position: absolute;
+  z-index: 3;
+  top: 25.7%;
+  left: 3.5%;
+  width: 29.5%;
+}
+.work-intro h2 {
+  margin: 0;
+  color: #0c4030;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(16px, 1.78cqw, 38px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.work-intro__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45cqw;
+  width: 11.3cqw;
+  height: 2.54cqw;
+  margin-top: 1.35cqw;
+  border-radius: 999px;
+  background: linear-gradient(110deg, #779f62, #588d4d);
+  color: #f7f7ef;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(12px, .94cqw, 20px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  transition: transform .24s ease, background .24s ease;
+}
+.work-intro__button span { font-size: 1.25em; line-height: 1; }
+.work-intro__button:hover { transform: translateX(4px); background: #4c833f; }
+.work-rail {
+  position: absolute;
+  z-index: 0;
+  top: 3.2%;
+  bottom: 0;
+  /* Center the rail around the lower card stack. Its radius is half its
+     width, producing the same unbroken circular end as the cards themselves. */
+  left: 18.69%;
+  width: 19.44%;
+  border-radius: 9.72cqw 0 9.72cqw 9.72cqw;
+  background: radial-gradient(circle at 85% 17%, #174b2e 0%, #0d4027 42%, #08341e 100%);
+}
+.work-top-grid {
+  position: absolute;
+  z-index: 2;
+  top: 3.2%;
+  /* The cards themselves begin and end with the hero's four story circles. */
+  left: 18.82%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  width: 72.32%;
+  height: 35.5%;
+  padding: .68cqw;
+  gap: .16cqw;
+  overflow: hidden;
+  border-radius: 7.15cqw;
+  background: radial-gradient(circle at 36% 25%, #174b2e 0%, #0d4027 44%, #08341e 100%);
+}
+.work-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  color: #0b3f2b;
+  text-align: center;
+}
+.work-top-grid .work-card {
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 1.45cqw .78cqw .65cqw;
+  border-radius: 50%;
+}
+.work-card--recovery { background: var(--ring-warm); }
+.work-card--community { background: radial-gradient(circle at 43% 31%, #d5e8bd, #bdd9a3 72%, #a8ca91); }
+.work-card--training { background: radial-gradient(circle at 40% 30%, #fffdf3, #edf1df 78%, #dce6ca); }
+.work-card--consultation { background: radial-gradient(circle at 42% 30%, #d6e9bc, #bbd89e 70%, #a7c98b); }
+.work-card__icon {
+  display: block;
+  width: auto;
+  height: 2.38cqw;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+.work-card h3 {
+  margin: .48cqw 0 .38cqw;
+  color: #0b3f2b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(13px, 1.08cqw, 24px);
+  font-weight: 500;
+  letter-spacing: -.055em;
+  line-height: 1.12;
+}
+.work-card p {
+  width: 86%;
+  margin: 0;
+  color: #164d36;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(8px, .72cqw, 15px);
+  font-weight: 500;
+  letter-spacing: -.045em;
+  line-height: 1.34;
+}
+.work-lower-cards {
+  position: absolute;
+  z-index: 2;
+  /* Meet the orange service with a small, deliberate breathing gap. */
+  top: 37.1%;
+  left: 19.6%;
+  /* Equal to one top-row circle after the grid's padding and gaps. */
+  width: 17.62%;
+}
+.work-lower-cards .work-card {
+  width: 100%;
+  border-radius: 50%;
+}
+.work-card--research {
+  height: 17.62cqw;
+  padding: 1.05cqw .65cqw .5cqw;
+  background: radial-gradient(circle at 41% 26%, #f8f9ed, #e9efd9 73%, #d6e2c2);
+}
+.work-card--forums {
+  height: 17.62cqw;
+  margin-top: 0;
+  padding: 1.65cqw .65cqw .5cqw;
+  background: radial-gradient(circle at 43% 28%, #d3e9b4, #badb9b 70%, #a3c889);
+}
+.work-lower-cards .work-card__icon { height: 2.18cqw; }
+.work-lower-cards .work-card h3 {
+  margin-top: .34cqw;
+  margin-bottom: .32cqw;
+  font-size: clamp(12px, .96cqw, 21px);
+}
+.work-lower-cards .work-card p {
+  width: 79%;
+  font-size: clamp(7px, .63cqw, 13px);
+  line-height: 1.36;
+}
+.work-summary {
+  position: absolute;
+  z-index: 3;
+  top: 58.5%;
+  left: 54.3%;
+  width: 37%;
+  margin: 0;
+  color: #3d7474;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(9px, 1.05cqw, 18px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.62;
+}
+.work-section-leaf {
+  position: absolute;
+  z-index: 3;
+  top: 87.9%;
+  left: 94.8%;
+  width: 4.55cqw;
+  height: 4.15cqw;
+  background-position: -94.8cqw -49.6cqw;
+}
+
+/* Our impact — photo windows are sampled directly from the supplied artwork,
+   preserving its before / rebuild / after photographic sequence at this
+   section's fixed 16:9 canvas. */
+.impact {
+  position: relative;
+  width: min(125vw, 221.475svh);
+  height: min(70.55vw, 125svh);
+  margin: 0 auto;
+  /* The shared footer deliberately sits in the outer page gutter on wide
+     canvases, so the section itself must not crop it. Individual artwork is
+     clipped below where the reference calls for it. */
+  overflow: visible;
+  background: #f3f4ec;
+  container-type: inline-size;
+}
+.impact-visual {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #f3f4ec;
+  background-image: var(--impact-reference);
+  background-repeat: no-repeat;
+  background-size: 100cqw 56.407cqw;
+  /* The reference supplies the photographs only. Its baked edge sits beneath
+     the CSS ring and is clipped away, leaving this border free to animate. */
+  background-origin: border-box;
+  background-clip: padding-box;
+}
+.impact-visual--before {
+  top: 11.15%;
+  left: 10.2%;
+  width: 15.72cqw;
+  height: 15.72cqw;
+  border: .78cqw solid var(--ring-green);
+  background-position: -17cqw -6.28cqw;
+}
+.impact-visual--feature {
+  /* Match the hero's measured visible circle (rather than its taller image
+     wrapper), centered on the shared content width. */
+  top: -11.59cqw;
+  left: 27.61%;
+  width: 39.42cqw;
+  height: 39.42cqw;
+  border: 1.02cqw solid var(--ring-warm);
+  /* Scale the reference crop to the larger circle without introducing a
+     different photo treatment. */
+  background-size: 124.04cqw 69.97cqw;
+  background-position: -41.59cqw 11.59cqw;
+  /* Preserve the reference's clean top crop while allowing the footer to
+     extend beyond this height-bound canvas. */
+  clip-path: inset(11.59cqw 0 0);
+}
+.impact-visual--after {
+  top: 11.15%;
+  left: 68.72%;
+  width: 15.72cqw;
+  height: 15.72cqw;
+  border: .78cqw solid var(--ring-green);
+  background-position: -65.39cqw -6.28cqw;
+}
+.impact-label {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 7.9cqw;
+  height: 1.59cqw;
+  margin: 0;
+  border-radius: 999px;
+  background: linear-gradient(105deg, #789b65, #87a972);
+  color: #f7f7ef;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(7px, .7cqw, 14px);
+  font-weight: 700;
+  letter-spacing: .27em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.impact-label--before { top: 38.96%; left: 14.11%; }
+.impact-label--after { top: 38.96%; left: 72.63%; }
+.impact-overview {
+  position: absolute;
+  /* The enlarged film circle extends 9.65% further into the section. Carry
+     the entire content row by the same amount to retain its original air. */
+  top: 58.7%;
+  /* Shared left content edge: hero footer, work heading, and impact copy. */
+  left: 3.5%;
+  width: 35.5%;
+}
+.impact-overview h2 {
+  margin: 0;
+  color: #205f5b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(22px, 2.35cqw, 50px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.impact-overview p {
+  /* The impact statistic is deliberately larger, but otherwise follows the
+     same Lora treatment as the hero mission copy. */
+  margin: 3.4cqw 0 0;
+  color: #3d7474;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(15px, 1.45cqw, 30px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.35;
+}
+.impact-overview strong { color: #ca6538; font-weight: 700; }
+.impact-story {
+  position: absolute;
+  top: 59.8%;
+  left: 42.5%;
+  width: 31%;
+  min-height: 33.5%;
+  padding-left: 2.95cqw;
+  border-left: 1px solid #8eac97;
+}
+.impact-story h3 {
+  margin: 0;
+  color: #205f5b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(16px, 1.78cqw, 38px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.impact-story p {
+  margin: 1.48cqw 0 0;
+  color: #3d7474;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(9px, 1.05cqw, 18px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.62;
+}
+.impact-story p + p { margin-top: 1.34cqw; }
+.impact-cta {
+  position: absolute;
+  top: 69.55%;
+  /* Right edge aligns with the final hero / work service circle. */
+  left: 76.34%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4cqw;
+  width: 14.8cqw;
+  height: 2.72cqw;
+  border-radius: 999px;
+  background: linear-gradient(105deg, #bd5432, #d8753c);
+  color: #fff8ed;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(11px, 1cqw, 21px);
+  font-weight: 500;
+  letter-spacing: -.03em;
+  transition: transform .24s ease, background .24s ease;
+}
+.impact-cta:hover { transform: translateX(4px); background: #b94d2d; }
+.impact-tagline {
+  /* Keep the closing note clearly after the deeper impact-content row. */
+  top: 95.5%;
+}
+.impact-section-leaf {
+  /* Inherit the hero leaf's scale and horizontal alignment. */
+  top: 92%;
+}
+
+/* On a wide, short viewport the hero canvas is intentionally narrower than
+   the browser. Reclaim the outer gutter for the heading, then grow the service
+   system so it still has the same visual authority as the hero artwork. */
+@media (min-aspect-ratio: 2 / 1) and (min-width: 861px) {
+  .work-intro {
+    left: calc((100cqw - 125vw) / 2 + 3.5cqw);
+    width: 31%;
+  }
+  .tagline {
+    left: calc((100cqw - 125vw) / 2 + 3.5cqw);
+  }
+  .work-intro__button {
+    width: 15.4cqw;
+    height: 3.5cqw;
+    margin-top: 1.7cqw;
+    font-size: clamp(12px, 1.22cqw, 20px);
+  }
+  .work-rail {
+    left: 18.69%;
+    width: 19.44%;
+    border-radius: 9.72cqw 0 9.72cqw 9.72cqw;
+  }
+  .work-top-grid {
+    left: 18.82%;
+    width: 72.32%;
+    border-radius: 9.5cqw;
+  }
+  .work-lower-cards {
+    left: 19.6%;
+    width: 17.62%;
+  }
+  .work-card--research,
+  .work-card--forums { height: 17.62cqw; }
+  .work-top-grid .work-card__icon { height: 3cqw; }
+  .work-top-grid .work-card h3 { font-size: clamp(13px, 1.38cqw, 25px); }
+  .work-top-grid .work-card p { font-size: clamp(8px, .88cqw, 15px); }
+  .work-lower-cards .work-card__icon { height: 2.75cqw; }
+  .work-lower-cards .work-card h3 { font-size: clamp(12px, 1.28cqw, 21px); }
+  .work-lower-cards .work-card p { font-size: clamp(7px, .85cqw, 13px); }
+}
+
+/* The photo is already settled; the remaining hero composition enters as a
+   measured sequence of masks and movement, without an opacity fade. */
+.brand,
+.intro,
+.desktop-nav a,
+.story-image,
+.mission,
+.tagline,
+.leaf {
+  transition-property: clip-path, transform;
+  transition-timing-function: cubic-bezier(.16, 1, .3, 1);
+}
+.brand {
+  transition-duration: .62s;
+}
+.intro {
+  transition-duration: .72s;
+}
+.desktop-nav a {
+  display: block;
+  transition-duration: .48s;
+}
+.story-image {
+  transition-duration: .68s;
+}
+.mission,
+.tagline,
+.leaf {
+  transition-duration: .62s;
+}
+.page-shell:not(.hero-is-ready) .brand {
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(-1cqw);
+}
+.page-shell:not(.hero-is-ready) .intro {
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(1.35cqw);
+}
+.page-shell:not(.hero-is-ready) .desktop-nav a {
+  clip-path: inset(0 0 0 100%);
+  transform: translateX(1.4rem);
+}
+.page-shell:not(.hero-is-ready) .story-image {
+  clip-path: circle(0 at 50% 50%);
+  transform: scale(.74);
+}
+.page-shell:not(.hero-is-ready) .mission {
+  clip-path: inset(0 100% 0 0);
+  transform: translateX(1.8cqw);
+}
+.page-shell:not(.hero-is-ready) .tagline {
+  clip-path: inset(0 100% 0 0);
+  transform: translateX(-1.2cqw);
+}
+.page-shell:not(.hero-is-ready) .leaf {
+  clip-path: circle(0 at 50% 50%);
+  transform: scale(.6);
+}
+.hero-is-ready .brand { transition-delay: 20ms; }
+.hero-is-ready .intro { transition-delay: 100ms; }
+.hero-is-ready .desktop-nav a:nth-child(1) { transition-delay: 180ms; }
+.hero-is-ready .desktop-nav a:nth-child(2) { transition-delay: 230ms; }
+.hero-is-ready .desktop-nav a:nth-child(3) { transition-delay: 280ms; }
+.hero-is-ready .desktop-nav a:nth-child(4) { transition-delay: 330ms; }
+.hero-is-ready .desktop-nav a:nth-child(5) { transition-delay: 380ms; }
+.hero-is-ready .desktop-nav a:nth-child(6) { transition-delay: 430ms; }
+.hero-is-ready .story-image:nth-child(1) { transition-delay: 280ms; }
+.hero-is-ready .story-image:nth-child(2) { transition-delay: 350ms; }
+.hero-is-ready .story-image:nth-child(3) { transition-delay: 420ms; }
+.hero-is-ready .story-image:nth-child(4) { transition-delay: 490ms; }
+.hero-is-ready .mission { transition-delay: 540ms; }
+.hero-is-ready .tagline { transition-delay: 640ms; }
+.hero-is-ready .leaf { transition-delay: 700ms; }
+
+/* Entry preloader — its imagery is static, while the circular loading edge is CSS. */
+.preloader {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  background: #f3f4ec;
+  color: #0b3f2b;
+}
+.preloader--leaving {
+  pointer-events: none;
+}
+.preloader-dark-field {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: -43.6vw;
+  width: 90vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 78% 50%, #174d31 0%, #0e4028 51%, #09391f 100%);
+  transform: translateY(-50%);
+  will-change: transform;
+}
+.preloader-stat {
+  z-index: 2;
+  margin: 0;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: -.035em;
+  line-height: 1.1;
+  transition: clip-path .64s cubic-bezier(.16, 1, .3, 1), transform .64s cubic-bezier(.16, 1, .3, 1);
+  will-change: clip-path, transform;
+}
+.preloader-stat--reveal-left {
+  clip-path: inset(0 100% 0 0);
+  transform: translateX(-1.4rem);
+}
+.preloader-stat--reveal-right {
+  clip-path: inset(0 0 0 100%);
+  transform: translateX(1.4rem);
+}
+.preloader-stat.is-revealed {
+  clip-path: inset(0);
+  transform: translateX(0);
+}
+.preloader-left-copy {
+  position: absolute;
+  z-index: 2;
+  top: 28%;
+  right: 73.2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #f7f7f0;
+  will-change: transform;
+}
+.preloader-stat--waste {
+  position: static;
+  font-size: clamp(25px, 2.1vw, 36px);
+}
+.preloader-stat--recycled {
+  position: static;
+  margin-top: 2.8vw;
+  font-size: clamp(15px, 1.2vw, 21px);
+  font-family: 'Lora', Georgia, serif;
+  text-align: center;
+}
+.preloader-media {
+  position: absolute;
+  z-index: 3;
+  top: 48%;
+  left: 49.75%;
+  width: min(35.9vw, 63.8svh);
+  height: min(35.9vw, 63.8svh);
+  padding: clamp(3px, .27vw, 5px);
+  overflow: hidden;
+  border-radius: 50%;
+  background: conic-gradient(from -90deg, #548a48 0deg, #87ad70 var(--loader-angle), #dce5d8 var(--loader-angle) 360deg);
+  box-shadow: 0 0 0 1px rgba(245, 247, 238, .7);
+  --preloader-x: 0px;
+  --preloader-y: 0px;
+  transform: translate(calc(-50% + var(--preloader-x)), calc(-50% + var(--preloader-y)));
+  will-change: transform, width, height, border-radius;
+}
+.preloader-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+.preloader-media--hero {
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+  /* The circular source has transparent pixels beyond the photo. Once it
+     becomes the hero artwork, retire the green loading track underneath. */
+  background: transparent;
+  box-shadow: none;
+}
+.preloader-media--hero img {
+  border-radius: 0;
+  /* Mirror the settled hero silhouette while the image is moving. */
+  clip-path: ellipse(76.69% 50.62% at 22.66% 50.85%);
+}
+.preloader-hero-outline {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+}
+.preloader-hero-outline circle {
+  stroke: var(--ring-warm);
+  stroke-width: 17;
+}
+.preloader-media--hero .preloader-hero-outline { display: block; }
+.preloader-right-copy {
+  position: absolute;
+  z-index: 2;
+  top: 28%;
+  left: 72.7%;
+  width: max-content;
+  max-width: 25%;
+  will-change: transform;
+}
+.preloader-stat--housing,
+.preloader-stat--deficit { position: static; }
+.preloader-stat--housing strong,
+.preloader-stat--housing span { display: block; }
+.preloader-stat--housing strong {
+  color: #0b3f2b;
+  font-size: clamp(28px, 2.3vw, 39px);
+  font-weight: 400;
+  letter-spacing: -.06em;
+  line-height: .92;
+}
+.preloader-stat--housing span {
+  margin-top: 1.1vw;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(20px, 1.75vw, 30px);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.preloader-stat--deficit {
+  margin-top: 2.7vw;
+  padding-left: 0;
+  color: #20543d;
+  font-size: clamp(17px, 1.35vw, 23px);
+  font-family: 'Lora', Georgia, serif;
+  line-height: 1.08;
+  text-align: center;
+  align-self: center;
+}
+
+/* Exit choreography is driven by one GSAP timeline: no fades and no competing CSS transitions. */
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-stat,
+  .brand,
+  .intro,
+  .desktop-nav a,
+  .story-image,
+  .mission,
+  .tagline,
+  .leaf {
+    transition-duration: .01ms;
+    transition-delay: 0ms;
+  }
+}
+
+@media (max-width: 860px) {
+  .hero { width: 100%; height: auto; min-height: 125vh; padding: 24px 24px 48px; display: flex; flex-direction: column; align-items: center; }
+  .brand { position: relative; top: auto; left: auto; transform: scale(.72); transform-origin: center; margin: -10px 0 8px; }
+  .desktop-nav { display: none; }
+  .feature-image { position: relative; top: auto; left: auto; order: 3; width: min(76vw, 327px); height: min(113vw, 487px); margin: 20px 0 35px; background-size: 1252px 706.5px; background-position: left top; }
+  .intro { position: relative; top: auto; left: auto; order: 2; width: 100%; text-align: center; }
+  h1 { font-size: clamp(27px, 7.6vw, 39px); line-height: 1.13; }
+  .intro br { display: none; }
+  .story-images { position: relative; top: auto; left: auto; order: 4; width: 100%; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .story-image { width: 126px; height: 126px; background-size: cover; }
+  .mission { position: relative; top: auto; left: auto; order: 5; width: min(100%, 540px); margin-top: 38px; grid-template-columns: 1px 1fr; column-gap: 18px; }
+  .mission p { font-size: 12px; line-height: 1.62; }
+  .tagline { position: relative; left: auto; bottom: auto; order: 6; margin-top: 18px; font-size: 7px; white-space: normal; flex-wrap: wrap; justify-content: center; }
+  .leaf { display: none; }
+
+  .preloader-dark-field { top: -18vw; left: 50%; width: 132vw; transform: translateX(-50%); }
+  .preloader-media { top: 31%; left: 50%; width: min(70vw, 390px); }
+  .preloader-left-copy { top: 7%; right: auto; left: 8%; width: 84%; }
+  .preloader-stat--waste { font-size: clamp(25px, 7.5vw, 36px); text-align: center; }
+  .preloader-stat--recycled { margin-top: 22px; font-size: clamp(14px, 3.7vw, 18px); }
+  .preloader-right-copy { top: 59%; left: 50%; width: 45%; }
+  .preloader-stat--housing strong { font-size: clamp(28px, 8vw, 38px); }
+  .preloader-stat--housing span { margin-top: 7px; font-size: clamp(18px, 4.3vw, 22px); }
+  .preloader-stat--housing span { white-space: normal; }
+  .preloader-stat--deficit { margin-top: 20px; padding-left: 0; font-size: clamp(17px, 4.6vw, 21px); }
+
+  .what-we-do {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 76px 28px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow: visible;
+  }
+  .work-intro,
+  .work-rail,
+  .work-top-grid,
+  .work-lower-cards,
+  .work-summary { position: relative; top: auto; right: auto; bottom: auto; left: auto; }
+  .work-intro { width: 100%; text-align: center; }
+  .work-intro h2 { font-size: clamp(31px, 8vw, 47px); line-height: 1.12; }
+  .work-intro__button { width: 190px; height: 48px; margin-top: 22px; font-size: 15px; }
+  .work-rail { display: none; }
+  .work-top-grid {
+    order: 2;
+    width: 100%;
+    height: auto;
+    padding: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    border-radius: 48px;
+  }
+  .work-top-grid .work-card { padding: 22px 10px 12px; }
+  .work-card__icon,
+  .work-lower-cards .work-card__icon { height: 37px; }
+  .work-card h3,
+  .work-lower-cards .work-card h3 { margin: 10px 0 8px; font-size: clamp(15px, 4vw, 21px); }
+  .work-card p,
+  .work-lower-cards .work-card p { width: 82%; font-size: clamp(9px, 2.4vw, 12px); line-height: 1.36; }
+  .work-lower-cards {
+    order: 3;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .work-lower-cards .work-card { height: auto; min-height: 240px; margin: 0; padding: 28px 8px 16px; }
+  .work-summary { order: 4; width: 100%; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.62; text-align: center; }
+  .work-summary br { display: none; }
+  .work-section-leaf { display: none; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding-left: 18px; padding-right: 18px; }
+  .brand { transform: scale(.59); margin: -16px 0 -2px; }
+  .feature-image { width: min(82vw, 327px); height: min(122vw, 487px); }
+  .story-image { width: calc(50vw - 28px); height: calc(50vw - 28px); max-width: 150px; max-height: 150px; }
+}
