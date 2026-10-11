@@ -417,8 +417,9 @@ function App() {
 
       const layer = document.createElement('div')
       layer.className = 'hero-work-handoff'
-      // The travelling copies must never be visible while the hero is at
-      // rest; otherwise they sit on top of the live rings after a refresh.
+      // The duplicate layer is prepared while hidden, then becomes the only
+      // owner of the rings while it is exactly aligned with their resting
+      // state. There is therefore no source-to-copy swap on the first scroll.
       layer.style.visibility = 'hidden'
       const travellingRings = heroRings.map((ring, index) => {
         const travellingRing = document.createElement('div')
@@ -433,10 +434,12 @@ function App() {
 
       let handoff
       let geometryRefreshTimer
-      const setHandoffVisibility = (isTravelling) => {
-        layer.style.visibility = isTravelling ? 'visible' : 'hidden'
+      let takeOverFrame
+      let handoffOwnsRings = false
+      const setRingOwner = (useHandoffLayer) => {
+        layer.style.visibility = useHandoffLayer ? 'visible' : 'hidden'
         heroRings.forEach((ring) => {
-          ring.style.visibility = isTravelling ? 'hidden' : ''
+          ring.style.visibility = useHandoffLayer ? 'hidden' : ''
         })
       }
       const rectAtScroll = (element, scrollPosition) => {
@@ -464,6 +467,24 @@ function App() {
           top: end.top + ((end.height - start.height) / 2),
         }
       }
+      const parkRingsAtRest = () => {
+        gsap.set(travellingRings, {
+          x: (index) => startRect(index).left,
+          y: (index) => startRect(index).top,
+          width: (index) => startRect(index).width,
+          height: (index) => startRect(index).height,
+          clipPath: 'circle(50% at 50% 50%)',
+        })
+      }
+      const takeOverRestingRings = () => {
+        if (handoffOwnsRings || handoff.scrollTrigger.progress > .001) return
+
+        // Both sets occupy the exact same pixels before this synchronous swap.
+        // No opacity transition is used—the visitor continues seeing one ring.
+        parkRingsAtRest()
+        setRingOwner(true)
+        handoffOwnsRings = true
+      }
 
       gsap.set(workGrid, { clipPath: 'inset(0% 100% 0% 0%)' })
       gsap.set(workCards, {
@@ -484,13 +505,11 @@ function App() {
           end: 'top 8%',
           scrub: .7,
           invalidateOnRefresh: true,
-          // Swap each layer only when crossing a scroll boundary. Updating
-          // visibility on every sub-pixel scroll caused a rough first frame
-          // after a cold load.
-          onEnter: () => setHandoffVisibility(true),
-          onEnterBack: () => setHandoffVisibility(true),
-          onLeaveBack: () => setHandoffVisibility(false),
-          onRefresh: (trigger) => setHandoffVisibility(trigger.progress > 0),
+          onRefresh: (trigger) => {
+            // A resize at the resting state must also retain the same owner
+            // and exact parked geometry; the scroll path itself is unchanged.
+            if (handoffOwnsRings && trigger.progress <= .001) parkRingsAtRest()
+          },
         },
       })
 
@@ -517,13 +536,17 @@ function App() {
         .to(workSummary, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .22 }, .86)
         .to(workLeaf, { clipPath: 'circle(75% at 50% 50%)', scale: 1, duration: .16 }, .92)
 
-      // The hero rings finish their CSS entrance shortly after the preloader
-      // clears. Refresh then so a visitor who scrolls after loading receives
-      // their settled geometry, not an in-flight entry measurement.
-      geometryRefreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 1200)
+      // The hero rings finish their CSS entrance 1.17s after the preloader
+      // clears. Refresh and transfer ownership after that settled frame, well
+      // before any visitor begins the Work handoff.
+      geometryRefreshTimer = window.setTimeout(() => {
+        ScrollTrigger.refresh()
+        takeOverFrame = requestAnimationFrame(takeOverRestingRings)
+      }, 1300)
 
       return () => {
         window.clearTimeout(geometryRefreshTimer)
+        cancelAnimationFrame(takeOverFrame)
         handoff.kill()
         layer.remove()
         gsap.set([
