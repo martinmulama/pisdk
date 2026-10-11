@@ -15,7 +15,9 @@ import workTrainingIcon from './assets/work-icon-training.png'
 import workConsultationIcon from './assets/work-icon-consultation.png'
 import workResearchIcon from './assets/work-icon-research.png'
 import workForumsIcon from './assets/work-icon-forums.png'
-import impactReference from './assets/pisdk-impact-reference.png'
+import impactBeforeRuins from './assets/impact-before-ruins.png'
+import impactRebuildWorker from './assets/impact-rebuild-worker.png'
+import impactFoundationOfHope from './assets/impact-foundation-of-hope.png'
 
 const menu = ['Home', 'About us', 'Our work', 'Current pilots', 'Get involved', 'Contact']
 
@@ -110,23 +112,21 @@ function WhatWeDo() {
   )
 }
 
-function ImpactVisual({ className, label }) {
+function ImpactVisual({ className, label, image, showPlay = false }) {
   return (
-    <div
-      className={`impact-visual ${className}`}
-      role="img"
-      aria-label={label}
-      style={{ '--impact-reference': `url(${impactReference})` }}
-    />
+    <div className={`impact-visual ${className}`}>
+      <img src={image} alt={label} />
+      {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
+    </div>
   )
 }
 
 function Impact() {
   return (
     <section className="impact" id="current-pilots" aria-labelledby="impact-heading">
-      <ImpactVisual className="impact-visual--before" label="A damaged Foundation of Hope building before the rebuild" />
-      <ImpactVisual className="impact-visual--feature" label="A PISDK craftsperson rebuilding the Foundation of Hope Youth Centre" />
-      <ImpactVisual className="impact-visual--after" label="The rebuilt Foundation of Hope Youth Centre" />
+      <ImpactVisual className="impact-visual--before" image={impactBeforeRuins} label="A collapsed adobe home before the rebuild" />
+      <ImpactVisual className="impact-visual--feature" image={impactRebuildWorker} label="A craftsperson rebuilding with earth blocks" showPlay />
+      <ImpactVisual className="impact-visual--after" image={impactFoundationOfHope} label="The rebuilt Foundation of Hope Youth Centre" />
 
       <p className="impact-label impact-label--before">Before</p>
       <p className="impact-label impact-label--after">After</p>
