@@ -19,6 +19,8 @@ import workForumsIcon from './assets/work-icon-forums.png'
 import impactBeforeRuins from './assets/impact-before-ruins.png'
 import impactRebuildWorker from './assets/impact-rebuild-worker.png'
 import impactFoundationOfHope from './assets/impact-foundation-of-hope.png'
+import getInvolvedPartnerIcon from './assets/get-involved-icon-partner.png'
+import getInvolvedVisitIcon from './assets/get-involved-icon-visit.png'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -63,9 +65,32 @@ const workServices = [
   },
 ]
 
-function ReferenceCrop({ className, label = '' }) {
-  return <div className={`reference-crop ${className}`} role="img" aria-label={label} />
-}
+const involvementWays = [
+  {
+    id: 'donate',
+    title: 'Donate Materials',
+    copy: <>Doors, windows, timber,<br />steel, and masonry—<br />channelled into community<br />housing.</>,
+    icon: workRecoveryIcon,
+  },
+  {
+    id: 'partner',
+    title: 'Partner With Us',
+    copy: <>CSR partnerships,<br />element sponsorship,<br />fiscal sponsorship.</>,
+    icon: getInvolvedPartnerIcon,
+  },
+  {
+    id: 'volunteer',
+    title: 'Volunteer',
+    copy: <>Join us in Kibera—<br />volunteers, researchers,<br />and interns welcome.</>,
+    icon: workCommunityIcon,
+  },
+  {
+    id: 'visit',
+    title: 'Visit Our Projects',
+    copy: <>See our work firsthand,<br />site visits available.</>,
+    icon: getInvolvedVisitIcon,
+  },
+]
 
 function StoryImage({ className, label, image }) {
   return <div className={`story-image ${className}`} role="img" aria-label={label} style={{ '--story-image': `url(${image})` }} />
@@ -73,6 +98,53 @@ function StoryImage({ className, label, image }) {
 
 function Brand() {
   return <a className="brand" href="#top" aria-label="PISDK — Paragon Institute of Sustainable Development Kenya" />
+}
+
+function DesktopNav() {
+  const navRef = useRef(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  const [hoveredIndex, setHoveredIndex] = useState(null)
+  const [indicatorY, setIndicatorY] = useState(0)
+  const indicatorIndex = hoveredIndex ?? activeIndex
+
+  const syncIndicator = useCallback(() => {
+    const nav = navRef.current
+    const target = nav?.querySelector(`[data-nav-index="${indicatorIndex}"]`)
+    if (target) setIndicatorY(target.offsetTop + target.offsetHeight / 2)
+  }, [indicatorIndex])
+
+  useLayoutEffect(() => {
+    syncIndicator()
+    window.addEventListener('resize', syncIndicator)
+    return () => window.removeEventListener('resize', syncIndicator)
+  }, [syncIndicator])
+
+  return (
+    <nav
+      ref={navRef}
+      className="desktop-nav"
+      aria-label="Primary navigation"
+      onMouseLeave={() => setHoveredIndex(null)}
+      style={{ '--nav-indicator-y': `${indicatorY}px` }}
+    >
+      {menu.map((item, index) => (
+        <a
+          className={index === activeIndex ? 'active' : ''}
+          data-nav-index={index}
+          href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
+          key={item}
+          aria-current={index === activeIndex ? 'page' : undefined}
+          onMouseEnter={() => setHoveredIndex(index)}
+          onFocus={() => setHoveredIndex(index)}
+          onBlur={() => setHoveredIndex(null)}
+          onClick={() => setActiveIndex(index)}
+        >
+          {item}
+        </a>
+      ))}
+      <span className="desktop-nav__indicator" aria-hidden="true" />
+    </nav>
+  )
 }
 
 function HeroFeature() {
@@ -110,7 +182,6 @@ function WhatWeDo() {
       </div>
 
       <p className="work-summary">We work across the entire circular ecosystem—<br />connecting people, resources and knowledge<br />to create lasting change in Kenya’s communities.</p>
-      <ReferenceCrop className="work-section-leaf" label="" />
     </section>
   )
 }
@@ -151,7 +222,34 @@ function Impact() {
       <div className="tagline impact-tagline" aria-label="People, materials, environment, circular construction">
         <span>People</span><b>/</b><span>Materials</span><b>/</b><span>Environment</span><b>/</b><span>Circular construction</span>
       </div>
-      <ReferenceCrop className="leaf impact-section-leaf" label="" />
+    </section>
+  )
+}
+
+function InvolvementCard({ way }) {
+  return (
+    <article className={`involvement-card involvement-card--${way.id}`}>
+      <img className="involvement-card__icon" src={way.icon} alt="" aria-hidden="true" />
+      <h3>{way.title}</h3>
+      <p>{way.copy}</p>
+    </article>
+  )
+}
+
+function GetInvolved() {
+  return (
+    <section className="get-involved" id="get-involved" aria-labelledby="get-involved-heading">
+      <div className="get-involved__backdrop" aria-hidden="true" />
+      <div className="get-involved__intro">
+        <h2 id="get-involved-heading">Get Involved</h2>
+        <p>See how you can help and what it means.</p>
+      </div>
+
+      <div className="involvement-options">
+        {involvementWays.map((way) => <InvolvementCard key={way.id} way={way} />)}
+      </div>
+
+      <a className="get-involved__cta" href="#contact">Start a conversation <span aria-hidden="true">→</span></a>
     </section>
   )
 }
@@ -276,6 +374,7 @@ function App() {
   const [isLeaving, setIsLeaving] = useState(false)
   const [isPreloaderDone, setIsPreloaderDone] = useState(false)
   const [isHeroReady, setIsHeroReady] = useState(false)
+  const [isRingsReady, setIsRingsReady] = useState(false)
   const [heroTarget, setHeroTarget] = useState(null)
   const pageRef = useRef(null)
 
@@ -317,6 +416,10 @@ function App() {
             height,
           })
         }
+        // Let the four hero rings settle beneath the outgoing preloader. When
+        // the homepage first becomes touchable, their diameter is already at
+        // its final resting size and ready for the Work handoff.
+        setIsRingsReady(true)
         setIsLeaving(true)
       }, reducedMotion ? 0 : 150)
     }
@@ -342,7 +445,7 @@ function App() {
       const play = feature?.querySelector('.impact-visual__play')
       const supportingVisuals = scope.querySelectorAll('.impact-visual--before, .impact-visual--after')
       const supportingLabels = scope.querySelectorAll('.impact-label')
-      const content = scope.querySelectorAll('.impact-overview, .impact-story, .impact-cta, .impact-tagline, .impact-section-leaf')
+      const content = scope.querySelectorAll('.impact-overview, .impact-story, .impact-cta, .impact-tagline')
 
       if (!impact || !feature || !featureImage || !featureRing || !play) return undefined
 
@@ -403,6 +506,77 @@ function App() {
 
     media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
+      const section = scope.querySelector('.get-involved')
+      const backdrop = scope.querySelector('.get-involved__backdrop')
+      const intro = scope.querySelector('.get-involved__intro')
+      const cards = scope.querySelectorAll('.involvement-card')
+      const cta = scope.querySelector('.get-involved__cta')
+
+      if (!section || !backdrop || !intro || cards.length !== 4 || !cta) return undefined
+
+      /* The navy field starts full-bleed, then closes evenly around the
+         centred service row from every edge—like the Work rail resolving out
+         of the page rather than a separate panel appearing. */
+      gsap.set(backdrop, { clipPath: 'inset(0% 0% 0% 0%)' })
+      gsap.set(intro, { clipPath: 'inset(0% 0% 100% 0%)', y: 28 })
+      gsap.set(cards, {
+        clipPath: 'circle(0% at 50% 50%)',
+        transformOrigin: '50% 50%',
+      })
+      gsap.set(cta, { clipPath: 'inset(0% 50% 0% 50% round 999px)' })
+
+      /* The backdrop is deliberately viewport-wide while the row scales from
+         the height-aware section canvas. Measure the cards instead of using
+         a fixed percentage so the final pill hugs both outer circles at every
+         desktop aspect ratio. */
+      const capsuleClip = () => {
+        const backdropBox = backdrop.getBoundingClientRect()
+        const cardBoxes = Array.from(cards, (card) => card.getBoundingClientRect())
+        const first = cardBoxes[0]
+        const last = cardBoxes[cardBoxes.length - 1]
+        const cardTop = Math.min(...cardBoxes.map((box) => box.top))
+        const cardBottom = Math.max(...cardBoxes.map((box) => box.bottom))
+        const gutter = first.width * .1
+        const toPercent = (value, size) => Math.max(0, Math.min(100, (value / size) * 100))
+
+        const top = toPercent(cardTop - backdropBox.top - gutter, backdropBox.height)
+        const right = toPercent(backdropBox.right - last.right - gutter, backdropBox.width)
+        const bottom = toPercent(backdropBox.bottom - cardBottom - gutter, backdropBox.height)
+        const left = toPercent(first.left - backdropBox.left - gutter, backdropBox.width)
+
+        return `inset(${top}% ${right}% ${bottom}% ${left}% round 999px)`
+      }
+
+      const handoff = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 88%',
+          end: 'top 14%',
+          scrub: .7,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      handoff
+        .to(backdrop, { clipPath: capsuleClip, duration: .56 }, 0)
+        .to(intro, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .3 }, .16)
+        .to(cards, { clipPath: 'circle(75% at 50% 50%)', duration: .32, stagger: .055 }, .38)
+        .to(cta, { clipPath: 'inset(0% 0% 0% 0% round 999px)', duration: .22 }, .7)
+
+      return () => handoff.kill()
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
       const heroRings = Array.from(scope.querySelectorAll('.story-image'))
       const workSection = scope.querySelector('.what-we-do')
       const workGrid = scope.querySelector('.work-top-grid')
@@ -411,16 +585,19 @@ function App() {
       const workIntro = scope.querySelector('.work-intro')
       const lowerCards = scope.querySelector('.work-lower-cards')
       const workSummary = scope.querySelector('.work-summary')
-      const workLeaf = scope.querySelector('.work-section-leaf')
 
-      if (heroRings.length !== 4 || workCards.length !== 4 || !workSection || !workGrid || !workRail || !workIntro || !lowerCards || !workSummary || !workLeaf) return undefined
+      if (heroRings.length !== 4 || workCards.length !== 4 || !workSection || !workGrid || !workRail || !workIntro || !lowerCards || !workSummary) return undefined
 
       const layer = document.createElement('div')
       layer.className = 'hero-work-handoff'
-      // The duplicate layer is prepared while hidden, then becomes the only
-      // owner of the rings while it is exactly aligned with their resting
-      // state. There is therefore no source-to-copy swap on the first scroll.
+      // A browser may restore the previous scroll position before the
+      // preloader completes. Keep this fixed layer invisible until its
+      // ScrollTrigger has established whether that position is still within
+      // the hero-to-Work handoff.
       layer.style.visibility = 'hidden'
+      // The preloader has already allowed the source rings to settle. Take
+      // ownership synchronously before the first exposed homepage frame, so
+      // immediate scrolling always controls full-size travelling rings.
       const travellingRings = heroRings.map((ring, index) => {
         const travellingRing = document.createElement('div')
         const ringStyle = window.getComputedStyle(ring)
@@ -433,9 +610,6 @@ function App() {
       document.body.appendChild(layer)
 
       let handoff
-      let geometryRefreshTimer
-      let takeOverFrame
-      let handoffOwnsRings = false
       const setRingOwner = (useHandoffLayer) => {
         layer.style.visibility = useHandoffLayer ? 'visible' : 'hidden'
         heroRings.forEach((ring) => {
@@ -476,16 +650,22 @@ function App() {
           clipPath: 'circle(50% at 50% 50%)',
         })
       }
-      const takeOverRestingRings = () => {
-        if (handoffOwnsRings || handoff.scrollTrigger.progress > .001) return
+      const syncRingOwner = (trigger) => {
+        if (!trigger) return
 
-        // Both sets occupy the exact same pixels before this synchronous swap.
-        // No opacity transition is used—the visitor continues seeing one ring.
-        parkRingsAtRest()
+        // After the morph, the real Work cards own the visual. Leaving the
+        // fixed photographic layer visible is what made hero rings appear on
+        // a restored scroll position in later sections.
+        if (trigger.progress >= .999) {
+          setRingOwner(false)
+          return
+        }
+
+        // Before the handoff begins the travelling layer exactly overlays the
+        // hero rings; during the scrub it remains the sole visual owner.
+        if (trigger.progress <= .001) parkRingsAtRest()
         setRingOwner(true)
-        handoffOwnsRings = true
       }
-
       gsap.set(workGrid, { clipPath: 'inset(0% 100% 0% 0%)' })
       gsap.set(workCards, {
         clipPath: 'circle(0% at 50% 50%)',
@@ -495,7 +675,6 @@ function App() {
       gsap.set(workIntro, { clipPath: 'inset(0% 100% 0% 0%)', x: -28 })
       gsap.set(lowerCards, { clipPath: 'inset(0% 0% 100% 0%)', y: 34 })
       gsap.set(workSummary, { clipPath: 'inset(0% 0% 100% 0%)', y: 24 })
-      gsap.set(workLeaf, { clipPath: 'circle(0% at 50% 50%)', scale: .72, transformOrigin: '50% 50%' })
 
       handoff = gsap.timeline({
         defaults: { ease: 'none' },
@@ -505,11 +684,8 @@ function App() {
           end: 'top 8%',
           scrub: .7,
           invalidateOnRefresh: true,
-          onRefresh: (trigger) => {
-            // A resize at the resting state must also retain the same owner
-            // and exact parked geometry; the scroll path itself is unchanged.
-            if (handoffOwnsRings && trigger.progress <= .001) parkRingsAtRest()
-          },
+          onUpdate: syncRingOwner,
+          onRefresh: syncRingOwner,
         },
       })
 
@@ -534,19 +710,14 @@ function App() {
         .to(workRail, { clipPath: 'inset(0% 0% 0% 0%)', duration: .32 }, .68)
         .to(lowerCards, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .26 }, .78)
         .to(workSummary, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .22 }, .86)
-        .to(workLeaf, { clipPath: 'circle(75% at 50% 50%)', scale: 1, duration: .16 }, .92)
 
-      // The hero rings finish their CSS entrance 1.17s after the preloader
-      // clears. Refresh and transfer ownership after that settled frame, well
-      // before any visitor begins the Work handoff.
-      geometryRefreshTimer = window.setTimeout(() => {
-        ScrollTrigger.refresh()
-        takeOverFrame = requestAnimationFrame(takeOverRestingRings)
-      }, 1300)
+      // Install the scrub path before the hero can be touched, then choose
+      // its owner from the current scroll position. This also handles native
+      // browser scroll restoration after a refresh in a later section.
+      ScrollTrigger.refresh()
+      syncRingOwner(handoff.scrollTrigger)
 
       return () => {
-        window.clearTimeout(geometryRefreshTimer)
-        cancelAnimationFrame(takeOverFrame)
         handoff.kill()
         layer.remove()
         gsap.set([
@@ -557,7 +728,6 @@ function App() {
           workIntro,
           lowerCards,
           workSummary,
-          workLeaf,
         ], { clearProps: 'clipPath,transform,visibility' })
       }
     })
@@ -575,13 +745,11 @@ function App() {
           onExitComplete={completePreloader}
         />
       )}
-      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
+      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
         <section className="hero" aria-labelledby="hero-heading">
         <Brand />
 
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {menu.map((item, index) => <a className={index === 0 ? 'active' : ''} href={`#${item.toLowerCase().replaceAll(' ', '-')}`} key={item}>{item}</a>)}
-        </nav>
+        <DesktopNav />
 
         <HeroFeature />
 
@@ -607,11 +775,10 @@ function App() {
         <div className="tagline" aria-label="People, materials, communities, circular construction">
           People <b>/</b> Materials <b>/</b> Communities <b>/</b> Circular construction
         </div>
-
-          <ReferenceCrop className="leaf" label="" />
         </section>
         <WhatWeDo />
         <Impact />
+        <GetInvolved />
       </main>
     </>
   )
