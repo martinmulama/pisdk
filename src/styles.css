@@ -697,7 +697,7 @@ h1 {
   clip-path: inset(0 0 0 100%);
   transform: translateX(1.4rem);
 }
-.page-shell:not(.hero-is-ready) .story-image {
+.page-shell:not(.rings-are-ready) .story-image {
   clip-path: circle(0 at 50% 50%);
   transform: scale(.74);
 }
@@ -721,10 +721,13 @@ h1 {
 .hero-is-ready .desktop-nav a:nth-child(4) { transition-delay: 330ms; }
 .hero-is-ready .desktop-nav a:nth-child(5) { transition-delay: 380ms; }
 .hero-is-ready .desktop-nav a:nth-child(6) { transition-delay: 430ms; }
-.hero-is-ready .story-image:nth-child(1) { transition-delay: 280ms; }
-.hero-is-ready .story-image:nth-child(2) { transition-delay: 350ms; }
-.hero-is-ready .story-image:nth-child(3) { transition-delay: 420ms; }
-.hero-is-ready .story-image:nth-child(4) { transition-delay: 490ms; }
+/* These finish under the outgoing preloader. Their full size is therefore
+   stable from the first scrollable hero frame through the Work handoff. */
+.rings-are-ready .story-image { transition-duration: .52s; }
+.rings-are-ready .story-image:nth-child(1) { transition-delay: 0ms; }
+.rings-are-ready .story-image:nth-child(2) { transition-delay: 70ms; }
+.rings-are-ready .story-image:nth-child(3) { transition-delay: 140ms; }
+.rings-are-ready .story-image:nth-child(4) { transition-delay: 210ms; }
 .hero-is-ready .mission { transition-delay: 540ms; }
 .hero-is-ready .tagline { transition-delay: 640ms; }
 .hero-is-ready .leaf { transition-delay: 700ms; }

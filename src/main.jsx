@@ -276,6 +276,7 @@ function App() {
   const [isLeaving, setIsLeaving] = useState(false)
   const [isPreloaderDone, setIsPreloaderDone] = useState(false)
   const [isHeroReady, setIsHeroReady] = useState(false)
+  const [isRingsReady, setIsRingsReady] = useState(false)
   const [heroTarget, setHeroTarget] = useState(null)
   const pageRef = useRef(null)
 
@@ -317,6 +318,10 @@ function App() {
             height,
           })
         }
+        // Let the four hero rings settle beneath the outgoing preloader. When
+        // the homepage first becomes touchable, their diameter is already at
+        // its final resting size and ready for the Work handoff.
+        setIsRingsReady(true)
         setIsLeaving(true)
       }, reducedMotion ? 0 : 150)
     }
@@ -417,10 +422,9 @@ function App() {
 
       const layer = document.createElement('div')
       layer.className = 'hero-work-handoff'
-      // The duplicate layer is prepared while hidden, then becomes the only
-      // owner of the rings while it is exactly aligned with their resting
-      // state. There is therefore no source-to-copy swap on the first scroll.
-      layer.style.visibility = 'hidden'
+      // The preloader has already allowed the source rings to settle. Take
+      // ownership synchronously before the first exposed homepage frame, so
+      // immediate scrolling always controls full-size travelling rings.
       const travellingRings = heroRings.map((ring, index) => {
         const travellingRing = document.createElement('div')
         const ringStyle = window.getComputedStyle(ring)
@@ -433,9 +437,6 @@ function App() {
       document.body.appendChild(layer)
 
       let handoff
-      let geometryRefreshTimer
-      let takeOverFrame
-      let handoffOwnsRings = false
       const setRingOwner = (useHandoffLayer) => {
         layer.style.visibility = useHandoffLayer ? 'visible' : 'hidden'
         heroRings.forEach((ring) => {
@@ -476,16 +477,6 @@ function App() {
           clipPath: 'circle(50% at 50% 50%)',
         })
       }
-      const takeOverRestingRings = () => {
-        if (handoffOwnsRings || handoff.scrollTrigger.progress > .001) return
-
-        // Both sets occupy the exact same pixels before this synchronous swap.
-        // No opacity transition is used—the visitor continues seeing one ring.
-        parkRingsAtRest()
-        setRingOwner(true)
-        handoffOwnsRings = true
-      }
-
       gsap.set(workGrid, { clipPath: 'inset(0% 100% 0% 0%)' })
       gsap.set(workCards, {
         clipPath: 'circle(0% at 50% 50%)',
@@ -506,9 +497,9 @@ function App() {
           scrub: .7,
           invalidateOnRefresh: true,
           onRefresh: (trigger) => {
-            // A resize at the resting state must also retain the same owner
-            // and exact parked geometry; the scroll path itself is unchanged.
-            if (handoffOwnsRings && trigger.progress <= .001) parkRingsAtRest()
+            // Preserve exact resting geometry through an early resize or
+            // refresh, before the scroll-scrubbed path begins.
+            if (handoff && trigger.progress <= .001) parkRingsAtRest()
           },
         },
       })
@@ -536,17 +527,13 @@ function App() {
         .to(workSummary, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .22 }, .86)
         .to(workLeaf, { clipPath: 'circle(75% at 50% 50%)', scale: 1, duration: .16 }, .92)
 
-      // The hero rings finish their CSS entrance 1.17s after the preloader
-      // clears. Refresh and transfer ownership after that settled frame, well
-      // before any visitor begins the Work handoff.
-      geometryRefreshTimer = window.setTimeout(() => {
-        ScrollTrigger.refresh()
-        takeOverFrame = requestAnimationFrame(takeOverRestingRings)
-      }, 1300)
+      // Install the scrub path before the hero can be touched. The layer and
+      // its source rings already occupy the same final-size pixels here.
+      ScrollTrigger.refresh()
+      parkRingsAtRest()
+      setRingOwner(true)
 
       return () => {
-        window.clearTimeout(geometryRefreshTimer)
-        cancelAnimationFrame(takeOverFrame)
         handoff.kill()
         layer.remove()
         gsap.set([
@@ -575,7 +562,7 @@ function App() {
           onExitComplete={completePreloader}
         />
       )}
-      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
+      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
         <section className="hero" aria-labelledby="hero-heading">
         <Brand />
 
