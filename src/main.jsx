@@ -590,6 +590,11 @@ function App() {
 
       const layer = document.createElement('div')
       layer.className = 'hero-work-handoff'
+      // A browser may restore the previous scroll position before the
+      // preloader completes. Keep this fixed layer invisible until its
+      // ScrollTrigger has established whether that position is still within
+      // the hero-to-Work handoff.
+      layer.style.visibility = 'hidden'
       // The preloader has already allowed the source rings to settle. Take
       // ownership synchronously before the first exposed homepage frame, so
       // immediate scrolling always controls full-size travelling rings.
@@ -645,6 +650,22 @@ function App() {
           clipPath: 'circle(50% at 50% 50%)',
         })
       }
+      const syncRingOwner = (trigger) => {
+        if (!trigger) return
+
+        // After the morph, the real Work cards own the visual. Leaving the
+        // fixed photographic layer visible is what made hero rings appear on
+        // a restored scroll position in later sections.
+        if (trigger.progress >= .999) {
+          setRingOwner(false)
+          return
+        }
+
+        // Before the handoff begins the travelling layer exactly overlays the
+        // hero rings; during the scrub it remains the sole visual owner.
+        if (trigger.progress <= .001) parkRingsAtRest()
+        setRingOwner(true)
+      }
       gsap.set(workGrid, { clipPath: 'inset(0% 100% 0% 0%)' })
       gsap.set(workCards, {
         clipPath: 'circle(0% at 50% 50%)',
@@ -663,11 +684,8 @@ function App() {
           end: 'top 8%',
           scrub: .7,
           invalidateOnRefresh: true,
-          onRefresh: (trigger) => {
-            // Preserve exact resting geometry through an early resize or
-            // refresh, before the scroll-scrubbed path begins.
-            if (handoff && trigger.progress <= .001) parkRingsAtRest()
-          },
+          onUpdate: syncRingOwner,
+          onRefresh: syncRingOwner,
         },
       })
 
@@ -693,11 +711,11 @@ function App() {
         .to(lowerCards, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .26 }, .78)
         .to(workSummary, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .22 }, .86)
 
-      // Install the scrub path before the hero can be touched. The layer and
-      // its source rings already occupy the same final-size pixels here.
+      // Install the scrub path before the hero can be touched, then choose
+      // its owner from the current scroll position. This also handles native
+      // browser scroll restoration after a refresh in a later section.
       ScrollTrigger.refresh()
-      parkRingsAtRest()
-      setRingOwner(true)
+      syncRingOwner(handoff.scrollTrigger)
 
       return () => {
         handoff.kill()
