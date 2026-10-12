@@ -26,6 +26,26 @@ gsap.registerPlugin(ScrollTrigger)
 
 const menu = ['Home', 'About us', 'Our work', 'Current pilots', 'Get involved', 'Contact']
 
+const footerLinkRows = [
+  [
+    ['About', '#top'],
+    ['Our work', '#our-work'],
+    ['Join us', '#get-involved'],
+    ['Contact', '#contact'],
+  ],
+  [
+    ['Media Center', '#current-pilots'],
+    ['Careers', '#get-involved'],
+    ['Discovery Center', '#our-work'],
+    ['Give with us', '#get-involved'],
+  ],
+  [
+    ['Our Projects', '#current-pilots'],
+    ['Policies & Governance', '#top'],
+    ['Terms of Use', '#top'],
+  ],
+]
+
 const workServices = [
   {
     id: 'recovery',
@@ -251,6 +271,61 @@ function GetInvolved() {
 
       <a className="get-involved__cta" href="#contact">Start a conversation <span aria-hidden="true">→</span></a>
     </section>
+  )
+}
+
+function FooterSocialIcon({ name }) {
+  const icons = {
+    Facebook: <path d="M14.2 23v-9h3.1l.5-3.5h-3.6V8.3c0-1 .3-1.7 1.8-1.7H18V3.5c-.4-.1-1.4-.2-2.7-.2-2.7 0-4.5 1.6-4.5 4.6v2.6H7.7V14h3.1v9h3.4Z" />,
+    X: <path d="m7 6 10.5 12M17 6 6.5 18" />,
+    LinkedIn: <><path d="M7.2 9.5v8.8M7.2 6.5h.1" /><path d="M11.1 18.3v-5c0-1.8 1.1-3 2.8-3 1.8 0 2.9 1.2 2.9 3v5M11.1 12.9v-2.5" /></>,
+    Instagram: <><rect x="5.5" y="5.5" width="13" height="13" rx="3.4" /><circle cx="12" cy="12" r="3" /><path d="M16.2 7.9h.1" /></>,
+    YouTube: <><rect x="4.7" y="7" width="14.6" height="10" rx="3" /><path d="m10.5 10 4 2-4 2v-4Z" fill="currentColor" stroke="none" /></>,
+  }
+
+  return (
+    <a className="footer-social__link" href="#contact" aria-label={name}>
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">{icons[name]}</svg>
+    </a>
+  )
+}
+
+function FooterLeaf() {
+  return (
+    <svg className="footer-principles__leaf" viewBox="0 0 54 72" aria-hidden="true">
+      <path d="M25.5 68.5c.1-18.8 2.8-33.8 13.2-47.3" />
+      <path d="M27 42.2C12.6 40.7 4.8 32.7 3.5 19.5c13.3 1.3 21.1 9.1 23.5 22.7Z" />
+      <path d="M31.3 30.6C32.5 16.1 40.2 7.9 52.1 4.5c.1 13.5-6.7 22.4-20.8 26.1Z" />
+      <path d="M25.8 53.2C15.6 53.5 8.5 49 5.3 40.6c10.2-.7 17.2 3.2 20.5 12.6Z" />
+    </svg>
+  )
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer" id="contact">
+      <div className="site-footer__wordmark" aria-label="PISDK">PISDK</div>
+      <span className="site-footer__divider" aria-hidden="true" />
+      <p className="site-footer__statement">We are turning waste<br />into homes, Creating jobs<br />and building dignity.</p>
+
+      <nav className="site-footer__links" aria-label="Footer navigation">
+        {footerLinkRows.map((row, rowIndex) => (
+          <div className="site-footer__link-row" key={rowIndex}>
+            {row.map(([label, href]) => <a href={href} key={label}>{label}</a>)}
+          </div>
+        ))}
+      </nav>
+
+      <div className="footer-social" aria-label="Social media">
+        {['Facebook', 'X', 'LinkedIn', 'Instagram', 'YouTube'].map((name) => <FooterSocialIcon key={name} name={name} />)}
+      </div>
+
+      <p className="site-footer__copyright">© 2026 PISDK. All rights reserved.</p>
+      <div className="footer-principles" aria-label="People, materials, environment, circular construction">
+        <FooterLeaf />
+        <span>People</span><b>/</b><span>Materials</span><b>/</b><span>Environment</span><b>/</b><span>Circular construction</span>
+      </div>
+    </footer>
   )
 }
 
@@ -779,6 +854,7 @@ function App() {
         <WhatWeDo />
         <Impact />
         <GetInvolved />
+        <SiteFooter />
       </main>
     </>
   )
