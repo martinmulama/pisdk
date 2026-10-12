@@ -24,7 +24,7 @@ a { color: inherit; text-decoration: none; }
 
 .page-shell {
   min-height: 125vh;
-  padding-bottom: 50px;
+  padding-bottom: 0;
   overflow-x: clip;
   overflow-y: visible;
   background: #f3f4ec;
@@ -753,6 +753,178 @@ h1 {
 .get-involved__cta span { font-size: 1.2em; line-height: 1; }
 .get-involved__cta:hover { background: #426c40; transform: translateX(calc(-50% + 4px)); }
 
+/* Footer — a full-bleed, screen-height final panel that deliberately takes
+   over from the fixed desktop navigation. Its layout follows the supplied
+   reference's left statement / right utility rhythm. */
+.site-footer {
+  position: relative;
+  z-index: 3;
+  isolation: isolate;
+  width: 125vw;
+  min-height: 125svh;
+  margin: 0 calc((100% - 125vw) / 2);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 48% 49%, rgb(3 78 39 / 42%) 0%, rgb(3 68 33 / 14%) 38%, transparent 70%),
+    linear-gradient(116deg, #073f22 0%, #003817 46%, #03421f 100%);
+  color: #fbfae9;
+  container-type: inline-size;
+}
+.site-footer__wordmark {
+  position: absolute;
+  top: 20%;
+  left: 5.5cqw;
+  color: #fffdf2;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(44px, 3.3cqw, 76px);
+  font-weight: 700;
+  letter-spacing: .035em;
+  line-height: 1;
+}
+.site-footer__divider {
+  position: absolute;
+  top: 20.15%;
+  left: 19.8%;
+  width: .12cqw;
+  height: 17.5%;
+  background: #d7d99f;
+}
+.site-footer__statement {
+  position: absolute;
+  top: 20.65%;
+  left: 22.5%;
+  width: 28.7%;
+  margin: 0;
+  color: #fffdf2;
+  /* This is the footer's concluding headline, so it follows the same
+     Montserrat display treatment as the hero and section titles. */
+  font-family: 'Montserrat', Arial, sans-serif;
+  /* Keep the closing thought subordinate to the footer system rather than
+     competing with the service/navigation column beside it. */
+  font-size: clamp(20px, 1.72cqw, 37px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.site-footer__links {
+  position: absolute;
+  top: 18.9%;
+  left: 49.3%;
+  width: 31.1%;
+  display: grid;
+  gap: 2.4cqw;
+}
+.site-footer__link-row {
+  display: grid;
+  grid-template-columns: 1.13fr 1fr 1.38fr 1fr;
+  column-gap: .8cqw;
+  align-items: start;
+}
+.site-footer__link-row a {
+  width: max-content;
+  max-width: 100%;
+  padding-bottom: .32cqw;
+  border-bottom: .12cqw solid #d7d99f;
+  color: #f9f8e8;
+  /* Footer links are navigation—not editorial copy—so they use the same
+     sans-serif utility language as the persistent desktop navigation. */
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(11px, .96cqw, 20px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: 1.25;
+  transition: color .2s ease, border-color .2s ease;
+}
+.site-footer__link-row a:hover,
+.site-footer__link-row a:focus-visible {
+  border-color: #efa06b;
+  color: #efa06b;
+  outline: none;
+}
+.footer-social {
+  position: absolute;
+  top: 17.8%;
+  right: 4.25cqw;
+  display: flex;
+  align-items: center;
+  gap: .72cqw;
+}
+.footer-social__link {
+  display: grid;
+  width: 2.22cqw;
+  height: 2.22cqw;
+  place-items: center;
+  border: .12cqw solid #f8f7e5;
+  border-radius: 50%;
+  color: #f8f7e5;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.footer-social__link:hover,
+.footer-social__link:focus-visible {
+  border-color: #efa06b;
+  color: #efa06b;
+  outline: none;
+  transform: translateY(-2px);
+}
+.footer-social__link svg {
+  width: 61%;
+  height: 61%;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+.site-footer__copyright {
+  position: absolute;
+  top: 45.1%;
+  left: 49.3%;
+  margin: 0;
+  color: #f9f8e8;
+  font-family: 'Lora', Georgia, serif;
+  /* Match the reading scale used by the hero, Work, and Impact body copy. */
+  font-size: clamp(9px, 1.05cqw, 18px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.62;
+}
+.footer-principles {
+  position: absolute;
+  top: 69.4%;
+  left: 5.15cqw;
+  display: flex;
+  align-items: center;
+  gap: 1.15cqw;
+  color: #fffdf2;
+  font-family: 'Montserrat', Arial, sans-serif;
+  /* Reuse the compact all-caps treatment from the hero closing note. */
+  font-size: clamp(6px, .63cqw, 11px);
+  font-weight: 500;
+  letter-spacing: .26em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.footer-principles b {
+  color: #d7d99f;
+  font-size: 1.05em;
+  font-weight: 400;
+}
+.footer-principles__leaf {
+  width: 2.75cqw;
+  height: 3.6cqw;
+  margin-right: .35cqw;
+  overflow: visible;
+}
+.footer-principles__leaf path:first-child {
+  fill: none;
+  stroke: #d7d99f;
+  stroke-linecap: round;
+  stroke-width: 3.2;
+}
+.footer-principles__leaf path:not(:first-child) {
+  fill: #d7d99f;
+}
+
 /* On a wide, short viewport the hero canvas is intentionally narrower than
    the browser. Reclaim the outer gutter for the heading, then grow the service
    system so it still has the same visual authority as the hero artwork. */
@@ -1158,6 +1330,36 @@ h1 {
   .involvement-card p { margin-top: 10px; font-size: clamp(9px, 2.7vw, 13px); }
   .get-involved__cta { width: 244px; height: 54px; margin-top: 4px; font-size: 16px; }
   .get-involved__cta:hover { transform: translateX(4px); }
+
+  .site-footer {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 74px 28px 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+    text-align: center;
+  }
+  .site-footer__wordmark,
+  .site-footer__divider,
+  .site-footer__statement,
+  .site-footer__links,
+  .footer-social,
+  .site-footer__copyright,
+  .footer-principles { position: relative; top: auto; right: auto; bottom: auto; left: auto; }
+  .site-footer__wordmark { font-size: clamp(46px, 13vw, 68px); }
+  .site-footer__divider { display: none; }
+  .site-footer__statement { width: min(100%, 540px); font-size: clamp(25px, 7.3vw, 39px); line-height: 1.24; }
+  .site-footer__links { width: min(100%, 610px); gap: 22px; }
+  .site-footer__link-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; }
+  .site-footer__link-row a { width: fit-content; margin: 0 auto; padding-bottom: 3px; border-width: 1px; font-size: clamp(15px, 4.4vw, 21px); }
+  .footer-social { gap: 12px; }
+  .footer-social__link { width: 38px; height: 38px; border-width: 1px; }
+  .site-footer__copyright { font-size: 15px; }
+  .footer-principles { width: min(100%, 600px); flex-wrap: wrap; justify-content: center; gap: 11px; font-size: 8px; line-height: 1.5; white-space: normal; }
+  .footer-principles__leaf { width: 34px; height: 44px; margin-right: 3px; }
 }
 
 @media (max-width: 480px) {
