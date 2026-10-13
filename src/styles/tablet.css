@@ -1,0 +1,141 @@
+/* Tablet layout (601px–860px). These overrides preserve the desktop visual
+   system while switching sections into a readable document-flow layout. */
+@media (max-width: 860px) {
+  .hero { width: 100%; height: auto; min-height: 100svh; padding: 24px 24px 48px; display: flex; flex-direction: column; align-items: center; }
+  .brand { position: relative; top: auto; left: auto; transform: scale(.72); transform-origin: center; margin: -10px 0 8px; }
+  .desktop-nav { display: none; }
+  .feature-image { position: relative; top: auto; left: auto; order: 3; width: min(76vw, 327px); height: min(113vw, 487px); margin: 20px 0 35px; background-size: 1252px 706.5px; background-position: left top; }
+  .intro { position: relative; top: auto; left: auto; order: 2; width: 100%; text-align: center; }
+  h1 { font-size: clamp(27px, 7.6vw, 39px); line-height: 1.13; }
+  .intro br { display: none; }
+  .story-images { position: relative; top: auto; left: auto; order: 4; width: 100%; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .story-image { width: 126px; height: 126px; background-size: cover; }
+  .mission { position: relative; top: auto; left: auto; order: 5; width: min(100%, 540px); margin-top: 38px; grid-template-columns: 1px 1fr; column-gap: 18px; }
+  .mission p { font-size: 12px; line-height: 1.62; }
+  .tagline { position: relative; left: auto; bottom: auto; order: 6; margin-top: 18px; font-size: 7px; white-space: normal; flex-wrap: wrap; justify-content: center; }
+
+  .preloader-sequence { top: 43%; width: 100vw; }
+  .preloader-step:nth-child(2) { left: 22%; }
+  .preloader-step:nth-child(3) { left: 44%; }
+  .preloader-step:nth-child(4) { left: 66%; }
+  .preloader-step:nth-child(5) { left: 88%; }
+  .preloader-dot__copy { padding: 14%; }
+  .preloader-dot__metric i { font-size: clamp(14px, 4.2vw, 18px); }
+  .preloader-dot__metric strong { font-size: clamp(36px, 10vw, 48px); }
+  .preloader-dot__copy em { font-size: clamp(13px, 3.6vw, 16px); }
+  .preloader-step__caption { top: clamp(84px, 24vw, 100px); max-width: 230px; }
+  .preloader-step__caption span { font-size: clamp(16px, 4.5vw, 20px); }
+  .preloader-step__caption small { margin-top: 11px; font-size: clamp(9px, 2.6vw, 11px); }
+
+  .what-we-do {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 76px 28px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    overflow: visible;
+  }
+  .work-intro,
+  .work-rail,
+  .work-top-grid,
+  .work-lower-cards,
+  .work-summary { position: relative; top: auto; right: auto; bottom: auto; left: auto; }
+  .work-intro { width: 100%; text-align: center; }
+  .work-intro h2 { font-size: clamp(31px, 8vw, 47px); line-height: 1.12; }
+  .work-intro__button { width: 190px; height: 48px; margin-top: 22px; font-size: 15px; }
+  .work-rail { display: none; }
+  .work-top-grid {
+    order: 2;
+    width: 100%;
+    height: auto;
+    padding: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    border-radius: 48px;
+  }
+  .work-top-grid .work-card { padding: 22px 10px 12px; }
+  .work-card__icon,
+  .work-lower-cards .work-card__icon { height: 37px; }
+  .work-card h3,
+  .work-lower-cards .work-card h3 { margin: 10px 0 8px; font-size: clamp(15px, 4vw, 21px); }
+  .work-card p,
+  .work-lower-cards .work-card p { width: 82%; font-size: clamp(9px, 2.4vw, 12px); line-height: 1.36; }
+  .work-lower-cards {
+    order: 3;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .work-lower-cards .work-card { height: auto; min-height: 240px; margin: 0; padding: 28px 8px 16px; }
+  .work-summary { order: 4; width: 100%; margin-top: 10px; font-size: 12px; font-weight: 400; line-height: 1.62; text-align: center; }
+  .work-summary br { display: none; }
+
+  .get-involved {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 76px 28px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    overflow: hidden;
+  }
+  .get-involved__backdrop { left: 0; width: 100%; }
+  .get-involved__intro,
+  .involvement-options,
+  .get-involved__cta { position: relative; top: auto; right: auto; bottom: auto; left: auto; transform: none; }
+  .get-involved__intro { width: 100%; }
+  .get-involved__intro h2 { color: #fffdf5; }
+  .get-involved__intro p { color: #d5e8bd; }
+  .get-involved__intro h2 { font-size: clamp(38px, 10vw, 55px); }
+  .get-involved__intro p { margin-top: 12px; font-size: clamp(16px, 4.3vw, 22px); }
+  .involvement-options {
+    width: min(100%, 590px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .involvement-card { width: 100%; height: auto; aspect-ratio: 1; }
+  .involvement-card__icon,
+  .involvement-card--partner .involvement-card__icon,
+  .involvement-card--volunteer .involvement-card__icon,
+  .involvement-card--visit .involvement-card__icon { height: 46px; margin-top: 17%; }
+  .involvement-card h3 { margin-top: 14px; font-size: clamp(15px, 4.2vw, 22px); }
+  .involvement-card p { margin-top: 10px; font-size: clamp(9px, 2.7vw, 13px); }
+  .get-involved__cta { width: 244px; height: 54px; margin-top: 4px; font-size: 16px; }
+  .get-involved__cta:hover { transform: translateX(4px); }
+
+  .site-footer {
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 74px 28px 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+    text-align: center;
+  }
+  .site-footer__wordmark,
+  .site-footer__divider,
+  .site-footer__statement,
+  .site-footer__links,
+  .footer-social,
+  .site-footer__copyright,
+  .footer-principles { position: relative; top: auto; right: auto; bottom: auto; left: auto; }
+  .site-footer__wordmark { font-size: clamp(46px, 13vw, 68px); }
+  .site-footer__divider { display: none; }
+  .site-footer__statement { width: min(100%, 540px); font-size: clamp(25px, 7.3vw, 39px); line-height: 1.24; }
+  .site-footer__links { width: min(100%, 610px); gap: 22px; }
+  .site-footer__link-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; }
+  .site-footer__link-row a { width: fit-content; margin: 0 auto; padding-bottom: 3px; border-width: 1px; font-size: clamp(15px, 4.4vw, 21px); }
+  .footer-social { gap: 12px; }
+  .footer-social__link { width: 38px; height: 38px; border-width: 1px; }
+  .site-footer__copyright { font-size: 15px; }
+  .footer-principles { width: min(100%, 600px); flex-wrap: wrap; justify-content: center; gap: 11px; font-size: 8px; line-height: 1.5; white-space: normal; }
+  .footer-principles__leaf { width: 34px; height: 44px; margin-right: 3px; }
+}

@@ -246,11 +246,23 @@ function HeroFeature() {
   )
 }
 
-function WorkCard({ service, index }) {
+function WorkCard({ service }) {
   return (
-    <article className={`work-card work-card--${service.id}`} style={{ '--work-service-position': `${13 + (index * 14.8)}%` }}>
+    <article className={`work-card work-card--${service.id}`}>
       <img className="work-card__icon" src={service.icon} alt="" aria-hidden="true" />
       <h3>{service.title}</h3>
+      <p>{service.copy}</p>
+    </article>
+  )
+}
+
+function MobileWorkService({ service }) {
+  return (
+    <article className={`work-mobile-service work-mobile-service--${service.id}`}>
+      <div className="work-mobile-service__circle">
+        <img src={service.icon} alt="" aria-hidden="true" />
+        <h3>{service.title}</h3>
+      </div>
       <p>{service.copy}</p>
     </article>
   )
@@ -264,18 +276,17 @@ function WhatWeDo() {
         <a className="work-intro__button" href="#current-pilots">Explore our work <span aria-hidden="true">→</span></a>
       </div>
 
+      <div className="work-mobile-scroll-list">
+        {workServices.map((service) => <MobileWorkService key={service.id} service={service} />)}
+      </div>
+
       <div className="work-mobile-stage">
         <div className="work-rail" aria-hidden="true" />
-        <div className="work-service-explanations" aria-live="polite">
-          {workServices.map((service, index) => (
-            <p key={service.id} style={{ '--work-service-position': `${13 + (index * 14.8)}%` }}>{service.copy}</p>
-          ))}
-        </div>
         <div className="work-top-grid">
-          {workServices.slice(0, 4).map((service, index) => <WorkCard key={service.id} service={service} index={index} />)}
+          {workServices.slice(0, 4).map((service) => <WorkCard key={service.id} service={service} />)}
         </div>
         <div className="work-lower-cards">
-          {workServices.slice(4).map((service, index) => <WorkCard key={service.id} service={service} index={index + 4} />)}
+          {workServices.slice(4).map((service) => <WorkCard key={service.id} service={service} />)}
         </div>
       </div>
 
@@ -975,81 +986,49 @@ function App() {
 
     media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
-      const stage = scope.querySelector('.work-mobile-stage')
-      const workRail = scope.querySelector('.work-rail')
-      const cards = Array.from(scope.querySelectorAll('.work-card'))
-      const explanations = Array.from(scope.querySelectorAll('.work-service-explanations p'))
+      const services = Array.from(scope.querySelectorAll('.work-mobile-service'))
 
-      if (!stage || !workRail || cards.length !== 6 || explanations.length !== 6) return undefined
+      if (services.length !== 6) return undefined
 
-      // This is the mobile counterpart to the preloader: six fixed knots on
-      // a single vertical thread. At every hand-off, one knot opens in place
-      // into its service circle while the previous circle returns to a knot.
-      // The cards themselves become the six thread knots at rest. Unlike a
-      // visibility toggle, this small scale is fully reversible, so upward
-      // scrolling always has a real element to grow back into.
-      gsap.set(cards, {
-        visibility: 'visible',
-        scale: .14,
-        y: 0,
-        xPercent: -50,
-        yPercent: -50,
-        transformOrigin: '50% 50%',
-        force3D: true,
-      })
-      gsap.set(explanations, {
-        visibility: 'visible',
-        x: 14,
-        clipPath: 'inset(0% 100% 0% 0%)',
-        force3D: true,
-      })
+      const animations = services.map((service) => {
+        const circle = service.querySelector('.work-mobile-service__circle')
+        const copy = service.querySelector('p')
+        if (!circle || !copy) return null
 
-      // Each chapter spends most of its scroll distance in a static reading
-      // state. Only the first third is used for the hand-off, preventing copy
-      // from continuously tracking tiny swipe or trackpad movements.
-      const chapterDuration = 1
-      const handoffDuration = .32
-      const copyDuration = .24
-      const story = gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: stage,
-          start: 'top top',
-          end: () => `+=${Math.round(window.innerHeight * 5.9)}`,
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
-          scrub: .35,
-          invalidateOnRefresh: true,
-        },
-      })
+        // Normal document scroll: a service opens from its knot as its row
+        // enters, then remains open with its revealed copy. On a reverse
+        // scroll the same timeline naturally contracts it back to a knot.
+        gsap.set(circle, { scale: .18, transformOrigin: '50% 50%', force3D: true })
+        gsap.set(copy, {
+          x: 14,
+          clipPath: 'inset(0% 100% 0% 0%)',
+          force3D: true,
+        })
 
-      story
-        .to(cards[0], { scale: 1, duration: handoffDuration }, 0)
-        .to(explanations[0], { x: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: copyDuration }, .08)
-
-      cards.slice(1).forEach((card, index) => {
-        const previous = cards[index]
-        const previousExplanation = explanations[index]
-        const nextExplanation = explanations[index + 1]
-        const handoffAt = (index + 1) * chapterDuration
-        story
-          .to(previous, { scale: .14, duration: handoffDuration }, handoffAt)
-          .to(card, { scale: 1, duration: handoffDuration }, handoffAt)
-          .to(previousExplanation, { x: -12, clipPath: 'inset(0% 0% 0% 100%)', duration: copyDuration }, handoffAt)
-          .to(nextExplanation, { x: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: copyDuration }, handoffAt + .08)
-      })
-
-      // Keep the sixth service visible through a complete final reading zone
-      // before the pin releases to the section summary.
-      story.to({}, { duration: chapterDuration - handoffDuration }, (workServices.length - 1) * chapterDuration + handoffDuration)
+        return gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: service,
+            // The interaction happens around the reading area rather than
+            // at the bottom of the viewport. Every completed service remains
+            // visually available, creating a calm, cumulative reading path.
+            start: 'top 76%',
+            end: 'top 57%',
+            scrub: .4,
+            invalidateOnRefresh: true,
+          },
+        })
+          .to(circle, { scale: 1, duration: .24 }, 0)
+          .to(copy, { x: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: .24 }, .04)
+      }).filter(Boolean)
 
       return () => {
-        story.kill()
-        // Preserve the React-owned service-position custom properties when a
-        // breakpoint changes; only discard properties owned by this scene.
-        gsap.set([workRail, ...cards], { clearProps: 'transform,visibility' })
-        gsap.set(explanations, { clearProps: 'transform,visibility,clipPath' })
+        animations.forEach((animation) => animation.kill())
+        services.forEach((service) => {
+          const circle = service.querySelector('.work-mobile-service__circle')
+          const copy = service.querySelector('p')
+          gsap.set([circle, copy], { clearProps: 'transform,clipPath' })
+        })
       }
     })
 
