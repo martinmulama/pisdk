@@ -2,11 +2,14 @@
 
 :root {
   /*
-   * Scale the whole composition to counter browsers that render pages at
-   * 125%. Because this is a layout scale (rather than a transform), the
-   * absolute artwork, type, and fixed navigation stay in the same proportion.
-  */
-  --page-scale: 0.8;
+   * The editorial canvas is intentionally 16:9. Keep it in ordinary CSS
+   * pixels so native browser zoom, fullscreen, Brave, and Firefox all share
+   * one coordinate system. These dimensions match the former visual result
+   * without relying on the non-standard `zoom` property.
+   */
+  --desktop-canvas-width: min(100vw, 177.18svh);
+  --desktop-canvas-height: min(56.44vw, 100svh);
+  --desktop-impact-height: min(64.464vw, 114.2svh);
   --deep-navy-green: #0d4027;
   --ring-warm: #efa06b;
   --ring-green: #9caf87;
@@ -23,19 +26,17 @@ body { min-width: 320px; margin: 0; overflow-x: clip; background: #f3f4ec; }
 a { color: inherit; text-decoration: none; }
 
 .page-shell {
-  min-height: 125vh;
+  min-height: 100vh;
   padding-bottom: 0;
   overflow-x: clip;
   overflow-y: visible;
   background: #f3f4ec;
-  zoom: var(--page-scale);
 }
 
 .hero {
   position: relative;
-  /* Compensate the shell scale so this canvas still fills the viewport. */
-  width: min(125vw, 221.475svh);
-  height: min(70.55vw, 125svh);
+  width: var(--desktop-canvas-width);
+  height: var(--desktop-canvas-height);
   margin: 0 auto;
   container-type: inline-size;
 }
@@ -61,10 +62,12 @@ a { color: inherit; text-decoration: none; }
 .desktop-nav {
   position: fixed;
   top: 4cqw;
-  right: clamp(34px, 4vw, 72px);
+  /* These values used to inherit the page-scale workaround. Keep their
+     visual size now that the page uses native browser coordinates. */
+  right: clamp(27px, 3.2vw, 58px);
   display: grid;
-  gap: clamp(11px, 1.65vw, 28px);
-  width: 162px;
+  gap: clamp(9px, 1.32vw, 22px);
+  width: 130px;
   text-align: right;
   z-index: 2;
 }
@@ -73,7 +76,7 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   display: block;
   font-family: 'Montserrat', Arial, sans-serif;
-  font-size: clamp(8px, .85vw, 16px);
+  font-size: clamp(7px, .68vw, 13px);
   font-weight: 500;
   letter-spacing: .21em;
   text-transform: uppercase;
@@ -98,11 +101,19 @@ a { color: inherit; text-decoration: none; }
   transition: top .3s cubic-bezier(.16, 1, .3, 1);
 }
 
+/* This wrapper becomes a true header row only on phones. `display: contents`
+   preserves the established desktop placement of the visual brand crop. */
+.mobile-hero-header { display: contents; }
+.mobile-menu-toggle,
+.mobile-nav { display: none; }
+.work-mobile-stage { display: contents; }
+.work-service-explanations { display: none; }
+
 .feature-image {
   position: absolute;
   top: 7.49cqw;
   /* Extend past the centered hero canvas until the image meets the viewport. */
-  left: calc((100cqw - 125vw) / 2);
+  left: calc((100cqw - 100vw) / 2);
   display: block;
   width: 25.704cqw;
   height: 38.946cqw;
@@ -210,8 +221,8 @@ h1 {
   --work-impact-runway: calc(19.6cqw + clamp(1rem, 1.5vw, 2rem));
   position: relative;
   /* Match the hero's centered, height-aware canvas at every desktop aspect. */
-  width: min(125vw, 221.475svh);
-  height: min(70.55vw, 125svh);
+  width: var(--desktop-canvas-width);
+  height: var(--desktop-canvas-height);
   margin: 0 auto var(--work-impact-runway);
   overflow: visible;
   background: #f3f4ec;
@@ -418,10 +429,10 @@ h1 {
 .impact {
   position: relative;
   z-index: 1;
-  width: min(125vw, 221.475svh);
+  width: var(--desktop-canvas-width);
   /* The central film circle now shares the lower Work-circle's left edge.
      Grow the canvas by the same ratio so the content keeps its breathing room. */
-  height: min(80.58vw, 142.75svh);
+  height: var(--desktop-impact-height);
   margin: 0 auto;
   /* The shared footer deliberately sits in the outer page gutter on wide
      canvases, so the section itself must not crop it. Individual artwork is
@@ -623,8 +634,8 @@ h1 {
   z-index: 2;
   /* Preserve the hero's height-aware canvas while its backdrop spans the
      entire visible viewport. */
-  width: min(125vw, 221.475svh);
-  height: min(70.55vw, 125svh);
+  width: var(--desktop-canvas-width);
+  height: var(--desktop-canvas-height);
   margin: 0 auto;
   overflow: hidden;
   container-type: inline-size;
@@ -634,8 +645,8 @@ h1 {
   z-index: 0;
   top: 0;
   bottom: 0;
-  left: calc((100cqw - 125vw) / 2);
-  width: 125vw;
+  left: calc((100cqw - 100vw) / 2);
+  width: 100vw;
   background: var(--deep-navy-green);
   clip-path: inset(0% 0% 0% 0%);
   will-change: clip-path;
@@ -760,9 +771,9 @@ h1 {
   position: relative;
   z-index: 3;
   isolation: isolate;
-  width: 125vw;
-  min-height: 125svh;
-  margin: 0 calc((100% - 125vw) / 2);
+  width: 100vw;
+  min-height: 100svh;
+  margin: 0;
   overflow: hidden;
   background:
     radial-gradient(ellipse at 48% 49%, rgb(3 78 39 / 42%) 0%, rgb(3 68 33 / 14%) 38%, transparent 70%),
@@ -930,11 +941,11 @@ h1 {
    system so it still has the same visual authority as the hero artwork. */
 @media (min-aspect-ratio: 2 / 1) and (min-width: 861px) {
   .work-intro {
-    left: calc((100cqw - 125vw) / 2 + 3.5cqw);
+    left: calc((100cqw - 100vw) / 2 + 3.5cqw);
     width: 31%;
   }
   .tagline {
-    left: calc((100cqw - 125vw) / 2 + 3.5cqw);
+    left: calc((100cqw - 100vw) / 2 + 3.5cqw);
   }
   .work-intro__button {
     width: 15.4cqw;
@@ -964,6 +975,19 @@ h1 {
   .work-lower-cards .work-card__icon { height: 2.55cqw; }
   .work-lower-cards .work-card h3 { font-size: clamp(13px, 1.12cqw, 23px); }
   .work-lower-cards .work-card p { font-size: clamp(9px, .98cqw, 18px); }
+}
+
+/* A fullscreen laptop display is much taller than the supplied reference.
+   The hero photo is pinned to the viewport edge while the four story rings
+   live inside the editorial canvas; without this adjustment the two systems
+   converge and collide once the canvas reaches the full viewport width. */
+@media (min-width: 861px) and (max-aspect-ratio: 19 / 10) {
+  .feature-image {
+    width: min(25.704cqw, 19.15vw);
+    height: min(38.946cqw, 29vw);
+  }
+  .intro,
+  .story-images { left: 27%; }
 }
 
 /* Recovery carries the longest service description. On desktop, give its
@@ -1049,167 +1073,149 @@ h1 {
 .hero-is-ready .mission { transition-delay: 540ms; }
 .hero-is-ready .tagline { transition-delay: 640ms; }
 
-/* Entry preloader — its imagery is static, while the circular loading edge is CSS. */
+/* Entry preloader — deliberately lightweight: a static line, four dots, and
+   one readable statistic at a time. No image needs to load before the page is
+   ready, which keeps the handoff reliable on slower browsers. */
 .preloader {
   position: fixed;
   z-index: 20;
   inset: 0;
   isolation: isolate;
   overflow: hidden;
-  background: #f3f4ec;
-  color: #0b3f2b;
+  background: radial-gradient(circle at 50% 50%, #06482f 0%, #043a29 46%, #022d20 100%);
+  color: #eff0df;
+  clip-path: inset(0);
 }
-.preloader--leaving {
-  pointer-events: none;
+.preloader--leaving { pointer-events: none; }
+.preloader-sequence {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: min(44vw, 740px);
+  height: 1px;
+  transform: translate(-50%, -50%);
 }
-.preloader-dark-field {
+.preloader-sequence__line {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(219, 226, 174, .7);
+}
+.preloader-step {
   position: absolute;
   z-index: 1;
   top: 50%;
-  left: -43.6vw;
-  width: 90vw;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle at 78% 50%, #174d31 0%, #0e4028 51%, #09391f 100%);
-  transform: translateY(-50%);
-  will-change: transform;
+  width: 0;
+  height: 0;
 }
-.preloader-stat {
-  z-index: 2;
-  margin: 0;
-  font-family: 'Montserrat', Arial, sans-serif;
-  font-weight: 400;
-  letter-spacing: -.035em;
-  line-height: 1.1;
-  transition: clip-path .64s cubic-bezier(.16, 1, .3, 1), transform .64s cubic-bezier(.16, 1, .3, 1);
-  will-change: clip-path, transform;
-}
-.preloader-stat--reveal-left {
-  clip-path: inset(0 100% 0 0);
-  transform: translateX(-1.4rem);
-}
-.preloader-stat--reveal-right {
-  clip-path: inset(0 0 0 100%);
-  transform: translateX(1.4rem);
-}
-.preloader-stat.is-revealed {
-  clip-path: inset(0);
-  transform: translateX(0);
-}
-.preloader-left-copy {
+.preloader-step:nth-child(2) { left: 16%; }
+.preloader-step:nth-child(3) { left: 42%; }
+.preloader-step:nth-child(4) { left: 68%; }
+.preloader-step:nth-child(5) { left: 94%; }
+.preloader-dot {
   position: absolute;
-  z-index: 2;
-  top: 28%;
-  right: 73.2vw;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--dot-color);
+  transform: translate(-50%, -50%);
+  will-change: width, height;
+}
+.preloader-dot__copy {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #f7f7f0;
-  will-change: transform;
-}
-.preloader-stat--waste {
-  position: static;
-  font-size: clamp(25px, 2.1vw, 36px);
-}
-.preloader-stat--recycled {
-  position: static;
-  margin-top: 2.8vw;
-  font-size: clamp(15px, 1.2vw, 21px);
-  font-family: 'Lora', Georgia, serif;
+  justify-content: center;
+  padding: 16%;
+  color: #06412d;
   text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  will-change: opacity, transform;
 }
-.preloader-media {
-  position: absolute;
-  z-index: 3;
-  top: 48%;
-  left: 49.75%;
-  width: min(35.9vw, 63.8svh);
-  height: min(35.9vw, 63.8svh);
-  padding: clamp(3px, .27vw, 5px);
-  overflow: hidden;
-  border-radius: 50%;
-  background: conic-gradient(from -90deg, #548a48 0deg, #87ad70 var(--loader-angle), #dce5d8 var(--loader-angle) 360deg);
-  box-shadow: 0 0 0 1px rgba(245, 247, 238, .7);
-  --preloader-x: 0px;
-  --preloader-y: 0px;
-  transform: translate(calc(-50% + var(--preloader-x)), calc(-50% + var(--preloader-y)));
-  will-change: transform, width, height, border-radius;
+.preloader-dot__mobile-label,
+.preloader-dot__mobile-support { display: none; }
+.preloader-dot__metric { display: block; }
+.preloader-dot__metric i,
+.preloader-dot__metric strong,
+.preloader-dot__copy em { display: block; }
+.preloader-dot__metric i {
+  margin-bottom: .08em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(15px, 1.16vw, 20px);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -.035em;
+  line-height: 1;
 }
-.preloader-media img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  object-fit: cover;
-}
-.preloader-media--hero {
-  padding: 0;
-  overflow: visible;
-  border-radius: 0;
-  /* The circular source has transparent pixels beyond the photo. Once it
-     becomes the hero artwork, retire the green loading track underneath. */
-  background: transparent;
-  box-shadow: none;
-}
-.preloader-media--hero img {
-  border-radius: 0;
-  /* Mirror the settled hero silhouette while the image is moving. */
-  clip-path: ellipse(76.69% 50.62% at 22.66% 50.85%);
-}
-.preloader-hero-outline {
-  display: none;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-  fill: none;
-}
-.preloader-hero-outline circle {
-  stroke: var(--ring-warm);
-  stroke-width: 17;
-}
-.preloader-media--hero .preloader-hero-outline { display: block; }
-.preloader-right-copy {
-  position: absolute;
-  z-index: 2;
-  top: 28%;
-  left: 72.7%;
-  width: max-content;
-  max-width: 25%;
-  will-change: transform;
-}
-.preloader-stat--housing,
-.preloader-stat--deficit { position: static; }
-.preloader-stat--housing strong,
-.preloader-stat--housing span { display: block; }
-.preloader-stat--housing strong {
-  color: #0b3f2b;
-  font-size: clamp(28px, 2.3vw, 39px);
-  font-weight: 400;
-  letter-spacing: -.06em;
-  line-height: .92;
-}
-.preloader-stat--housing span {
-  margin-top: 1.1vw;
-  font-family: 'Lora', Georgia, serif;
-  font-size: clamp(20px, 1.75vw, 30px);
-  line-height: 1.1;
+.preloader-dot__metric strong {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(39px, 3.35vw, 57px);
+  font-weight: 600;
+  letter-spacing: -.075em;
+  line-height: .82;
   white-space: nowrap;
 }
-.preloader-stat--deficit {
-  margin-top: 2.7vw;
-  padding-left: 0;
-  color: #20543d;
-  font-size: clamp(17px, 1.35vw, 23px);
-  font-family: 'Lora', Georgia, serif;
-  line-height: 1.08;
-  text-align: center;
-  align-self: center;
+.preloader-dot__copy em {
+  max-width: 11em;
+  margin-top: .18em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(14px, 1.08vw, 18px);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -.035em;
+  line-height: 1.12;
 }
-
-/* Exit choreography is driven by one GSAP timeline: no fades and no competing CSS transitions. */
+.preloader-step__caption {
+  position: absolute;
+  top: clamp(106px, 7.8vw, 132px);
+  left: 50%;
+  width: max-content;
+  max-width: min(310px, 72vw);
+  color: #d9dfb3;
+  text-align: center;
+  transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.preloader-step__caption span,
+.preloader-step__caption small { display: block; }
+.preloader-step__caption span {
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(17px, 1.35vw, 23px);
+  line-height: 1.15;
+}
+.preloader-step__caption small {
+  margin-top: 13px;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(9px, .7vw, 12px);
+  font-weight: 500;
+  letter-spacing: .27em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.preloader-ring-handoff {
+  position: fixed;
+  z-index: 21;
+  inset: 0;
+  pointer-events: none;
+}
+.preloader-ring-handoff__dot {
+  position: fixed;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  will-change: top, left, width, height, border-width, border-color;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .preloader-stat,
@@ -1225,7 +1231,7 @@ h1 {
 }
 
 @media (max-width: 860px) {
-  .hero { width: 100%; height: auto; min-height: 125vh; padding: 24px 24px 48px; display: flex; flex-direction: column; align-items: center; }
+  .hero { width: 100%; height: auto; min-height: 100svh; padding: 24px 24px 48px; display: flex; flex-direction: column; align-items: center; }
   .brand { position: relative; top: auto; left: auto; transform: scale(.72); transform-origin: center; margin: -10px 0 8px; }
   .desktop-nav { display: none; }
   .feature-image { position: relative; top: auto; left: auto; order: 3; width: min(76vw, 327px); height: min(113vw, 487px); margin: 20px 0 35px; background-size: 1252px 706.5px; background-position: left top; }
@@ -1238,16 +1244,18 @@ h1 {
   .mission p { font-size: 12px; line-height: 1.62; }
   .tagline { position: relative; left: auto; bottom: auto; order: 6; margin-top: 18px; font-size: 7px; white-space: normal; flex-wrap: wrap; justify-content: center; }
 
-  .preloader-dark-field { top: -18vw; left: 50%; width: 132vw; transform: translateX(-50%); }
-  .preloader-media { top: 31%; left: 50%; width: min(70vw, 390px); }
-  .preloader-left-copy { top: 7%; right: auto; left: 8%; width: 84%; }
-  .preloader-stat--waste { font-size: clamp(25px, 7.5vw, 36px); text-align: center; }
-  .preloader-stat--recycled { margin-top: 22px; font-size: clamp(14px, 3.7vw, 18px); }
-  .preloader-right-copy { top: 59%; left: 50%; width: 45%; }
-  .preloader-stat--housing strong { font-size: clamp(28px, 8vw, 38px); }
-  .preloader-stat--housing span { margin-top: 7px; font-size: clamp(18px, 4.3vw, 22px); }
-  .preloader-stat--housing span { white-space: normal; }
-  .preloader-stat--deficit { margin-top: 20px; padding-left: 0; font-size: clamp(17px, 4.6vw, 21px); }
+  .preloader-sequence { top: 43%; width: 100vw; }
+  .preloader-step:nth-child(2) { left: 22%; }
+  .preloader-step:nth-child(3) { left: 44%; }
+  .preloader-step:nth-child(4) { left: 66%; }
+  .preloader-step:nth-child(5) { left: 88%; }
+  .preloader-dot__copy { padding: 14%; }
+  .preloader-dot__metric i { font-size: clamp(14px, 4.2vw, 18px); }
+  .preloader-dot__metric strong { font-size: clamp(36px, 10vw, 48px); }
+  .preloader-dot__copy em { font-size: clamp(13px, 3.6vw, 16px); }
+  .preloader-step__caption { top: clamp(84px, 24vw, 100px); max-width: 230px; }
+  .preloader-step__caption span { font-size: clamp(16px, 4.5vw, 20px); }
+  .preloader-step__caption small { margin-top: 11px; font-size: clamp(9px, 2.6vw, 11px); }
 
   .what-we-do {
     width: 100%;
@@ -1362,9 +1370,431 @@ h1 {
   .footer-principles__leaf { width: 34px; height: 44px; margin-right: 3px; }
 }
 
+/* Mobile preloader (≤600px): a dedicated portrait composition. The tablet
+   sequence above remains horizontal until its own layout is designed. These
+   type tokens will also be the basis for the mobile page typography. */
+@media (max-width: 600px) {
+  :root {
+    --mobile-title-size: clamp(28px, 8vw, 38px);
+    --mobile-body-size: clamp(15px, 4.2vw, 18px);
+    --mobile-meta-size: clamp(10px, 2.8vw, 12px);
+  }
+
+  .preloader {
+    background: #06432f;
+    padding: 0;
+  }
+  .preloader-sequence {
+    inset: 0;
+    width: auto;
+    height: auto;
+    transform: none;
+  }
+  .preloader-sequence__line {
+    top: 19%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    width: 1px;
+    height: 63%;
+    transform: translateX(-50%);
+    background: rgba(219, 226, 174, .66);
+  }
+  .preloader-step {
+    left: 50% !important;
+    width: 0;
+  }
+  .preloader-step:nth-child(2) { top: 19%; }
+  .preloader-step:nth-child(3) { top: 40%; }
+  .preloader-step:nth-child(4) { top: 61%; }
+  .preloader-step:nth-child(5) { top: 82%; }
+  .preloader-dot__copy {
+    padding: 11%;
+    justify-content: center;
+  }
+  .preloader-dot__mobile-support { display: block; }
+  .preloader-dot__mobile-label {
+    /* Unlike the desktop category caption, this is used only for the opening
+       stat and reads as the lead-in to its sentence—not as a separate title. */
+    display: block;
+    margin-bottom: 7px;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(13px, 4vw, 16px);
+    font-weight: 400;
+    letter-spacing: -.035em;
+    line-height: 1.05;
+    text-transform: none;
+  }
+  .preloader-dot__metric {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: .22em;
+    white-space: nowrap;
+  }
+  .preloader-dot__metric i {
+    margin: 0;
+    font-size: clamp(19px, 6vw, 23px);
+    font-weight: 500;
+    letter-spacing: -.05em;
+    line-height: .96;
+  }
+  .preloader-dot__metric strong {
+    font-size: clamp(26px, 8vw, 31px);
+    font-weight: 600;
+    letter-spacing: -.065em;
+    line-height: .96;
+  }
+  .preloader-dot__copy em {
+    margin-top: 4px;
+    font-size: clamp(24px, 7.5vw, 29px);
+    font-weight: 500;
+    letter-spacing: -.05em;
+    line-height: .95;
+  }
+  .preloader-dot__mobile-support {
+    margin-top: 10px;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(13px, 4vw, 16px);
+    font-weight: 400;
+    letter-spacing: -.04em;
+    line-height: 1.16;
+  }
+  .preloader-step__caption { display: none; }
+}
+
 @media (max-width: 480px) {
   .hero { padding-left: 18px; padding-right: 18px; }
   .brand { transform: scale(.59); margin: -16px 0 -2px; }
   .feature-image { width: min(82vw, 327px); height: min(122vw, 487px); }
   .story-image { width: calc(50vw - 28px); height: calc(50vw - 28px); max-width: 150px; max-height: 150px; }
+}
+
+/* Phone hero (≤600px). The preloader's vertical knots hand off into this
+   centred ring stack; tablet and desktop retain their existing compositions. */
+@media (max-width: 600px) {
+  .hero {
+    width: 100%;
+    height: auto;
+    min-height: 100svh;
+    padding: 16px 20px 40px;
+    align-items: stretch;
+  }
+  .mobile-hero-header {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: 1;
+    width: 100%;
+    min-height: 36px;
+  }
+  .mobile-hero-header .brand {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(65vw, 224px);
+    height: auto;
+    aspect-ratio: 6.56;
+    margin: 0;
+    background-size: 284.6% auto;
+    background-position: 53.3% 2.8%;
+    transform: none;
+  }
+  .mobile-menu-toggle {
+    position: absolute;
+    right: -4px;
+    display: grid;
+    width: 46px;
+    height: 46px;
+    padding: 10px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    place-content: center;
+    gap: 5px;
+  }
+  .mobile-menu-toggle span {
+    display: block;
+    width: 26px;
+    height: 2px;
+    border-radius: 999px;
+    background: #0c4030;
+    transition: transform .22s ease, opacity .18s ease;
+  }
+  .mobile-menu-toggle.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .mobile-menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .mobile-menu-toggle.is-open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-nav {
+    position: absolute;
+    z-index: 3;
+    top: 52px;
+    right: 0;
+    display: grid;
+    width: min(212px, calc(100vw - 40px));
+    padding: 18px 20px;
+    border: 1px solid rgba(12, 64, 48, .16);
+    border-radius: 18px;
+    background: rgba(243, 244, 236, .98);
+    box-shadow: 0 16px 34px rgba(6, 55, 37, .14);
+    gap: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .24s cubic-bezier(.16, 1, .3, 1);
+  }
+  .mobile-nav.is-open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .mobile-nav a {
+    color: #155d5e;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .feature-image { display: none; }
+  .intro {
+    order: 2;
+    width: min(100%, 350px);
+    margin: 24px auto 0;
+    text-align: left;
+  }
+  h1 {
+    font-size: clamp(17px, 4.8vw, 20px);
+    letter-spacing: -.035em;
+    line-height: 1.22;
+  }
+  .intro br { display: none; }
+  .intro h1 br + span::before { content: ' '; }
+  .story-images {
+    order: 3;
+    display: grid;
+    width: 100%;
+    /* The rings are the mobile hero's primary visual narrative. Their height
+       intentionally carries the mission copy below the opening viewport. */
+    --mobile-ring-size: clamp(108px, min(40vw, 18svh), 154px);
+    margin-top: 14px;
+    justify-items: center;
+    gap: 9px;
+  }
+  .story-image {
+    width: var(--mobile-ring-size);
+    height: var(--mobile-ring-size);
+    max-width: none;
+    max-height: none;
+  }
+  .story-image::after { border-width: .78cqw; }
+  .mission {
+    order: 4;
+    width: min(100%, 338px);
+    margin: 58px auto 0;
+    column-gap: 14px;
+  }
+  .mission { align-items: stretch; }
+  .mission-rule { align-self: stretch; height: auto; min-height: 0; }
+  .mission > div { align-self: start; }
+  .mission p {
+    margin: 0 0 20px;
+    font-size: clamp(13px, 3.8vw, 15px);
+    line-height: 1.58;
+  }
+  .mission p + p { margin-top: 0; }
+  .tagline { display: none; }
+
+  /* Mobile Work is a pinned, vertical thread. Every service is anchored to a
+     fixed knot, so it can open and close in place without a wandering card or
+     layout reflow. Desktop and tablet retain their independent layouts. */
+  .what-we-do {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0 0 64px;
+    overflow: visible;
+  }
+  .work-mobile-stage {
+    position: relative;
+    display: block;
+    --work-thread-x: clamp(64px, 20vw, 85px);
+    --mobile-service-circle: clamp(106px, 31vw, 126px);
+    --work-copy-left: clamp(136px, calc(20vw + 73px), 170px);
+    width: 100%;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 43%, #174b2e 0%, #0d4027 48%, #08341e 100%);
+  }
+  .work-rail {
+    z-index: 0;
+    display: block;
+    position: absolute;
+    top: 13%;
+    bottom: 13%;
+    left: var(--work-thread-x);
+    width: 1px;
+    height: auto;
+    min-height: 0;
+    border-radius: 0;
+    background: rgba(219, 226, 174, .66);
+    transform: translateX(-50%);
+  }
+  .work-top-grid,
+  .work-lower-cards { display: contents; }
+  .work-top-grid .work-card,
+  .work-lower-cards .work-card {
+    position: absolute;
+    z-index: 2;
+    top: var(--work-service-position);
+    left: var(--work-thread-x);
+    width: var(--mobile-service-circle);
+    height: var(--mobile-service-circle);
+    min-height: 0;
+    margin: 0;
+    padding: clamp(14px, 3.8vw, 18px) clamp(10px, 3vw, 14px);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+  .work-card__icon,
+  .work-lower-cards .work-card__icon {
+    display: block;
+    width: auto;
+    height: clamp(24px, 7vw, 30px);
+    margin: 0;
+  }
+  .work-card h3,
+  .work-lower-cards .work-card h3 {
+    margin: clamp(7px, 2vw, 9px) 0 0;
+    font-size: clamp(12px, 3.55vw, 15px);
+    line-height: 1.08;
+    letter-spacing: -.055em;
+  }
+  .work-card p,
+  .work-lower-cards .work-card p {
+    display: none;
+  }
+  .work-service-explanations {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+  }
+  .work-service-explanations p {
+    position: absolute;
+    /* A text block reads visually lower than a circle when it is centred by
+       raw geometry. Lift it slightly so its optical centre meets the icon and
+       title at the centre of the active service knot. */
+    top: calc(var(--work-service-position) - 5px);
+    right: 18px;
+    left: var(--work-copy-left);
+    width: auto;
+    margin: 0;
+    color: #f3f4ec;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(11px, 3.2vw, 13px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.34;
+    transform: translateY(-50%);
+    will-change: transform, clip-path;
+  }
+  .work-intro {
+    position: relative;
+    z-index: 1;
+    top: auto;
+    right: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 34px 20px 26px;
+    background: #f3f4ec;
+    text-align: center;
+  }
+  .work-intro h2 {
+    position: static;
+    width: auto;
+    margin: 0;
+    color: #0c4030;
+    font-size: clamp(17px, 4.8vw, 20px);
+    font-weight: 600;
+    line-height: 1.22;
+    letter-spacing: -.035em;
+  }
+  .work-intro__button { display: none; }
+  .work-summary {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(100% - 40px, 420px);
+    margin: 46px auto 0;
+    padding: 0;
+    font-size: clamp(13px, 3.8vw, 15px);
+    line-height: 1.58;
+    text-align: left;
+  }
+}
+
+/* A short handset has less vertical room for each of the six stops. Keep the
+   thread full-height but scale the type—not the interaction—so every service
+   still resolves cleanly inside its opened knot. */
+@media (max-width: 600px) and (max-height: 650px) {
+  .work-card h3,
+  .work-lower-cards .work-card h3 {
+    margin-bottom: 5px;
+    font-size: clamp(13px, 4vw, 16px);
+  }
+  .work-service-explanations p {
+    right: 14px;
+    font-size: clamp(9px, 2.7vw, 10.5px);
+    line-height: 1.22;
+  }
+}
+
+@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
+  .work-mobile-stage {
+    height: auto;
+    min-height: 0;
+    padding: 18px 0 28px;
+    background: radial-gradient(circle at 50% 25%, #174b2e 0%, #0d4027 46%, #08341e 100%);
+  }
+  .work-intro {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    margin: 0;
+  }
+  .work-intro h2 { color: #0c4030; }
+  .work-rail { display: none; }
+  .work-service-explanations { display: none; }
+  .work-top-grid,
+  .work-lower-cards {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100% - 24px, 560px);
+    margin: 0 auto 12px;
+    gap: 12px;
+  }
+  .work-top-grid .work-card,
+  .work-lower-cards .work-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    transform: none;
+  }
 }
