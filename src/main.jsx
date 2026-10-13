@@ -8,7 +8,6 @@ import storyDamagedHome from './assets/story-damaged-home.png'
 import storyReclaimedScrap from './assets/story-reclaimed-scrap.png'
 import storyRebuiltHome from './assets/story-rebuilt-home.png'
 import storyCommunityChildren from './assets/story-community-children.png'
-import nairobiWasteHousing from './assets/nairobi-waste-housing.png'
 import heroFeature from './assets/hero-building-hope-hero-crop.png'
 import workRecoveryIcon from './assets/work-icon-recovery.png'
 import workCommunityIcon from './assets/work-icon-community.png'
@@ -112,6 +111,46 @@ const involvementWays = [
   },
 ]
 
+const preloaderStats = [
+  {
+    eyebrow: 'Over',
+    value: '2,400',
+    detail: 'tonnes',
+    support: 'of waste every day',
+    mobileIntro: 'Nairobi generates',
+    label: 'Nairobi generates',
+    color: '#f3a16d',
+    ringColor: '#efa06b',
+  },
+  {
+    eyebrow: 'Only',
+    value: '5%',
+    detail: '',
+    support: 'of C&D waste is recycled.',
+    label: 'Recycling',
+    color: '#cce4a8',
+    ringColor: '#9caf87',
+  },
+  {
+    eyebrow: 'Over',
+    value: '60%',
+    detail: '',
+    support: 'of the population live in informal settlements.',
+    label: 'Informal housing',
+    color: '#f5f3e8',
+    ringColor: '#9caf87',
+  },
+  {
+    eyebrow: 'A',
+    value: '2m',
+    detail: '',
+    support: 'unit housing deficit.',
+    label: 'Housing',
+    color: '#9ecb9d',
+    ringColor: '#9caf87',
+  },
+]
+
 function StoryImage({ className, label, image }) {
   return <div className={`story-image ${className}`} role="img" aria-label={label} style={{ '--story-image': `url(${image})` }} />
 }
@@ -167,6 +206,38 @@ function DesktopNav() {
   )
 }
 
+function MobileNav() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <>
+      <button
+        className={`mobile-menu-toggle${isOpen ? ' is-open' : ''}`}
+        type="button"
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation"
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+      <nav id="mobile-navigation" className={`mobile-nav${isOpen ? ' is-open' : ''}`} aria-label="Mobile navigation">
+        {menu.map((item) => (
+          <a
+            href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
+            key={item}
+            onClick={() => setIsOpen(false)}
+          >
+            {item}
+          </a>
+        ))}
+      </nav>
+    </>
+  )
+}
+
 function HeroFeature() {
   return (
     <div className="feature-image">
@@ -185,6 +256,18 @@ function WorkCard({ service }) {
   )
 }
 
+function MobileWorkService({ service }) {
+  return (
+    <article className={`work-mobile-service work-mobile-service--${service.id}`}>
+      <div className="work-mobile-service__circle">
+        <img src={service.icon} alt="" aria-hidden="true" />
+        <h3>{service.title}</h3>
+      </div>
+      <p>{service.copy}</p>
+    </article>
+  )
+}
+
 function WhatWeDo() {
   return (
     <section className="what-we-do" id="our-work" aria-labelledby="work-heading">
@@ -193,12 +276,18 @@ function WhatWeDo() {
         <a className="work-intro__button" href="#current-pilots">Explore our work <span aria-hidden="true">→</span></a>
       </div>
 
-      <div className="work-rail" aria-hidden="true" />
-      <div className="work-top-grid">
-        {workServices.slice(0, 4).map((service) => <WorkCard key={service.id} service={service} />)}
+      <div className="work-mobile-scroll-list">
+        {workServices.map((service) => <MobileWorkService key={service.id} service={service} />)}
       </div>
-      <div className="work-lower-cards">
-        {workServices.slice(4).map((service) => <WorkCard key={service.id} service={service} />)}
+
+      <div className="work-mobile-stage">
+        <div className="work-rail" aria-hidden="true" />
+        <div className="work-top-grid">
+          {workServices.slice(0, 4).map((service) => <WorkCard key={service.id} service={service} />)}
+        </div>
+        <div className="work-lower-cards">
+          {workServices.slice(4).map((service) => <WorkCard key={service.id} service={service} />)}
+        </div>
       </div>
 
       <p className="work-summary">We work across the entire circular ecosystem—<br />connecting people, resources and knowledge<br />to create lasting change in Kenya’s communities.</p>
@@ -329,116 +418,171 @@ function SiteFooter() {
   )
 }
 
-function Preloader({ isLeaving, progress, heroTarget, onExitComplete }) {
-  const mediaRef = useRef(null)
-  const darkFieldRef = useRef(null)
-  const leftCopyRef = useRef(null)
-  const rightCopyRef = useRef(null)
-  const mediaImageRef = useRef(null)
+function Preloader({ isLeaving, progress, onExitComplete }) {
+  const preloaderRef = useRef(null)
+  const sequenceRef = useRef(null)
+  const dotRefs = useRef([])
+  const copyRefs = useRef([])
+  const captionRefs = useRef([])
+  const activeIndex = Math.min(preloaderStats.length - 1, Math.floor(progress / (100 / preloaderStats.length)))
+  const previousIndex = useRef(-1)
+
+  const getSizes = useCallback(() => {
+    const compact = window.innerWidth <= 860
+    const mobile = window.innerWidth <= 600
+    const dot = mobile
+      ? Math.min(18, Math.max(14, window.innerWidth * .052))
+      : compact
+        ? Math.min(32, Math.max(24, window.innerWidth * .075))
+      : Math.min(36, Math.max(28, window.innerWidth * .02))
+    // On phones, use the available height as well as the width. This lets the
+    // active statistic use the generous portrait space without colliding with
+    // the earlier/later knots on shorter handsets.
+    const expanded = mobile
+      ? Math.min(196, Math.max(154, Math.min(window.innerWidth * .56, window.innerHeight * .34)))
+      : compact
+        ? Math.min(156, Math.max(132, window.innerWidth * .34))
+      : Math.min(218, Math.max(176, Math.min(window.innerWidth * .12, window.innerHeight * .26)))
+
+    return { dot, expanded }
+  }, [])
 
   useLayoutEffect(() => {
-    if (!isLeaving || !heroTarget || !mediaRef.current) return undefined
+    if (isLeaving) return undefined
 
-    const media = mediaRef.current
-    const darkField = darkFieldRef.current
-    const leftCopy = leftCopyRef.current
-    const rightCopy = rightCopyRef.current
-    const mediaBounds = media.getBoundingClientRect()
-    const leftBounds = leftCopy.getBoundingClientRect()
-    const rightBounds = rightCopy.getBoundingClientRect()
-    const translateX = heroTarget.left - (mediaBounds.left + mediaBounds.width / 2) + heroTarget.width / 2
-    const translateY = heroTarget.top - (mediaBounds.top + mediaBounds.height / 2) + heroTarget.height / 2
+    const dots = dotRefs.current.filter(Boolean)
+    const copies = copyRefs.current.filter(Boolean)
+    const captions = captionRefs.current.filter(Boolean)
+    const activeDot = dots[activeIndex]
+    const activeCopy = copies[activeIndex]
+    const activeCaption = captions[activeIndex]
+    if (!activeDot || !activeCopy || !activeCaption) return undefined
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const fieldDuration = reducedMotion ? 0.08 : 0.58
-    const mediaDelay = reducedMotion ? 0 : fieldDuration + 0.06
-    const duration = reducedMotion ? 0.08 : 1.08
-    const shapeDuration = reducedMotion ? 0.08 : 0.56
-    const ease = reducedMotion ? 'none' : 'power3.inOut'
+    const { dot, expanded } = getSizes()
+    const previousDot = dots[previousIndex.current]
+    const previousCopy = copies[previousIndex.current]
+    const previousCaption = captions[previousIndex.current]
+    const timeline = gsap.timeline()
+    if (previousIndex.current === -1) {
+      gsap.set(dots, { width: dot, height: dot })
+      gsap.set([...copies, ...captions], { autoAlpha: 0, y: 8 })
+    }
 
-    gsap.set(media, { clipPath: 'inset(0)' })
+    if (previousDot && previousIndex.current !== activeIndex) {
+      timeline
+        .to([previousCopy, previousCaption], { autoAlpha: 0, y: -7, duration: reducedMotion ? .01 : .16, ease: 'power1.out' }, 0)
+        .to(previousDot, { width: dot, height: dot, duration: reducedMotion ? .01 : .44, ease: 'power3.inOut' }, 0)
+    }
 
-    let handoffFrame
+    timeline
+      .to(activeDot, { width: expanded, height: expanded, duration: reducedMotion ? .01 : .58, ease: 'power3.inOut' }, previousDot ? .06 : 0)
+      .to(activeCopy, { autoAlpha: 1, y: 0, duration: reducedMotion ? .01 : .28, ease: 'power2.out' }, previousDot ? .28 : .22)
+      .to(activeCaption, { autoAlpha: 1, y: 0, duration: reducedMotion ? .01 : .24, ease: 'power2.out' }, previousDot ? .34 : .29)
+
+    previousIndex.current = activeIndex
+    return () => timeline.kill()
+  }, [activeIndex, getSizes, isLeaving])
+
+  useLayoutEffect(() => {
+    if (!isLeaving || !preloaderRef.current || !sequenceRef.current) return undefined
+
+    const preloader = preloaderRef.current
+    const sequence = sequenceRef.current
+    const dots = dotRefs.current.filter(Boolean)
+    const copies = copyRefs.current.filter(Boolean)
+    const captions = captionRefs.current.filter(Boolean)
+    const targets = Array.from(document.querySelectorAll('.story-image'))
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isMobile = window.matchMedia('(max-width: 600px)').matches
+    const { dot } = getSizes()
+    const handoffLayer = document.createElement('div')
+    handoffLayer.className = 'preloader-ring-handoff'
+    document.body.appendChild(handoffLayer)
+
+    const createTravellingDots = () => dots.map((source, index) => {
+      const bounds = source.getBoundingClientRect()
+      const travellingDot = document.createElement('div')
+      travellingDot.className = 'preloader-ring-handoff__dot'
+      travellingDot.style.left = `${bounds.left + bounds.width / 2}px`
+      travellingDot.style.top = `${bounds.top + bounds.height / 2}px`
+      travellingDot.style.width = `${dot}px`
+      travellingDot.style.height = `${dot}px`
+      travellingDot.style.boxSizing = 'border-box'
+      travellingDot.style.border = `${dot / 2}px solid ${preloaderStats[index].color}`
+      handoffLayer.appendChild(travellingDot)
+      return travellingDot
+    })
+
+    // The handoff dots are separate from the sequence so their final motion is
+    // not clipped by the preloader while the hero becomes visible underneath.
+    const travellingDots = createTravellingDots()
     const exit = gsap.timeline({
-      defaults: { duration, ease },
       onComplete: () => {
-        // Snap to the measured hero bounds before the image source changes.
-        // This keeps the moving element itself continuous with the real hero.
-        gsap.set(media, {
-          width: heroTarget.width,
-          height: heroTarget.height,
-          borderRadius: 0,
-        })
-        const landedBounds = media.getBoundingClientRect()
-        media.style.setProperty('--preloader-x', `${translateX + heroTarget.left - landedBounds.left}px`)
-        media.style.setProperty('--preloader-y', `${translateY + heroTarget.top - landedBounds.top}px`)
-        handoffFrame = requestAnimationFrame(() => {
-          handoffFrame = requestAnimationFrame(onExitComplete)
-        })
+        handoffLayer.remove()
+        onExitComplete()
       },
     })
 
     exit
-      .to(darkField, { x: -window.innerWidth - darkField.getBoundingClientRect().right, duration: fieldDuration, ease: 'power2.in' }, 0)
-      .to(leftCopy, { x: -leftBounds.right - 64, duration: fieldDuration, ease: 'power2.in' }, 0)
-      .to(rightCopy, { x: window.innerWidth - rightBounds.left + 64, duration: fieldDuration, ease: 'power2.in' }, 0)
-      // The image changes from the problem statement to the homepage story as
-      // its journey begins. Its landing is therefore the same artwork as hero.
-      .call(() => {
-        media.classList.add('preloader-media--hero')
-        mediaImageRef.current.src = heroFeature
-      }, [], mediaDelay)
-      .to(media, {
-        '--preloader-x': `${translateX}px`,
-        '--preloader-y': `${translateY}px`,
-      }, mediaDelay)
-      // Form the hero oval early. The final section is only a rigid slide,
-      // so its silhouette does not swell as it lands on the hero image.
-      .to(media, {
-        width: heroTarget.width,
-        height: heroTarget.height,
-        borderRadius: 0,
-        duration: shapeDuration,
-        ease: reducedMotion ? 'none' : 'power2.inOut',
-      }, mediaDelay)
+      .to([...copies, ...captions], { autoAlpha: 0, y: -8, duration: reducedMotion ? .01 : .16, ease: 'power1.in' }, 0)
+      .to(dots, { width: dot, height: dot, duration: reducedMotion ? .01 : .32, ease: 'power3.inOut' }, 0)
+      .to(sequence, { autoAlpha: 0, duration: reducedMotion ? .01 : .16, ease: 'power1.out' }, .14)
+      // On phones the curtain rises from its lower edge, following the same
+      // vertical path as the four knots and their destination hero rings.
+      .to(preloader, { clipPath: isMobile ? 'inset(0 0 100% 0)' : 'inset(0 0 0 100%)', duration: reducedMotion ? .01 : .72, ease: 'power1.inOut' }, reducedMotion ? .01 : .28)
+      .to(travellingDots, {
+        left: (index) => {
+          const target = targets[index]?.getBoundingClientRect()
+          return target ? target.left + target.width / 2 : window.innerWidth / 2
+        },
+        top: (index) => {
+          const target = targets[index]?.getBoundingClientRect()
+          return target ? target.top + target.height / 2 : window.innerHeight / 2
+        },
+        width: (index) => targets[index]?.offsetWidth ?? dot,
+        height: (index) => targets[index]?.offsetHeight ?? dot,
+        borderWidth: (index) => (targets[index]?.offsetWidth ?? dot) * (isMobile ? .024 : .055),
+        borderColor: (index) => preloaderStats[index].ringColor,
+        duration: reducedMotion ? .01 : .72,
+        ease: 'power2.inOut',
+      }, reducedMotion ? .01 : .28)
 
     return () => {
       exit.kill()
-      cancelAnimationFrame(handoffFrame)
+      handoffLayer.remove()
     }
-  }, [heroTarget, isLeaving, onExitComplete])
+  }, [getSizes, isLeaving, onExitComplete])
 
   return (
     <section
+      ref={preloaderRef}
       className={`preloader${isLeaving ? ' preloader--leaving' : ''}`}
       aria-label="Loading PISDK"
       aria-live="polite"
+      aria-atomic="true"
     >
-      <div className="preloader-dark-field" ref={darkFieldRef} />
-
-      <div className="preloader-left-copy" ref={leftCopyRef}>
-        <p className={`preloader-stat preloader-stat--waste preloader-stat--reveal-left${progress >= 14 ? ' is-revealed' : ''}`}>Nairobi generates<br />over 2,400 tonnes<br />of waste every day.</p>
-        <p className={`preloader-stat preloader-stat--recycled preloader-stat--reveal-left${progress >= 30 ? ' is-revealed' : ''}`}>Less than 5%<br />of C&amp;D waste<br />is recycled.</p>
-      </div>
-
-      <div
-        className="preloader-media"
-        ref={mediaRef}
-        role="progressbar"
-        aria-label="Loading the PISDK homepage"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow={Math.round(progress)}
-        style={{ '--loader-angle': `${progress * 3.6}deg` }}
-      >
-        <img ref={mediaImageRef} src={nairobiWasteHousing} alt="Nairobi skyline and construction waste" />
-        <svg className="preloader-hero-outline" viewBox="0 0 429 650" focusable="false" aria-hidden="true">
-          <circle cx="97.2" cy="330.5" r="329" />
-        </svg>
-      </div>
-
-      <div className="preloader-right-copy" ref={rightCopyRef}>
-        <p className={`preloader-stat preloader-stat--housing preloader-stat--reveal-right${progress >= 48 ? ' is-revealed' : ''}`}><strong>Over 60%</strong><span>of the population live in<br />informal settlements.</span></p>
-        <p className={`preloader-stat preloader-stat--deficit preloader-stat--reveal-right${progress >= 64 ? ' is-revealed' : ''}`}>A 2m unit<br />housing deficit.</p>
+      <div className="preloader-sequence" ref={sequenceRef} role="progressbar" aria-label="Loading the PISDK homepage" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(progress)}>
+        <span className="preloader-sequence__line" aria-hidden="true" />
+        {preloaderStats.map((stat, index) => (
+          <div className="preloader-step" key={stat.label || stat.value}>
+            <div className="preloader-dot" ref={(node) => { dotRefs.current[index] = node }} style={{ '--dot-color': stat.color }}>
+              <div className="preloader-dot__copy" ref={(node) => { copyRefs.current[index] = node }}>
+              {stat.mobileIntro && <small className="preloader-dot__mobile-label">{stat.mobileIntro}</small>}
+                <span className="preloader-dot__metric">
+                  <i>{stat.eyebrow}</i>
+                  <strong>{stat.value}</strong>
+                </span>
+                {stat.detail && <em>{stat.detail}</em>}
+                <small className="preloader-dot__mobile-support">{stat.support}</small>
+              </div>
+            </div>
+            <div className="preloader-step__caption" ref={(node) => { captionRefs.current[index] = node }}>
+              {stat.support && <span>{stat.support}</span>}
+              {stat.label && <small>{stat.label}</small>}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )
@@ -450,7 +594,6 @@ function App() {
   const [isPreloaderDone, setIsPreloaderDone] = useState(false)
   const [isHeroReady, setIsHeroReady] = useState(false)
   const [isRingsReady, setIsRingsReady] = useState(false)
-  const [heroTarget, setHeroTarget] = useState(null)
   const pageRef = useRef(null)
 
   const completePreloader = useCallback(() => setIsPreloaderDone(true), [])
@@ -462,9 +605,45 @@ function App() {
   }, [isPreloaderDone])
 
   useEffect(() => {
+    if (!isPreloaderDone) return undefined
+
+    // Fullscreen, browser chrome changes, and device rotation can alter both
+    // viewport units and the measured positions used by the scroll-scrubbed
+    // handoffs. Refresh only after the viewport has settled for two frames so
+    // every section recalculates from one stable coordinate system.
+    let firstFrame = 0
+    let settledFrame = 0
+    const refreshAfterViewportChange = () => {
+      cancelAnimationFrame(firstFrame)
+      cancelAnimationFrame(settledFrame)
+      firstFrame = requestAnimationFrame(() => {
+        settledFrame = requestAnimationFrame(() => ScrollTrigger.refresh())
+      })
+    }
+
+    const viewport = window.visualViewport
+    window.addEventListener('resize', refreshAfterViewportChange)
+    window.addEventListener('orientationchange', refreshAfterViewportChange)
+    document.addEventListener('fullscreenchange', refreshAfterViewportChange)
+    viewport?.addEventListener('resize', refreshAfterViewportChange)
+    document.fonts?.ready.then(refreshAfterViewportChange).catch(() => {})
+    refreshAfterViewportChange()
+
+    return () => {
+      cancelAnimationFrame(firstFrame)
+      cancelAnimationFrame(settledFrame)
+      window.removeEventListener('resize', refreshAfterViewportChange)
+      window.removeEventListener('orientationchange', refreshAfterViewportChange)
+      document.removeEventListener('fullscreenchange', refreshAfterViewportChange)
+      viewport?.removeEventListener('resize', refreshAfterViewportChange)
+    }
+  }, [isPreloaderDone])
+
+  useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    // This is a problem statement, not a flash screen: give visitors time to read it.
-    const duration = reducedMotion ? 80 : 6500
+    // Four quiet, readable statistics—one state per dot—prepare the story
+    // without delaying the actual page with image decoding.
+    const duration = reducedMotion ? 80 : 7200
     let frame
     let exitTimer
     const startedAt = performance.now()
@@ -481,16 +660,6 @@ function App() {
       }
 
       exitTimer = window.setTimeout(() => {
-        const featureImage = document.querySelector('.feature-image')
-        if (featureImage) {
-          const { left, top, width, height } = featureImage.getBoundingClientRect()
-          setHeroTarget({
-            left,
-            top,
-            width,
-            height,
-          })
-        }
         // Let the four hero rings settle beneath the outgoing preloader. When
         // the homepage first becomes touchable, their diameter is already at
         // its final resting size and ready for the Work handoff.
@@ -810,26 +979,88 @@ function App() {
     return () => media.revert()
   }, [isPreloaderDone])
 
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
+      const services = Array.from(scope.querySelectorAll('.work-mobile-service'))
+
+      if (services.length !== 6) return undefined
+
+      const animations = services.map((service) => {
+        const circle = service.querySelector('.work-mobile-service__circle')
+        const copy = service.querySelector('p')
+        if (!circle || !copy) return null
+
+        // Normal document scroll: a service opens from its knot as its row
+        // enters, then remains open with its revealed copy. On a reverse
+        // scroll the same timeline naturally contracts it back to a knot.
+        gsap.set(circle, { scale: .18, transformOrigin: '50% 50%', force3D: true })
+        gsap.set(copy, {
+          x: 14,
+          clipPath: 'inset(0% 100% 0% 0%)',
+          force3D: true,
+        })
+
+        return gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            trigger: service,
+            // The interaction happens around the reading area rather than
+            // at the bottom of the viewport. Every completed service remains
+            // visually available, creating a calm, cumulative reading path.
+            start: 'top 76%',
+            end: 'top 57%',
+            scrub: .4,
+            invalidateOnRefresh: true,
+          },
+        })
+          .to(circle, { scale: 1, duration: .24 }, 0)
+          .to(copy, { x: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: .24 }, .04)
+      }).filter(Boolean)
+
+      return () => {
+        animations.forEach((animation) => animation.kill())
+        services.forEach((service) => {
+          const circle = service.querySelector('.work-mobile-service__circle')
+          const copy = service.querySelector('p')
+          gsap.set([circle, copy], { clearProps: 'transform,clipPath' })
+        })
+      }
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
   return (
     <>
       {!isPreloaderDone && (
         <Preloader
           isLeaving={isLeaving}
           progress={progress}
-          heroTarget={heroTarget}
           onExitComplete={completePreloader}
         />
       )}
       <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
         <section className="hero" aria-labelledby="hero-heading">
-        <Brand />
+        <div className="mobile-hero-header">
+          <Brand />
+          <MobileNav />
+        </div>
 
         <DesktopNav />
 
         <HeroFeature />
 
         <div className="intro">
-          <h1 id="hero-heading">We are working toward a just, resilient,<br />{'and waste-free world where low-income communities'}<br />{'build with dignity using reclaimed resources.'}</h1>
+          <h1 id="hero-heading">
+            <span>We are working toward a just, resilient,</span><br />
+            <span>and waste-free world where low-income communities</span><br />
+            <span>build with dignity using reclaimed resources.</span>
+          </h1>
         </div>
 
         <div className="story-images" aria-label="Stories from PISDK communities">

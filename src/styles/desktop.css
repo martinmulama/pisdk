@@ -1,0 +1,1003 @@
+:root {
+  /*
+   * The editorial canvas is intentionally 16:9. Keep it in ordinary CSS
+   * pixels so native browser zoom, fullscreen, Brave, and Firefox all share
+   * one coordinate system. These dimensions match the former visual result
+   * without relying on the non-standard `zoom` property.
+   */
+  --desktop-canvas-width: min(100vw, 177.18svh);
+  --desktop-canvas-height: min(56.44vw, 100svh);
+  --desktop-impact-height: min(64.464vw, 114.2svh);
+  --deep-navy-green: #0d4027;
+  --ring-warm: #efa06b;
+  --ring-green: #9caf87;
+  --recovery-orange: var(--ring-warm);
+  color: #245e5c;
+  background: #f3f4ec;
+  font-family: 'Lora', Georgia, serif;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html { overflow-x: clip; scroll-behavior: smooth; }
+body { min-width: 320px; margin: 0; overflow-x: clip; background: #f3f4ec; }
+a { color: inherit; text-decoration: none; }
+
+.page-shell {
+  min-height: 100vh;
+  padding-bottom: 0;
+  overflow-x: clip;
+  overflow-y: visible;
+  background: #f3f4ec;
+}
+
+.hero {
+  position: relative;
+  width: var(--desktop-canvas-width);
+  height: var(--desktop-canvas-height);
+  margin: 0 auto;
+  container-type: inline-size;
+}
+
+.reference-crop {
+  background-image: var(--reference-image);
+  background-repeat: no-repeat;
+  background-size: 100cqw 56.44cqw;
+}
+
+.brand {
+  position: absolute;
+  top: 1.074cqw;
+  left: calc(50% - 11.515cqw);
+  width: 26.25cqw;
+  height: 4cqw;
+  background-image: var(--reference-image);
+  background-repeat: no-repeat;
+  background-size: 74.7cqw 42.13cqw;
+  background-position: -25.83cqw -1.074cqw;
+}
+
+.desktop-nav {
+  position: fixed;
+  top: 4cqw;
+  /* These values used to inherit the page-scale workaround. Keep their
+     visual size now that the page uses native browser coordinates. */
+  right: clamp(27px, 3.2vw, 58px);
+  display: grid;
+  gap: clamp(9px, 1.32vw, 22px);
+  width: 130px;
+  text-align: right;
+  z-index: 2;
+}
+
+.desktop-nav a {
+  position: relative;
+  display: block;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(7px, .68vw, 13px);
+  font-weight: 500;
+  letter-spacing: .21em;
+  text-transform: uppercase;
+  transition: color .2s ease;
+}
+.desktop-nav a:hover, .desktop-nav .active { color: #e04c30; }
+.desktop-nav__indicator {
+  position: absolute;
+  top: var(--nav-indicator-y, 0px);
+  /* The nav retains its established width and right offset. The one shared
+     indicator travels in the outer-right gutter between menu links. */
+  left: calc(100% + clamp(5px, .4cqw, 9px));
+  width: 4.55cqw;
+  height: 4.15cqw;
+  background-image: var(--reference-image);
+  background-repeat: no-repeat;
+  background-size: 100cqw 56.44cqw;
+  background-position: -94.8cqw -49.6cqw;
+  pointer-events: none;
+  transform: translateY(-50%) scale(.5);
+  transform-origin: left center;
+  transition: top .3s cubic-bezier(.16, 1, .3, 1);
+}
+
+/* This wrapper becomes a true header row only on phones. `display: contents`
+   preserves the established desktop placement of the visual brand crop. */
+.mobile-hero-header { display: contents; }
+.mobile-menu-toggle,
+.mobile-nav { display: none; }
+.work-mobile-stage { display: contents; }
+.work-mobile-scroll-list { display: none; }
+
+.feature-image {
+  position: absolute;
+  top: 7.49cqw;
+  /* Extend past the centered hero canvas until the image meets the viewport. */
+  left: calc((100cqw - 100vw) / 2);
+  display: block;
+  width: 25.704cqw;
+  height: 38.946cqw;
+}
+.feature-image > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Mask just inside the pale edge baked into the circular source image. */
+  clip-path: ellipse(76.69% 50.62% at 22.66% 50.85%);
+}
+.feature-image::after {
+  position: absolute;
+  /* The hero photo is a clipped portion of a circle. Recreate that exact
+     circle as a CSS border so it matches—and can transition with—the Impact
+     visual rings. */
+  top: .23%;
+  left: -54.03%;
+  width: 153.38%;
+  height: 101.24%;
+  border: 1.02cqw solid var(--ring-warm);
+  border-radius: 50%;
+  box-sizing: border-box;
+  content: '';
+  pointer-events: none;
+}
+
+.intro { position: absolute; top: 14.1%; left: 19.5%; }
+h1 {
+  margin: 0;
+  color: #205f5b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(16px, 1.78cqw, 38px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+
+.story-images { position: absolute; top: calc(39.18% - 2.85cqw); left: 19.5%; display: flex; gap: 4.8cqw; }
+.story-image {
+  position: relative;
+  width: 14.14cqw;
+  height: 14.14cqw;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #d8dfca;
+  background-image: var(--story-image);
+  background-position: center;
+  background-size: cover;
+  flex: 0 0 auto;
+}
+.story-image.damaged { background-position: 57% 52%; }
+.story-image.materials { background-position: 50% 50%; }
+.story-image.rebuilt { background-position: 54% 50%; }
+.story-image.children { background-position: 53% 47%; }
+.story-image::after {
+  position: absolute;
+  inset: 0;
+  border: .78cqw solid var(--ring-green);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+.damaged::after { border-color: var(--ring-warm); }
+
+.mission {
+  position: absolute;
+  top: 68.2%;
+  left: 45.54%;
+  display: grid;
+  grid-template-columns: 1px 1fr;
+  column-gap: 2cqw;
+  width: 40.2%;
+}
+.mission-rule { width: 1px; height: 11cqw; background: #9ba885; }
+.mission p { margin: .22cqw 0 1.3cqw; color: #3d7474; font-size: clamp(9px, 1.05cqw, 18px); line-height: 1.62; }
+.mission p + p { margin-top: 0; }
+
+.tagline {
+  position: absolute;
+  top: 90.6%;
+  bottom: auto;
+  left: 3.5%;
+  display: flex;
+  align-items: center;
+  gap: .82cqw;
+  color: #3e7778;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(6px, .63cqw, 11px);
+  font-weight: 500;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tagline b { color: #7e9485; font-size: .75cqw; font-weight: 400; }
+
+/* What we do — desktop geometry follows the supplied 1951 × 806 reference. */
+.what-we-do {
+  /* A clean off-white runway gives the Impact film circle room to arrive
+     before the next section's copy begins. Its depth matches the entire
+     upward reach of the film circle, plus a small visual buffer—so the full
+     video never collides with the lower Work cards or summary. */
+  --work-impact-runway: calc(19.6cqw + clamp(1rem, 1.5vw, 2rem));
+  position: relative;
+  /* Match the hero's centered, height-aware canvas at every desktop aspect. */
+  width: var(--desktop-canvas-width);
+  height: var(--desktop-canvas-height);
+  margin: 0 auto var(--work-impact-runway);
+  overflow: visible;
+  background: #f3f4ec;
+  container-type: inline-size;
+}
+.work-intro {
+  position: absolute;
+  z-index: 3;
+  top: 25.7%;
+  left: 3.5%;
+  width: 29.5%;
+}
+.work-intro h2 {
+  margin: 0;
+  color: #0c4030;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(16px, 1.78cqw, 38px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.work-intro__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45cqw;
+  width: 11.3cqw;
+  height: 2.54cqw;
+  margin-top: 1.35cqw;
+  border-radius: 999px;
+  background: linear-gradient(110deg, #779f62, #588d4d);
+  color: #f7f7ef;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(12px, .94cqw, 20px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  transition: transform .24s ease, background .24s ease;
+}
+.work-intro__button span { font-size: 1.25em; line-height: 1; }
+.work-intro__button:hover { transform: translateX(4px); background: #4c833f; }
+.work-rail {
+  position: absolute;
+  z-index: 0;
+  top: 3.2%;
+  bottom: 0;
+  /* Center the rail around the lower card stack. Its radius is half its
+     width, producing the same unbroken circular end as the cards themselves. */
+  left: 18.69%;
+  width: 19.44%;
+  border-radius: 9.72cqw 0 9.72cqw 9.72cqw;
+  background: radial-gradient(circle at 85% 17%, #174b2e 0%, #0d4027 42%, #08341e 100%);
+}
+.work-top-grid {
+  position: absolute;
+  z-index: 2;
+  top: 3.2%;
+  /* The cards themselves begin and end with the hero's four story circles. */
+  left: 18.82%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  width: 72.32%;
+  height: 35.5%;
+  padding: .68cqw;
+  gap: .16cqw;
+  overflow: hidden;
+  border-radius: 7.15cqw;
+  background: radial-gradient(circle at 36% 25%, #174b2e 0%, #0d4027 44%, #08341e 100%);
+}
+.work-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  color: #0b3f2b;
+  text-align: center;
+}
+.work-top-grid .work-card {
+  width: 100%;
+  aspect-ratio: 1;
+  /* Slightly reclaim top padding for the larger, more legible information
+     hierarchy below. The circle diameter itself remains part of the hero
+     handoff geometry, so it must not be changed here. */
+  padding: 1.25cqw .78cqw .65cqw;
+  border-radius: 50%;
+}
+.work-card--recovery { background: var(--ring-warm); }
+.work-card--community { background: radial-gradient(circle at 43% 31%, #d5e8bd, #bdd9a3 72%, #a8ca91); }
+.work-card--training { background: radial-gradient(circle at 40% 30%, #fffdf3, #edf1df 78%, #dce6ca); }
+.work-card--consultation { background: radial-gradient(circle at 42% 30%, #d6e9bc, #bbd89e 70%, #a7c98b); }
+.work-card__icon {
+  display: block;
+  width: auto;
+  height: 2.58cqw;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+.work-card h3 {
+  margin: .52cqw 0 .34cqw;
+  color: #0b3f2b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(13px, 1.15cqw, 24px);
+  font-weight: 600;
+  letter-spacing: -.055em;
+  line-height: 1.12;
+}
+.work-card p {
+  width: 84%;
+  margin: 0;
+  color: #164d36;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(9px, .93cqw, 18px);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  line-height: 1.34;
+}
+.work-lower-cards {
+  position: absolute;
+  z-index: 2;
+  /* Meet the orange service with a small, deliberate breathing gap. */
+  top: 37.1%;
+  left: 19.6%;
+  /* Equal to one top-row circle after the grid's padding and gaps. */
+  width: 17.62%;
+}
+.work-lower-cards .work-card {
+  width: 100%;
+  border-radius: 50%;
+}
+.work-card--research {
+  height: 17.62cqw;
+  padding: 1.14cqw .65cqw .5cqw;
+  background: radial-gradient(circle at 41% 26%, #f8f9ed, #e9efd9 73%, #d6e2c2);
+}
+.work-card--forums {
+  height: 17.62cqw;
+  margin-top: 0;
+  padding: 1.2cqw .65cqw .5cqw;
+  background: radial-gradient(circle at 43% 28%, #d3e9b4, #badb9b 70%, #a3c889);
+}
+.work-lower-cards .work-card__icon { height: 2.46cqw; }
+.work-lower-cards .work-card h3 {
+  margin-top: .42cqw;
+  /* The lower cards have intentional open space beneath their copy. Give the
+     description a clearer pause below its title so the content occupies the
+     circle as one balanced vertical composition. */
+  margin-bottom: 1.05cqw;
+  font-size: clamp(13px, 1.1cqw, 23px);
+}
+.work-lower-cards .work-card p {
+  width: 81%;
+  font-size: clamp(9px, .93cqw, 18px);
+  line-height: 1.36;
+}
+.work-summary {
+  position: absolute;
+  z-index: 3;
+  top: 58.5%;
+  left: 54.3%;
+  width: 37%;
+  margin: 0;
+  color: #3d7474;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(9px, 1.05cqw, 18px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.62;
+}
+/* A temporary, viewport-fixed layer carries the four photographic hero rings
+   into the work system. The live cards stay beneath it until the final radial
+   handoff, avoiding a fade or duplicated image state. */
+.hero-work-handoff {
+  position: fixed;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-work-handoff__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* The handoff changes position through compositor transforms only. */
+  will-change: transform, clip-path;
+  backface-visibility: hidden;
+}
+.hero-work-handoff__ring::after {
+  position: absolute;
+  inset: 0;
+  border: clamp(6px, .78vw, 15px) solid var(--handoff-ring-color, var(--ring-green));
+  border-radius: inherit;
+  content: '';
+}
+.hero-work-handoff__ring--1 { --handoff-ring-color: var(--ring-warm); }
+
+/* Our impact — the supplied before / rebuild / after photographs remain
+   independent from their CSS rings for a crisp presentation and future
+   transition work. */
+.impact {
+  position: relative;
+  z-index: 1;
+  width: var(--desktop-canvas-width);
+  /* The central film circle now shares the lower Work-circle's left edge.
+     Grow the canvas by the same ratio so the content keeps its breathing room. */
+  height: var(--desktop-impact-height);
+  margin: 0 auto;
+  /* The shared footer deliberately sits in the outer page gutter on wide
+     canvases, so the section itself must not crop it. Individual artwork is
+     clipped below where the reference calls for it. */
+  overflow: visible;
+  background: #f3f4ec;
+  container-type: inline-size;
+}
+.impact-visual {
+  --impact-ring-width: 0px;
+  --impact-ring-color: transparent;
+  position: absolute;
+  padding: var(--impact-ring-width);
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #f3f4ec;
+}
+.impact-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+.impact-visual__ring {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border: var(--impact-ring-width) solid var(--impact-ring-color);
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+.impact-visual__play {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 5.3cqw;
+  height: 5.3cqw;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(124 154 103 / 88%);
+  transform: translate(-50%, -50%);
+}
+.impact-visual__play::after {
+  width: 0;
+  height: 0;
+  margin-left: .32cqw;
+  border-top: .9cqw solid transparent;
+  border-bottom: .9cqw solid transparent;
+  border-left: 1.38cqw solid #f7f7ef;
+  content: '';
+}
+.impact-visual--before {
+  /* Sit at the foot of the enlarged film circle, rather than competing with
+     its upper arc as the Impact section enters the viewport. */
+  top: 20.12cqw;
+  left: 2.19%;
+  width: 15.72cqw;
+  height: 15.72cqw;
+  --impact-ring-width: .78cqw;
+  --impact-ring-color: var(--ring-green);
+}
+.impact-visual--before img { object-position: 55% 54%; }
+.impact-visual--feature {
+  /* Stay centred in the shared content width while the left curve lands on
+     the Work section's lowest-circle edge (19.6%). */
+  top: -19.6cqw;
+  left: 19.6%;
+  width: 55.44cqw;
+  height: 55.44cqw;
+  --impact-ring-width: 1.02cqw;
+  --impact-ring-color: var(--ring-warm);
+  /* GSAP masks this whole element during the Work → Impact handoff. Keeping
+     the static state whole means reduced-motion visitors see the completed
+     circle rather than a permanently clipped video. */
+  clip-path: inset(0);
+}
+.impact-visual--feature img { object-position: 55% 50%; }
+.impact-visual--after {
+  top: 20.12cqw;
+  left: 76.73%;
+  width: 15.72cqw;
+  height: 15.72cqw;
+  --impact-ring-width: .78cqw;
+  --impact-ring-color: var(--ring-green);
+}
+.impact-visual--after img { object-position: 62% 50%; }
+.impact-label {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 7.9cqw;
+  height: 1.59cqw;
+  margin: 0;
+  border-radius: 999px;
+  background: linear-gradient(105deg, #789b65, #87a972);
+  color: #f7f7ef;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(7px, .7cqw, 14px);
+  font-weight: 700;
+  letter-spacing: .27em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.impact-label--before { top: 35.84cqw; left: 6.1%; }
+.impact-label--after { top: 35.84cqw; left: 80.64%; }
+.impact-overview {
+  position: absolute;
+  /* The enlarged film circle extends 9.65% further into the section. Carry
+     the entire content row by the same amount to retain its original air. */
+  top: 41.11cqw;
+  /* Shared left content edge: hero footer, work heading, and impact copy. */
+  left: 3.5%;
+  width: 35.5%;
+}
+.impact-overview h2 {
+  margin: 0;
+  color: #205f5b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(22px, 2.35cqw, 50px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.impact-overview p {
+  /* The impact statistic is deliberately larger, but otherwise follows the
+     same Lora treatment as the hero mission copy. */
+  margin: 3.4cqw 0 0;
+  color: #3d7474;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(15px, 1.45cqw, 30px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.35;
+}
+.impact-overview strong { color: #ca6538; font-weight: 700; }
+.impact-story {
+  position: absolute;
+  top: 41.73cqw;
+  left: 42.5%;
+  width: 31%;
+  min-height: 18.9cqw;
+  padding-left: 2.95cqw;
+  border-left: 1px solid #8eac97;
+}
+.impact-story h3 {
+  margin: 0;
+  color: #205f5b;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(16px, 1.78cqw, 38px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.impact-story p {
+  margin: 1.48cqw 0 0;
+  color: #3d7474;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(9px, 1.05cqw, 18px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.62;
+}
+.impact-story p + p { margin-top: 1.34cqw; }
+.impact-cta {
+  position: absolute;
+  top: 47.23cqw;
+  /* Right edge aligns with the final hero / work service circle. */
+  left: 76.34%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4cqw;
+  width: 14.8cqw;
+  height: 2.72cqw;
+  border-radius: 999px;
+  background: linear-gradient(105deg, #bd5432, #d8753c);
+  color: #fff8ed;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(11px, 1cqw, 21px);
+  font-weight: 500;
+  letter-spacing: -.03em;
+  transition: transform .24s ease, background .24s ease;
+}
+.impact-cta:hover { transform: translateX(4px); background: #b94d2d; }
+.impact-tagline {
+  /* Keep the closing note clearly after the deeper impact-content row. */
+  top: 61.91cqw;
+}
+/* Get involved — a full-bleed counterpart to the Work service rail. */
+.get-involved {
+  position: relative;
+  /* Impact's film circle is intentionally allowed to overflow during its
+     reveal. Start this next canvas above that overflow so the sections meet
+     cleanly once the visitor reaches this call-to-action. */
+  z-index: 2;
+  /* Preserve the hero's height-aware canvas while its backdrop spans the
+     entire visible viewport. */
+  width: var(--desktop-canvas-width);
+  height: var(--desktop-canvas-height);
+  margin: 0 auto;
+  overflow: hidden;
+  container-type: inline-size;
+}
+.get-involved__backdrop {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: calc((100cqw - 100vw) / 2);
+  width: 100vw;
+  background: var(--deep-navy-green);
+  clip-path: inset(0% 0% 0% 0%);
+  will-change: clip-path;
+}
+.get-involved__intro {
+  position: absolute;
+  z-index: 2;
+  /* Hold clear of the persistent navigation before beginning the section. */
+  top: 15.2%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  transform: none;
+}
+.get-involved__intro h2 {
+  margin: 0;
+  color: #0c4030;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(22px, 2.35cqw, 50px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.get-involved__intro p {
+  margin: 1.15cqw 0 0;
+  color: #245e5c;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(12px, 1.12cqw, 21px);
+  font-weight: 400;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+}
+.involvement-options {
+  position: absolute;
+  z-index: 2;
+  /* Use the exact hero-ring rhythm, but centre the complete system now that
+     the image has been removed. */
+  top: calc(39.18% - 3.43cqw);
+  --involvement-row-width: 73.2cqw;
+  left: calc((100% - var(--involvement-row-width)) / 2);
+  display: grid;
+  width: var(--involvement-row-width);
+  grid-template-columns: repeat(4, 15.3cqw);
+  gap: 4cqw;
+}
+.involvement-card {
+  display: flex;
+  width: 15.3cqw;
+  height: 15.3cqw;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  color: #0c4030;
+  text-align: center;
+}
+.involvement-card--donate { background: var(--ring-warm); }
+.involvement-card--partner { background: radial-gradient(circle at 43% 31%, #d5e8bd, #bdd9a3 72%, #a8ca91); }
+.involvement-card--volunteer { background: radial-gradient(circle at 40% 30%, #fffdf3, #edf1df 78%, #dce6ca); }
+.involvement-card--visit { background: radial-gradient(circle at 42% 30%, #d6e9bc, #bbd89e 70%, #a7c98b); }
+.involvement-card__icon {
+  display: block;
+  width: auto;
+  height: 3.45cqw;
+  margin-top: 2.3cqw;
+  object-fit: contain;
+}
+.involvement-card--partner .involvement-card__icon { height: 3.55cqw; }
+.involvement-card--volunteer .involvement-card__icon { height: 3.22cqw; margin-top: 2.4cqw; }
+.involvement-card--visit .involvement-card__icon { height: 3.62cqw; margin-top: 2.22cqw; }
+.involvement-card h3 {
+  margin: 1cqw 0 0;
+  color: #0c4030;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(13px, 1.33cqw, 28px);
+  font-weight: 600;
+  letter-spacing: -.05em;
+  line-height: 1.13;
+}
+.involvement-card p {
+  width: 82%;
+  margin: .76cqw 0 0;
+  color: #0c4030;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(9px, .93cqw, 18px);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  line-height: 1.34;
+}
+.get-involved__cta {
+  position: absolute;
+  z-index: 2;
+  /* A distinct quiet interval separates the participation choices from the
+     action, while sharing the centred axis of the opening statement. */
+  /* This remains wholly below the service rail once the field has resolved
+     into its capsule, giving the next action its own calm reading space. */
+  top: 71%;
+  left: 50%;
+  display: inline-flex;
+  width: 16.38cqw;
+  height: 3.5cqw;
+  align-items: center;
+  justify-content: center;
+  gap: .55cqw;
+  border-radius: 999px;
+  background: linear-gradient(105deg, #4b7148, #658c56);
+  color: #fffdf5;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(13px, 1.18cqw, 24px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  transform: translateX(-50%);
+  transition: transform .24s ease, background .24s ease;
+}
+.get-involved__cta span { font-size: 1.2em; line-height: 1; }
+.get-involved__cta:hover { background: #426c40; transform: translateX(calc(-50% + 4px)); }
+
+/* Footer — a full-bleed, screen-height final panel that deliberately takes
+   over from the fixed desktop navigation. Its layout follows the supplied
+   reference's left statement / right utility rhythm. */
+.site-footer {
+  position: relative;
+  z-index: 3;
+  isolation: isolate;
+  width: 100vw;
+  min-height: 100svh;
+  margin: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 48% 49%, rgb(3 78 39 / 42%) 0%, rgb(3 68 33 / 14%) 38%, transparent 70%),
+    linear-gradient(116deg, #073f22 0%, #003817 46%, #03421f 100%);
+  color: #fbfae9;
+  container-type: inline-size;
+}
+.site-footer__wordmark {
+  position: absolute;
+  top: 20%;
+  left: 5.5cqw;
+  color: #fffdf2;
+  font-family: 'Lora', Georgia, serif;
+  font-size: clamp(44px, 3.3cqw, 76px);
+  font-weight: 700;
+  letter-spacing: .035em;
+  line-height: 1;
+}
+.site-footer__divider {
+  position: absolute;
+  top: 20.15%;
+  left: 19.8%;
+  width: .12cqw;
+  height: 17.5%;
+  background: #d7d99f;
+}
+.site-footer__statement {
+  position: absolute;
+  top: 20.65%;
+  left: 22.5%;
+  width: 28.7%;
+  margin: 0;
+  color: #fffdf2;
+  /* This is the footer's concluding headline, so it follows the same
+     Montserrat display treatment as the hero and section titles. */
+  font-family: 'Montserrat', Arial, sans-serif;
+  /* Keep the closing thought subordinate to the footer system rather than
+     competing with the service/navigation column beside it. */
+  font-size: clamp(20px, 1.72cqw, 37px);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  line-height: 1.18;
+}
+.site-footer__links {
+  position: absolute;
+  top: 18.9%;
+  left: 49.3%;
+  width: 31.1%;
+  display: grid;
+  gap: 2.4cqw;
+}
+.site-footer__link-row {
+  display: grid;
+  grid-template-columns: 1.13fr 1fr 1.38fr 1fr;
+  column-gap: .8cqw;
+  align-items: start;
+}
+.site-footer__link-row a {
+  width: max-content;
+  max-width: 100%;
+  padding-bottom: .32cqw;
+  border-bottom: .12cqw solid #d7d99f;
+  color: #f9f8e8;
+  /* Footer links are navigation—not editorial copy—so they use the same
+     sans-serif utility language as the persistent desktop navigation. */
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(11px, .96cqw, 20px);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: 1.25;
+  transition: color .2s ease, border-color .2s ease;
+}
+.site-footer__link-row a:hover,
+.site-footer__link-row a:focus-visible {
+  border-color: #efa06b;
+  color: #efa06b;
+  outline: none;
+}
+.footer-social {
+  position: absolute;
+  top: 17.8%;
+  right: 4.25cqw;
+  display: flex;
+  align-items: center;
+  gap: .72cqw;
+}
+.footer-social__link {
+  display: grid;
+  width: 2.22cqw;
+  height: 2.22cqw;
+  place-items: center;
+  border: .12cqw solid #f8f7e5;
+  border-radius: 50%;
+  color: #f8f7e5;
+  transition: color .2s ease, border-color .2s ease, transform .2s ease;
+}
+.footer-social__link:hover,
+.footer-social__link:focus-visible {
+  border-color: #efa06b;
+  color: #efa06b;
+  outline: none;
+  transform: translateY(-2px);
+}
+.footer-social__link svg {
+  width: 61%;
+  height: 61%;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+.site-footer__copyright {
+  position: absolute;
+  top: 45.1%;
+  left: 49.3%;
+  margin: 0;
+  color: #f9f8e8;
+  font-family: 'Lora', Georgia, serif;
+  /* Match the reading scale used by the hero, Work, and Impact body copy. */
+  font-size: clamp(9px, 1.05cqw, 18px);
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.62;
+}
+.footer-principles {
+  position: absolute;
+  top: 69.4%;
+  left: 5.15cqw;
+  display: flex;
+  align-items: center;
+  gap: 1.15cqw;
+  color: #fffdf2;
+  font-family: 'Montserrat', Arial, sans-serif;
+  /* Reuse the compact all-caps treatment from the hero closing note. */
+  font-size: clamp(6px, .63cqw, 11px);
+  font-weight: 500;
+  letter-spacing: .26em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.footer-principles b {
+  color: #d7d99f;
+  font-size: 1.05em;
+  font-weight: 400;
+}
+.footer-principles__leaf {
+  width: 2.75cqw;
+  height: 3.6cqw;
+  margin-right: .35cqw;
+  overflow: visible;
+}
+.footer-principles__leaf path:first-child {
+  fill: none;
+  stroke: #d7d99f;
+  stroke-linecap: round;
+  stroke-width: 3.2;
+}
+.footer-principles__leaf path:not(:first-child) {
+  fill: #d7d99f;
+}
+
+/* On a wide, short viewport the hero canvas is intentionally narrower than
+   the browser. Reclaim the outer gutter for the heading, then grow the service
+   system so it still has the same visual authority as the hero artwork. */
+@media (min-aspect-ratio: 2 / 1) and (min-width: 861px) {
+  .work-intro {
+    left: calc((100cqw - 100vw) / 2 + 3.5cqw);
+    width: 31%;
+  }
+  .tagline {
+    left: calc((100cqw - 100vw) / 2 + 3.5cqw);
+  }
+  .work-intro__button {
+    width: 15.4cqw;
+    height: 3.5cqw;
+    margin-top: 1.7cqw;
+    font-size: clamp(12px, 1.22cqw, 20px);
+  }
+  .work-rail {
+    left: 18.69%;
+    width: 19.44%;
+    border-radius: 9.72cqw 0 9.72cqw 9.72cqw;
+  }
+  .work-top-grid {
+    left: 18.82%;
+    width: 72.32%;
+    border-radius: 9.5cqw;
+  }
+  .work-lower-cards {
+    left: 19.6%;
+    width: 17.62%;
+  }
+  .work-card--research,
+  .work-card--forums { height: 17.62cqw; }
+  .work-top-grid .work-card__icon { height: 2.65cqw; }
+  .work-top-grid .work-card h3 { font-size: clamp(13px, 1.18cqw, 24px); }
+  .work-top-grid .work-card p { font-size: clamp(9px, .98cqw, 18px); }
+  .work-lower-cards .work-card__icon { height: 2.55cqw; }
+  .work-lower-cards .work-card h3 { font-size: clamp(13px, 1.12cqw, 23px); }
+  .work-lower-cards .work-card p { font-size: clamp(9px, .98cqw, 18px); }
+}
+
+/* A fullscreen laptop display is much taller than the supplied reference.
+   The hero photo is pinned to the viewport edge while the four story rings
+   live inside the editorial canvas; without this adjustment the two systems
+   converge and collide once the canvas reaches the full viewport width. */
+@media (min-width: 861px) and (max-aspect-ratio: 19 / 10) {
+  .feature-image {
+    width: min(25.704cqw, 19.15vw);
+    height: min(38.946cqw, 29vw);
+  }
+  .intro,
+  .story-images { left: 27%; }
+}
+
+/* Recovery carries the longest service description. On desktop, give its
+   paragraph the wide, upper portion of the circle by making its supporting
+   symbol and two-line label deliberately quieter—not the essential copy. */
+@media (min-width: 861px) {
+  .work-top-grid .work-card--recovery { padding-top: .95cqw; }
+  .work-top-grid .work-card--recovery .work-card__icon { height: 2.15cqw; }
+  .work-top-grid .work-card--recovery h3 {
+    margin-top: .38cqw;
+    margin-bottom: .26cqw;
+    font-size: clamp(12px, 1.04cqw, 22px);
+  }
+}
+

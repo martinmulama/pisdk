@@ -1,0 +1,171 @@
+/* Shared entry and preloader motion. Kept apart from viewport layout so
+   animation changes do not affect responsive geometry. */
+
+/* The photo is already settled; the remaining hero composition enters as a
+   measured sequence of masks and movement, without an opacity fade. */
+.brand,
+.intro,
+.desktop-nav a,
+.story-image,
+.mission,
+.tagline {
+  transition-property: clip-path, transform;
+  transition-timing-function: cubic-bezier(.16, 1, .3, 1);
+}
+.brand { transition-duration: .62s; }
+.intro { transition-duration: .72s; }
+.desktop-nav a { transition-property: color, clip-path, transform; transition-duration: .48s; }
+.story-image { transition-duration: .68s; }
+.mission,
+.tagline { transition-duration: .62s; }
+.page-shell:not(.hero-is-ready) .brand { clip-path: inset(0 0 100% 0); transform: translateY(-1cqw); }
+.page-shell:not(.hero-is-ready) .intro { clip-path: inset(0 0 100% 0); transform: translateY(1.35cqw); }
+.page-shell:not(.hero-is-ready) .desktop-nav a { clip-path: inset(0 0 0 100%); transform: translateX(1.4rem); }
+.page-shell:not(.rings-are-ready) .story-image { clip-path: circle(0 at 50% 50%); transform: scale(.74); }
+.page-shell:not(.hero-is-ready) .mission { clip-path: inset(0 100% 0 0); transform: translateX(1.8cqw); }
+.page-shell:not(.hero-is-ready) .tagline { clip-path: inset(0 100% 0 0); transform: translateX(-1.2cqw); }
+.hero-is-ready .brand { transition-delay: 20ms; }
+.hero-is-ready .intro { transition-delay: 100ms; }
+.hero-is-ready .desktop-nav a:nth-child(1) { transition-delay: 180ms; }
+.hero-is-ready .desktop-nav a:nth-child(2) { transition-delay: 230ms; }
+.hero-is-ready .desktop-nav a:nth-child(3) { transition-delay: 280ms; }
+.hero-is-ready .desktop-nav a:nth-child(4) { transition-delay: 330ms; }
+.hero-is-ready .desktop-nav a:nth-child(5) { transition-delay: 380ms; }
+.hero-is-ready .desktop-nav a:nth-child(6) { transition-delay: 430ms; }
+.rings-are-ready .story-image { transition-duration: .52s; }
+.rings-are-ready .story-image:nth-child(1) { transition-delay: 0ms; }
+.rings-are-ready .story-image:nth-child(2) { transition-delay: 70ms; }
+.rings-are-ready .story-image:nth-child(3) { transition-delay: 140ms; }
+.rings-are-ready .story-image:nth-child(4) { transition-delay: 210ms; }
+.hero-is-ready .mission { transition-delay: 540ms; }
+.hero-is-ready .tagline { transition-delay: 640ms; }
+
+/* The preloader is deliberately lightweight: a static line, four dots, and
+   one readable statistic at a time. */
+.preloader {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #06482f 0%, #043a29 46%, #022d20 100%);
+  color: #eff0df;
+  clip-path: inset(0);
+}
+.preloader--leaving { pointer-events: none; }
+.preloader-sequence {
+  position: absolute;
+  top: 43%;
+  left: 50%;
+  width: min(44vw, 740px);
+  height: 1px;
+  transform: translate(-50%, -50%);
+}
+.preloader-sequence__line { position: absolute; z-index: 0; top: 50%; right: 0; left: 0; height: 1px; background: rgba(219, 226, 174, .7); }
+.preloader-step { position: absolute; z-index: 1; top: 50%; width: 0; height: 0; }
+.preloader-step:nth-child(2) { left: 16%; }
+.preloader-step:nth-child(3) { left: 42%; }
+.preloader-step:nth-child(4) { left: 68%; }
+.preloader-step:nth-child(5) { left: 94%; }
+.preloader-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--dot-color);
+  transform: translate(-50%, -50%);
+  will-change: width, height;
+}
+.preloader-dot__copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16%;
+  color: #06412d;
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.preloader-dot__mobile-label,
+.preloader-dot__mobile-support { display: none; }
+.preloader-dot__metric { display: block; }
+.preloader-dot__metric i,
+.preloader-dot__metric strong,
+.preloader-dot__copy em { display: block; }
+.preloader-dot__metric i {
+  margin-bottom: .08em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(15px, 1.16vw, 20px);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -.035em;
+  line-height: 1;
+}
+.preloader-dot__metric strong {
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(39px, 3.35vw, 57px);
+  font-weight: 600;
+  letter-spacing: -.075em;
+  line-height: .82;
+  white-space: nowrap;
+}
+.preloader-dot__copy em {
+  max-width: 11em;
+  margin-top: .18em;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(14px, 1.08vw, 18px);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -.035em;
+  line-height: 1.12;
+}
+.preloader-step__caption {
+  position: absolute;
+  top: clamp(106px, 7.8vw, 132px);
+  left: 50%;
+  width: max-content;
+  max-width: min(310px, 72vw);
+  color: #d9dfb3;
+  text-align: center;
+  transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.preloader-step__caption span,
+.preloader-step__caption small { display: block; }
+.preloader-step__caption span { font-family: 'Lora', Georgia, serif; font-size: clamp(17px, 1.35vw, 23px); line-height: 1.15; }
+.preloader-step__caption small {
+  margin-top: 13px;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-size: clamp(9px, .7vw, 12px);
+  font-weight: 500;
+  letter-spacing: .27em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.preloader-ring-handoff { position: fixed; z-index: 21; inset: 0; pointer-events: none; }
+.preloader-ring-handoff__dot {
+  position: fixed;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  will-change: top, left, width, height, border-width, border-color;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-stat,
+  .brand,
+  .intro,
+  .desktop-nav a,
+  .story-image,
+  .mission,
+  .tagline { transition-duration: .01ms; transition-delay: 0ms; }
+}
