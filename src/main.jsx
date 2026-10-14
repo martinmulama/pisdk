@@ -88,25 +88,25 @@ const involvementWays = [
   {
     id: 'donate',
     title: 'Donate Materials',
-    copy: <>Doors, windows, timber,<br />steel, and masonry—<br />channelled into community<br />housing.</>,
+    copy: <>Doors, windows, timber,<br /> steel, and masonry—<br /> channelled into community<br /> housing.</>,
     icon: workRecoveryIcon,
   },
   {
     id: 'partner',
     title: 'Partner With Us',
-    copy: <>CSR partnerships,<br />element sponsorship,<br />fiscal sponsorship.</>,
+    copy: <>CSR partnerships,<br /> element sponsorship,<br /> fiscal sponsorship.</>,
     icon: getInvolvedPartnerIcon,
   },
   {
     id: 'volunteer',
     title: 'Volunteer',
-    copy: <>Join us in Kibera—<br />volunteers, researchers,<br />and interns welcome.</>,
+    copy: <>Join us in Kibera—<br /> volunteers, researchers,<br /> and interns welcome.</>,
     icon: workCommunityIcon,
   },
   {
     id: 'visit',
     title: 'Visit Our Projects',
-    copy: <>See our work firsthand,<br />site visits available.</>,
+    copy: <>See our work firsthand,<br /> site visits available.</>,
     icon: getInvolvedVisitIcon,
   },
 ]
@@ -153,6 +153,61 @@ const preloaderStats = [
 
 function StoryImage({ className, label, image }) {
   return <div className={`story-image ${className}`} role="img" aria-label={label} style={{ '--story-image': `url(${image})` }} />
+}
+
+/* Mobile keeps the hero story in one SVG coordinate system. That lets the
+ * circles travel into a shared destination without rasterising the images or
+ * relying on opacity changes. It is rendered only on motion-capable phones;
+ * desktop and the reduced-motion fallback retain their existing markup. */
+function MobileHeroMerge() {
+  const centreX = 195
+  // Four generous rings with an intentional breathing gap between them. The
+  // complete stack remains inside the mobile hero viewport.
+  const radius = 68
+  const targetY = 72
+  const sourceRings = [
+    { id: 'materials', image: storyReclaimedScrap, y: 226, label: 'Reclaimed construction materials' },
+    { id: 'rebuilt', image: storyRebuiltHome, y: 380, label: 'A rebuilt home made from reclaimed materials' },
+    { id: 'children', image: storyCommunityChildren, y: 534, label: 'Children in a local community' },
+  ]
+  const imageBox = (y) => ({ x: centreX - radius, y: y - radius, width: radius * 2, height: radius * 2 })
+
+  return (
+    <section className="mobile-hero-merge" aria-label="PISDK mission story">
+      <div className="mobile-hero-merge__viewport">
+        <svg className="mobile-hero-merge__canvas" viewBox="0 0 390 620" role="img" aria-label="Four community story circles becoming one rebuilding story">
+          <defs>
+            <clipPath id="mobile-merge-target-clip"><circle data-mobile-merge-mask="target" cx={centreX} cy={targetY} r={radius} /></clipPath>
+            <clipPath id="mobile-merge-final-clip"><circle data-mobile-merge-final-clip cx={centreX} cy={sourceRings[2].y} r="0" /></clipPath>
+            {sourceRings.map(({ id, y }) => <clipPath key={id} id={`mobile-merge-${id}-clip`}><circle data-mobile-merge-mask={id} cx={centreX} cy={y} r={radius} /></clipPath>)}
+          </defs>
+
+          <g data-mobile-merge-target data-mobile-merge-source="target" data-mobile-merge-ring data-mobile-merge-y={targetY}>
+            <circle data-mobile-merge-fill className="mobile-merge__fill" cx={centreX} cy={targetY} r={radius} />
+            <image {...imageBox(targetY)} href={storyDamagedHome} preserveAspectRatio="xMidYMid slice" clipPath="url(#mobile-merge-target-clip)" />
+            <circle data-mobile-merge-ring-outline className="mobile-merge__ring mobile-merge__ring--warm" cx={centreX} cy={targetY} r={radius} />
+          </g>
+
+          {sourceRings.map(({ id, image, y, label }) => (
+            <g key={id} data-mobile-merge-source={id} data-mobile-merge-final={id === 'children' ? '' : undefined} data-mobile-merge-ring data-mobile-merge-y={y} aria-label={label}>
+              <circle data-mobile-merge-fill className="mobile-merge__fill" cx={centreX} cy={y} r={radius} />
+              <image {...imageBox(y)} href={image} preserveAspectRatio="xMidYMid slice" clipPath={`url(#mobile-merge-${id}-clip)`} />
+              {id === 'children' && <image {...imageBox(y)} href={impactRebuildWorker} preserveAspectRatio="xMidYMid slice" clipPath="url(#mobile-merge-final-clip)" />}
+              <circle data-mobile-merge-ring-outline className="mobile-merge__ring" cx={centreX} cy={y} r={radius} />
+            </g>
+          ))}
+        </svg>
+
+      </div>
+      <section className="mobile-hero-merge__mission" aria-label="Our mission">
+        <span className="mobile-hero-merge__rule" />
+        <div>
+          <p>At the Paragon Institute of Sustainable Development Kenya (PISDK), we advance circular economy solutions in construction and waste management. Our mission is to prove that sustainability equals affordability.</p>
+          <p>We do this by deconstructing buildings instead of demolishing them, recovering valuable materials, and channeling them back into community housing and infrastructure at prices co-created with the people we serve.</p>
+        </div>
+      </section>
+    </section>
+  )
 }
 
 function Brand() {
@@ -268,6 +323,18 @@ function MobileWorkService({ service }) {
   )
 }
 
+// Identical SVG command structures allow the CTA's path to interpolate from a
+// pill into the ellipse that becomes a true circle after its final transform.
+// Keeping this as a tiny path calculation avoids a heavier morphing plugin.
+function mobileExploreMorphPath(progress = 0) {
+  const mix = (from, to) => from + (to - from) * progress
+  const left = mix(24, 95)
+  const right = mix(166, 95)
+  const controlNear = mix(179.25, 147.5)
+  const controlFar = mix(10.75, 42.5)
+  return `M ${left} 0 L ${right} 0 C ${controlNear} 0 190 10.75 190 24 C 190 37.25 ${controlNear} 48 ${right} 48 L ${left} 48 C ${controlFar} 48 0 37.25 0 24 C 0 10.75 ${controlFar} 0 ${left} 0 Z`
+}
+
 function WhatWeDo() {
   return (
     <section className="what-we-do" id="our-work" aria-labelledby="work-heading">
@@ -290,7 +357,16 @@ function WhatWeDo() {
         </div>
       </div>
 
-      <p className="work-summary">We work across the entire circular ecosystem—<br />connecting people, resources and knowledge<br />to create lasting change in Kenya’s communities.</p>
+      <p className="work-summary">We work across the entire circular ecosystem—<br />{' '}connecting people, resources and knowledge<br />{' '}to create lasting change in Kenya’s communities.</p>
+      <div className="work-mobile-outro">
+        <a className="work-mobile-outro__button" href="#current-pilots">
+          <svg className="work-mobile-outro__morph" viewBox="0 0 190 48" preserveAspectRatio="none" aria-hidden="true">
+            <path data-mobile-explore-morph d={mobileExploreMorphPath()} />
+          </svg>
+          <span className="work-mobile-outro__label">Explore our work</span>
+          <span className="work-mobile-outro__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
     </section>
   )
 }
@@ -492,9 +568,11 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
     const dots = dotRefs.current.filter(Boolean)
     const copies = copyRefs.current.filter(Boolean)
     const captions = captionRefs.current.filter(Boolean)
-    const targets = Array.from(document.querySelectorAll('.story-image'))
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const isMobile = window.matchMedia('(max-width: 600px)').matches
+    const targets = isMobile
+      ? Array.from(document.querySelectorAll('[data-mobile-merge-ring]'))
+      : Array.from(document.querySelectorAll('.story-image'))
     const { dot } = getSizes()
     const handoffLayer = document.createElement('div')
     handoffLayer.className = 'preloader-ring-handoff'
@@ -517,6 +595,7 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
     // The handoff dots are separate from the sequence so their final motion is
     // not clipped by the preloader while the hero becomes visible underneath.
     const travellingDots = createTravellingDots()
+    const targetBounds = (index) => targets[index]?.getBoundingClientRect()
     const exit = gsap.timeline({
       onComplete: () => {
         handoffLayer.remove()
@@ -533,16 +612,16 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
       .to(preloader, { clipPath: isMobile ? 'inset(0 0 100% 0)' : 'inset(0 0 0 100%)', duration: reducedMotion ? .01 : .72, ease: 'power1.inOut' }, reducedMotion ? .01 : .28)
       .to(travellingDots, {
         left: (index) => {
-          const target = targets[index]?.getBoundingClientRect()
+          const target = targetBounds(index)
           return target ? target.left + target.width / 2 : window.innerWidth / 2
         },
         top: (index) => {
-          const target = targets[index]?.getBoundingClientRect()
+          const target = targetBounds(index)
           return target ? target.top + target.height / 2 : window.innerHeight / 2
         },
-        width: (index) => targets[index]?.offsetWidth ?? dot,
-        height: (index) => targets[index]?.offsetHeight ?? dot,
-        borderWidth: (index) => (targets[index]?.offsetWidth ?? dot) * (isMobile ? .024 : .055),
+        width: (index) => targetBounds(index)?.width ?? dot,
+        height: (index) => targetBounds(index)?.height ?? dot,
+        borderWidth: (index) => (targetBounds(index)?.width ?? dot) * (isMobile ? .024 : .055),
         borderColor: (index) => preloaderStats[index].ringColor,
         duration: reducedMotion ? .01 : .72,
         ease: 'power2.inOut',
@@ -594,9 +673,28 @@ function App() {
   const [isPreloaderDone, setIsPreloaderDone] = useState(false)
   const [isHeroReady, setIsHeroReady] = useState(false)
   const [isRingsReady, setIsRingsReady] = useState(false)
+  const [usesMobileMerge, setUsesMobileMerge] = useState(() => (
+    typeof window !== 'undefined'
+    && window.matchMedia('(max-width: 600px)').matches
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ))
   const pageRef = useRef(null)
 
   const completePreloader = useCallback(() => setIsPreloaderDone(true), [])
+
+  useEffect(() => {
+    const mobile = window.matchMedia('(max-width: 600px)')
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setUsesMobileMerge(mobile.matches && !reduced.matches)
+
+    update()
+    mobile.addEventListener('change', update)
+    reduced.addEventListener('change', update)
+    return () => {
+      mobile.removeEventListener('change', update)
+      reduced.removeEventListener('change', update)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isPreloaderDone) return undefined
@@ -676,6 +774,139 @@ function App() {
   }, [])
 
   useLayoutEffect(() => {
+    if (!isPreloaderDone || !usesMobileMerge || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
+      const chapter = scope.querySelector('.mobile-hero-merge')
+      const target = scope.querySelector('[data-mobile-merge-target]')
+      const finalMask = scope.querySelector('[data-mobile-merge-final-clip]')
+      const canvas = scope.querySelector('.mobile-hero-merge__canvas')
+      const viewport = scope.querySelector('.mobile-hero-merge__viewport')
+      const sources = Array.from(scope.querySelectorAll('[data-mobile-merge-source]:not([data-mobile-merge-target])'))
+      const finalCircle = scope.querySelector('[data-mobile-merge-final]')
+      const mission = scope.querySelector('.mobile-hero-merge__mission')
+
+      if (!chapter || !target || !finalMask || !canvas || !viewport || sources.length !== 3 || !finalCircle || !mission) return undefined
+
+      const targetY = Number(target.dataset.mobileMergeY)
+      const getSourceY = (source) => Number(source.dataset.mobileMergeY)
+      const getMask = (source) => scope.querySelector(`[data-mobile-merge-mask="${source.dataset.mobileMergeSource}"]`)
+      const ringRadius = Number(getMask(target)?.getAttribute('r'))
+      const getFinalGeometry = () => {
+        const viewBox = canvas.viewBox.baseVal
+        const bounds = viewport.getBoundingClientRect()
+        const scale = Math.min(bounds.width / viewBox.width, bounds.height / viewBox.height)
+        const verticalInset = (bounds.height - viewBox.height * scale) / 2
+        // Match the mobile Impact film's *outer* diameter exactly. SVG circle
+        // geometry sits beneath its stroke, so reserve the 7px outline inside
+        // that diameter rather than letting the scaled border overflow it.
+        const finalRingWidth = 7
+        // `100vw` (used by the Impact film) includes the scrollbar width.
+        // Use innerWidth here as well, rather than the canvas client width,
+        // so the two outer circles have the same visible diameter.
+        const finalDiameter = window.innerWidth - 20 - finalRingWidth
+        const finalRadius = finalDiameter / 2
+        const visualFinalRadius = finalRadius + finalRingWidth / 2
+        const finalScale = finalDiameter / (ringRadius * 2 * scale)
+        const desiredCentre = Math.max(visualFinalRadius + 16, Math.min(220, window.innerHeight * .25))
+        const readingGap = 56
+        // Leave a small stage inset below the enlarged ring. This removes the
+        // clipped edge while preserving the deliberate reading gap above the
+        // mission block that follows it.
+        const settleInset = 10
+        const scrollDistance = Math.max(80, bounds.height + readingGap - desiredCentre - visualFinalRadius - readingGap - settleInset)
+
+        return {
+          scrollDistance,
+          finalScale,
+          finalY: (desiredCentre + scrollDistance - verticalInset) / scale,
+        }
+      }
+
+      gsap.set(target, { scale: 1, svgOrigin: `195 ${targetY}`, transformOrigin: '50% 50%' })
+      gsap.set(finalMask, { attr: { r: 0 } })
+      gsap.set(mission, { y: 0, force3D: true })
+      sources.forEach((source) => {
+        gsap.set(source, { x: 0, y: 0, scale: 1, svgOrigin: `195 ${getSourceY(source)}`, transformOrigin: '50% 50%' })
+      })
+
+      const handoff = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: chapter,
+          // This runs entirely in normal document flow—no fixed/sticky stage
+          // and no ScrollTrigger pin spacer. The handoff completes as the
+          // Let the heading leave first, then use a short, ordinary scroll
+          // range. The start cannot be below the initial viewport or the
+          // timeline would initialise part-way through on first load.
+          start: 'top top',
+          end: () => `+=${Math.round(getFinalGeometry().scrollDistance)}`,
+          scrub: .55,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      // Merge only with the immediate circle below. The top ring joins the
+      // second, that combined story joins the third, then the third joins the
+      // bottom ring. Short local paths prevent any visible criss-crossing.
+      const mergePlan = [
+        { incoming: target, receiver: sources[0], receiverScale: 1.16 },
+        { incoming: sources[0], receiver: sources[1], receiverScale: 1.35 },
+        { incoming: sources[1], receiver: sources[2], receiverScale: () => getFinalGeometry().finalScale },
+      ]
+      mergePlan.forEach(({ incoming, receiver, receiverScale }, index) => {
+        const mask = getMask(incoming)
+        const outline = incoming.querySelector('[data-mobile-merge-ring-outline]')
+        const fill = incoming.querySelector('[data-mobile-merge-fill]')
+        if (!mask || !outline || !fill) return
+        const at = index * .33
+        const receiverY = getSourceY(receiver)
+
+        handoff
+          .to(incoming, {
+            y: receiverY - getSourceY(incoming),
+            scale: .78,
+            duration: .25,
+            force3D: true,
+          }, at)
+          .to(receiver, {
+            scale: receiverScale,
+            duration: .3,
+            force3D: true,
+          }, at)
+          .to([mask, outline, fill], { attr: { r: 0 }, duration: .1 }, at + .23)
+      })
+
+      handoff
+        .to(finalCircle, {
+          y: () => getFinalGeometry().finalY - getSourceY(finalCircle),
+          duration: .3,
+          force3D: true,
+        // Move the newly enlarged final circle upward as its last merge
+        // happens—never after it has grown into the mission reading area.
+        }, .66)
+        .to(finalMask, { attr: { r: ringRadius }, duration: .22 }, .78)
+
+      return () => {
+        handoff.kill()
+        gsap.set([target, ...sources, mission], { clearProps: 'transform' })
+        gsap.set(finalMask, { attr: { r: 0 } })
+        ;[target, ...sources].forEach((source) => {
+          const mask = getMask(source)
+          const outline = source.querySelector('[data-mobile-merge-ring-outline]')
+          const fill = source.querySelector('[data-mobile-merge-fill]')
+          if (mask && outline && fill) gsap.set([mask, outline, fill], { attr: { r: ringRadius } })
+        })
+      }
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone, usesMobileMerge])
+
+  useLayoutEffect(() => {
     if (!isPreloaderDone || !pageRef.current) return undefined
 
     const media = gsap.matchMedia()
@@ -736,6 +967,182 @@ function App() {
         .to(supportingVisuals, { clipPath: revealMask, y: 0, duration: .25, stagger: .06 }, .56)
         .to(supportingLabels, { clipPath: revealMask, y: 0, duration: .18, stagger: .05 }, .66)
         .to(content, { clipPath: revealMask, y: 0, duration: .28, stagger: .045 }, .74)
+
+      return () => handoff.kill()
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+      const overview = pageRef.current.querySelector('.impact-overview')
+      const statistics = overview?.querySelectorAll('strong')
+
+      if (!overview || !statistics?.length) return undefined
+
+      const reveal = gsap.fromTo(statistics, {
+        '--impact-stat-paint': '0%',
+      }, {
+        '--impact-stat-paint': '100%',
+        duration: 1,
+        ease: 'none',
+        stagger: .16,
+        scrollTrigger: {
+          trigger: overview,
+          // Begin only once the whole Impact brief is in a natural reading
+          // zone, rather than while the film circle is still taking focus.
+          start: 'top 72%',
+          end: 'top 48%',
+          scrub: .45,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      return () => {
+        reveal.kill()
+        gsap.set(statistics, { clearProps: '--impact-stat-paint' })
+      }
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
+      const source = scope.querySelector('.work-mobile-outro__button')
+      const sourceContent = scope.querySelectorAll('.work-mobile-outro__label, .work-mobile-outro__arrow')
+      const sourceShape = scope.querySelector('[data-mobile-explore-morph]')
+      const impact = scope.querySelector('.impact')
+      const feature = scope.querySelector('.impact-visual--feature')
+      const play = feature?.querySelector('.impact-visual__play')
+
+      if (!source || !sourceShape || !impact || !feature || !play) return undefined
+
+      // Both controls live in normal flow. Their document-coordinate delta is
+      // stable while scrolling, so the CTA can travel into the centre of the
+      // incoming film without pinning or a fixed overlay.
+      const handoffVector = () => {
+        const sourceBox = source.getBoundingClientRect()
+        const playBox = play.getBoundingClientRect()
+        return {
+          x: playBox.left + playBox.width / 2 - (sourceBox.left + sourceBox.width / 2),
+          y: playBox.top + playBox.height / 2 - (sourceBox.top + sourceBox.height / 2),
+        }
+      }
+
+      gsap.set(feature, { clipPath: 'circle(0% at 50% 50%)' })
+      gsap.set(play, { scale: 0, transformOrigin: '50% 50%' })
+      gsap.set(source, { transformOrigin: '50% 50%', willChange: 'transform,clip-path' })
+      gsap.set(sourceContent, { transformOrigin: '50% 50%' })
+      const shape = { progress: 0 }
+
+      const handoff = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: impact,
+          start: 'top 94%',
+          end: 'top 42%',
+          scrub: .5,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      handoff
+        .to(feature, { clipPath: 'circle(75% at 50% 50%)', duration: .68 }, 0)
+        .to(source, {
+          x: () => handoffVector().x,
+          y: () => handoffVector().y,
+          // Keep the recognisable Explore pill intact while it travels. Its
+          // physical change happens only once it has reached the play centre.
+          duration: .56,
+          force3D: true,
+        }, .12)
+        .to(sourceContent, { clipPath: 'inset(0% 50% 0% 50%)', duration: .12 }, .54)
+        .to(source, {
+          scaleX: .368421,
+          scaleY: 1.458333,
+          duration: .2,
+          force3D: true,
+        }, .56)
+        .to(shape, {
+          progress: 1,
+          duration: .2,
+          onUpdate: () => sourceShape.setAttribute('d', mobileExploreMorphPath(shape.progress)),
+        }, .56)
+        .to(play, { scale: 1, duration: .18, force3D: true }, .72)
+        // A discrete handoff avoids a fade while allowing the real video play
+        // control to take over exactly where the CTA arrived.
+        .set(source, { visibility: 'hidden' }, .84)
+
+      return () => {
+        handoff.kill()
+        gsap.set([feature, play, source, ...sourceContent], { clearProps: 'clipPath,transform,borderRadius,visibility,willChange' })
+        sourceShape.setAttribute('d', mobileExploreMorphPath())
+      }
+    })
+
+    return () => media.revert()
+  }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+
+    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+      const scope = pageRef.current
+      const section = scope.querySelector('.get-involved')
+      const backdrop = scope.querySelector('.get-involved__backdrop')
+      const intro = scope.querySelector('.get-involved__intro')
+      const cards = Array.from(scope.querySelectorAll('.involvement-card'))
+      const cta = scope.querySelector('.get-involved__cta')
+
+      if (!section || !backdrop || !intro || cards.length !== 4 || !cta) return undefined
+
+      const capsuleClip = () => {
+        const backdropBox = backdrop.getBoundingClientRect()
+        const boxes = cards.map((card) => card.getBoundingClientRect())
+        const top = Math.min(...boxes.map((box) => box.top))
+        const right = Math.max(...boxes.map((box) => box.right))
+        const bottom = Math.max(...boxes.map((box) => box.bottom))
+        const left = Math.min(...boxes.map((box) => box.left))
+        const gutter = Math.max(12, boxes[0].width * .075)
+        const toPercent = (value, size) => Math.max(0, Math.min(100, value / size * 100))
+
+        return `inset(${toPercent(top - backdropBox.top - gutter, backdropBox.height)}% ${toPercent(backdropBox.right - right - gutter, backdropBox.width)}% ${toPercent(backdropBox.bottom - bottom - gutter, backdropBox.height)}% ${toPercent(left - backdropBox.left - gutter, backdropBox.width)}% round 42px)`
+      }
+
+      gsap.set(backdrop, { clipPath: 'inset(0% 0% 0% 0%)' })
+      gsap.set(intro, { clipPath: 'inset(0% 0% 100% 0%)', y: 22 })
+      gsap.set(cards, { clipPath: 'circle(0% at 50% 50%)', transformOrigin: '50% 50%' })
+      gsap.set(cta, { clipPath: 'inset(0% 50% 0% 50% round 999px)' })
+
+      const handoff = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 90%',
+          end: 'top 22%',
+          scrub: .7,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      handoff
+        .to(backdrop, { clipPath: capsuleClip, duration: .56 }, 0)
+        .to(intro, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .26 }, .14)
+        .to(cards, { clipPath: 'circle(75% at 50% 50%)', duration: .34, stagger: .07 }, .32)
+        .to(cta, { clipPath: 'inset(0% 0% 0% 0% round 999px)', duration: .2 }, .7)
 
       return () => handoff.kill()
     })
@@ -1045,7 +1452,7 @@ function App() {
         />
       )}
       <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
-        <section className="hero" aria-labelledby="hero-heading">
+        <section className={`hero${usesMobileMerge ? ' hero--mobile-merge' : ''}`} aria-labelledby="hero-heading">
         <div className="mobile-hero-header">
           <Brand />
           <MobileNav />
@@ -1062,6 +1469,8 @@ function App() {
             <span>build with dignity using reclaimed resources.</span>
           </h1>
         </div>
+
+        {usesMobileMerge && <MobileHeroMerge />}
 
         <div className="story-images" aria-label="Stories from PISDK communities">
           <StoryImage className="damaged" image={storyDamagedHome} label="A damaged home in need of rebuilding" />
