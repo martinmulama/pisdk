@@ -155,10 +155,10 @@ function StoryImage({ className, label, image }) {
   return <div className={`story-image ${className}`} role="img" aria-label={label} style={{ '--story-image': `url(${image})` }} />
 }
 
-/* Mobile keeps the hero story in one SVG coordinate system. That lets the
+/* Compact screens keep the hero story in one SVG coordinate system. That lets
  * circles travel into a shared destination without rasterising the images or
- * relying on opacity changes. It is rendered only on motion-capable phones;
- * desktop and the reduced-motion fallback retain their existing markup. */
+ * relying on opacity changes. Desktop and reduced-motion retain their own
+ * established markup. */
 function MobileHeroMerge() {
   const centreX = 195
   // Four generous rings with an intentional breathing gap between them. The
@@ -504,7 +504,7 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
   const previousIndex = useRef(-1)
 
   const getSizes = useCallback(() => {
-    const compact = window.innerWidth <= 860
+    const compact = window.matchMedia('(max-width: 860px), (max-width: 1100px) and (max-height: 900px)').matches
     const mobile = window.innerWidth <= 600
     const dot = mobile
       ? Math.min(18, Math.max(14, window.innerWidth * .052))
@@ -517,7 +517,7 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
     const expanded = mobile
       ? Math.min(196, Math.max(154, Math.min(window.innerWidth * .56, window.innerHeight * .34)))
       : compact
-        ? Math.min(156, Math.max(132, window.innerWidth * .34))
+        ? Math.min(246, Math.max(190, Math.min(window.innerWidth * .34, window.innerHeight * .29)))
       : Math.min(218, Math.max(176, Math.min(window.innerWidth * .12, window.innerHeight * .26)))
 
     return { dot, expanded }
@@ -569,8 +569,11 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
     const copies = copyRefs.current.filter(Boolean)
     const captions = captionRefs.current.filter(Boolean)
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isMobile = window.matchMedia('(max-width: 600px)').matches
-    const targets = isMobile
+    // Compact tablets use the same vertical handoff as phones. The former
+    // width-only test selected hidden desktop rings in tablet portrait, which
+    // made the curtain resolve without a visible destination.
+    const isCompactStory = window.matchMedia('(max-width: 860px), (max-width: 1100px) and (max-height: 900px)').matches
+    const targets = isCompactStory
       ? Array.from(document.querySelectorAll('[data-mobile-merge-ring]'))
       : Array.from(document.querySelectorAll('.story-image'))
     const { dot } = getSizes()
@@ -607,9 +610,9 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
       .to([...copies, ...captions], { autoAlpha: 0, y: -8, duration: reducedMotion ? .01 : .16, ease: 'power1.in' }, 0)
       .to(dots, { width: dot, height: dot, duration: reducedMotion ? .01 : .32, ease: 'power3.inOut' }, 0)
       .to(sequence, { autoAlpha: 0, duration: reducedMotion ? .01 : .16, ease: 'power1.out' }, .14)
-      // On phones the curtain rises from its lower edge, following the same
-      // vertical path as the four knots and their destination hero rings.
-      .to(preloader, { clipPath: isMobile ? 'inset(0 0 100% 0)' : 'inset(0 0 0 100%)', duration: reducedMotion ? .01 : .72, ease: 'power1.inOut' }, reducedMotion ? .01 : .28)
+      // On compact screens the curtain rises from its lower edge, following
+      // the same vertical path as the knots and destination hero rings.
+      .to(preloader, { clipPath: isCompactStory ? 'inset(0 0 100% 0)' : 'inset(0 0 0 100%)', duration: reducedMotion ? .01 : .72, ease: 'power1.inOut' }, reducedMotion ? .01 : .28)
       .to(travellingDots, {
         left: (index) => {
           const target = targetBounds(index)
@@ -621,7 +624,7 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
         },
         width: (index) => targetBounds(index)?.width ?? dot,
         height: (index) => targetBounds(index)?.height ?? dot,
-        borderWidth: (index) => (targetBounds(index)?.width ?? dot) * (isMobile ? .024 : .055),
+        borderWidth: (index) => (targetBounds(index)?.width ?? dot) * (isCompactStory ? .024 : .055),
         borderColor: (index) => preloaderStats[index].ringColor,
         duration: reducedMotion ? .01 : .72,
         ease: 'power2.inOut',
@@ -675,7 +678,7 @@ function App() {
   const [isRingsReady, setIsRingsReady] = useState(false)
   const [usesMobileMerge, setUsesMobileMerge] = useState(() => (
     typeof window !== 'undefined'
-    && window.matchMedia('(max-width: 600px)').matches
+    && window.matchMedia('(max-width: 860px), (max-width: 1100px) and (max-height: 900px)').matches
     && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
   ))
   const pageRef = useRef(null)
@@ -683,7 +686,9 @@ function App() {
   const completePreloader = useCallback(() => setIsPreloaderDone(true), [])
 
   useEffect(() => {
-    const mobile = window.matchMedia('(max-width: 600px)')
+    // Phones and compact tablets share the vertical hero story. Desktop keeps
+    // its independent, horizontal ring handoff from 861px upward.
+    const mobile = window.matchMedia('(max-width: 860px), (max-width: 1100px) and (max-height: 900px)')
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
     const update = () => setUsesMobileMerge(mobile.matches && !reduced.matches)
 
@@ -778,7 +783,7 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add('(max-width: 860px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const chapter = scope.querySelector('.mobile-hero-merge')
       const target = scope.querySelector('[data-mobile-merge-target]')
@@ -804,10 +809,16 @@ function App() {
         // geometry sits beneath its stroke, so reserve the 7px outline inside
         // that diameter rather than letting the scaled border overflow it.
         const finalRingWidth = 7
-        // `100vw` (used by the Impact film) includes the scrollbar width.
-        // Use innerWidth here as well, rather than the canvas client width,
-        // so the two outer circles have the same visible diameter.
-        const finalDiameter = window.innerWidth - 20 - finalRingWidth
+        // On a phone the chapter spans the viewport, but on a tablet it is
+        // deliberately centred inside a narrower reading column. Never size
+        // the final circle from the wider window alone: it would extend past
+        // that column and look clipped at both sides. The smaller value keeps
+        // the film generous while guaranteeing its full outline remains in
+        // view at every compact breakpoint.
+        const finalDiameter = Math.min(
+          window.innerWidth - 20 - finalRingWidth,
+          bounds.width - finalRingWidth - 2,
+        )
         const finalRadius = finalDiameter / 2
         const visualFinalRadius = finalRadius + finalRingWidth / 2
         const finalScale = finalDiameter / (ringRadius * 2 * scale)
@@ -911,7 +922,10 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
+    // Compact landscape tablets use the mobile Impact handoff below. Keep the
+    // desktop film reveal out of that range so both timelines never compete
+    // for the same circle and play control.
+    media.add('(min-width: 1101px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (min-height: 901px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const impact = scope.querySelector('.impact')
       const feature = scope.querySelector('.impact-visual--feature')
@@ -921,6 +935,25 @@ function App() {
       const supportingVisuals = scope.querySelectorAll('.impact-visual--before, .impact-visual--after')
       const supportingLabels = scope.querySelectorAll('.impact-label')
       const content = scope.querySelectorAll('.impact-overview, .impact-story, .impact-cta, .impact-tagline')
+
+      // Large tablets use a shorter Work canvas than desktop. On a tall
+      // portrait screen, the generic Impact trigger would consequently begin
+      // while the hero-to-Work handoff was still in progress. Give each large
+      // tablet orientation its own natural scroll window: Work resolves
+      // first, then the incoming film circle starts opening as it reaches the
+      // reading area. Desktop keeps its established timing exactly.
+      const isLargeTabletPortrait = window.matchMedia(
+        '(min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait)'
+      ).matches
+      const isLargeTabletLandscape = window.matchMedia(
+        '(min-width: 1200px) and (max-width: 1450px) and (min-height: 901px) and (max-height: 1100px) and (orientation: landscape)'
+      ).matches
+      const impactStart = isLargeTabletPortrait
+        ? 'top 65%'
+        : isLargeTabletLandscape
+          ? 'top 78%'
+          : 'top 92%'
+      const impactEnd = (isLargeTabletPortrait || isLargeTabletLandscape) ? 'top 12%' : 'top 10%'
 
       if (!impact || !feature || !featureImage || !featureRing || !play) return undefined
 
@@ -952,8 +985,8 @@ function App() {
         defaults: { ease: 'none' },
         scrollTrigger: {
           trigger: impact,
-          start: 'top 92%',
-          end: 'top 10%',
+          start: impactStart,
+          end: impactEnd,
           scrub: .7,
           invalidateOnRefresh: true,
         },
@@ -979,7 +1012,7 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add('(max-width: 860px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (prefers-reduced-motion: no-preference)', () => {
       const overview = pageRef.current.querySelector('.impact-overview')
       const statistics = overview?.querySelectorAll('strong')
 
@@ -1017,7 +1050,7 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add('(max-width: 860px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const source = scope.querySelector('.work-mobile-outro__button')
       const sourceContent = scope.querySelectorAll('.work-mobile-outro__label, .work-mobile-outro__arrow')
@@ -1042,7 +1075,7 @@ function App() {
 
       gsap.set(feature, { clipPath: 'circle(0% at 50% 50%)' })
       gsap.set(play, { scale: 0, transformOrigin: '50% 50%' })
-      gsap.set(source, { transformOrigin: '50% 50%', willChange: 'transform,clip-path' })
+      gsap.set(source, { transformOrigin: '50% 50%', willChange: 'transform' })
       gsap.set(sourceContent, { transformOrigin: '50% 50%' })
       const shape = { progress: 0 }
 
@@ -1067,22 +1100,30 @@ function App() {
           duration: .56,
           force3D: true,
         }, .12)
-        .to(sourceContent, { clipPath: 'inset(0% 50% 0% 50%)', duration: .12 }, .54)
+        // Let the CTA finish its journey before changing shape. Starting the
+        // non-uniform scale even a frame early makes the tablet version look
+        // as if it pulls to one side rather than resolving into a circle.
+        .to(sourceContent, { clipPath: 'inset(0% 50% 0% 50%)', duration: .12 }, .68)
         .to(source, {
-          scaleX: .368421,
-          scaleY: 1.458333,
-          duration: .2,
+          // Resolve from the measured controls rather than fixed dimensions.
+          // This keeps the pill-to-play morph perfectly registered when the
+          // same mobile composition scales up for tablets.
+          scaleX: () => play.offsetWidth / source.offsetWidth,
+          scaleY: () => play.offsetHeight / source.offsetHeight,
+          duration: .22,
           force3D: true,
-        }, .56)
+        }, .68)
         .to(shape, {
           progress: 1,
-          duration: .2,
+          duration: .22,
           onUpdate: () => sourceShape.setAttribute('d', mobileExploreMorphPath(shape.progress)),
-        }, .56)
-        .to(play, { scale: 1, duration: .18, force3D: true }, .72)
-        // A discrete handoff avoids a fade while allowing the real video play
-        // control to take over exactly where the CTA arrived.
-        .set(source, { visibility: 'hidden' }, .84)
+        }, .68)
+        // At the exact final circle state, swap in the real video control on
+        // the same centre and dimensions. The green surface never fades or
+        // drifts; it simply gains its play mark once its CTA text has folded
+        // away, which keeps the handoff clear under scroll scrubbing.
+        .set(play, { scale: 1 }, .9)
+        .set(source, { visibility: 'hidden' }, .9)
 
       return () => {
         handoff.kill()
@@ -1099,13 +1140,14 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add('(max-width: 860px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const section = scope.querySelector('.get-involved')
       const backdrop = scope.querySelector('.get-involved__backdrop')
       const intro = scope.querySelector('.get-involved__intro')
       const cards = Array.from(scope.querySelectorAll('.involvement-card'))
       const cta = scope.querySelector('.get-involved__cta')
+      const usesHorizontalCapsule = window.matchMedia('(min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (orientation: landscape)').matches
 
       if (!section || !backdrop || !intro || cards.length !== 4 || !cta) return undefined
 
@@ -1119,7 +1161,8 @@ function App() {
         const gutter = Math.max(12, boxes[0].width * .075)
         const toPercent = (value, size) => Math.max(0, Math.min(100, value / size * 100))
 
-        return `inset(${toPercent(top - backdropBox.top - gutter, backdropBox.height)}% ${toPercent(backdropBox.right - right - gutter, backdropBox.width)}% ${toPercent(backdropBox.bottom - bottom - gutter, backdropBox.height)}% ${toPercent(left - backdropBox.left - gutter, backdropBox.width)}% round 42px)`
+        const rounding = usesHorizontalCapsule ? '999px' : '52px'
+        return `inset(${toPercent(top - backdropBox.top - gutter, backdropBox.height)}% ${toPercent(backdropBox.right - right - gutter, backdropBox.width)}% ${toPercent(backdropBox.bottom - bottom - gutter, backdropBox.height)}% ${toPercent(left - backdropBox.left - gutter, backdropBox.width)}% round ${rounding})`
       }
 
       gsap.set(backdrop, { clipPath: 'inset(0% 0% 0% 0%)' })
@@ -1155,7 +1198,7 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add('(min-width: 1101px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (min-height: 901px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const section = scope.querySelector('.get-involved')
       const backdrop = scope.querySelector('.get-involved__backdrop')
@@ -1226,7 +1269,9 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(min-width: 861px) and (prefers-reduced-motion: no-preference)', () => {
+    // Compact landscape tablets use the mobile service list too, so they
+    // must not initialise the desktop hero-to-grid handoff layer.
+    media.add('(min-width: 1101px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (min-height: 901px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const heroRings = Array.from(scope.querySelectorAll('.story-image'))
       const workSection = scope.querySelector('.what-we-do')
@@ -1236,6 +1281,16 @@ function App() {
       const workIntro = scope.querySelector('.work-intro')
       const lowerCards = scope.querySelector('.work-lower-cards')
       const workSummary = scope.querySelector('.work-summary')
+      // The large iPad layouts deliberately give source and destination rings
+      // identical horizontal centres. Moving them with the desktop stagger
+      // would still make a straight rail look skewed mid-scrub, so those two
+      // tablet orientations travel and resolve as one composed system.
+      const usesAlignedTabletHandoff = window.matchMedia(
+        '(min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait), ' +
+        '(min-width: 1200px) and (max-width: 1450px) and (min-height: 901px) and (max-height: 1100px) and (orientation: landscape)'
+      ).matches
+      const ringStagger = usesAlignedTabletHandoff ? 0 : .025
+      const cardStagger = usesAlignedTabletHandoff ? 0 : .04
 
       if (heroRings.length !== 4 || workCards.length !== 4 || !workSection || !workGrid || !workRail || !workIntro || !lowerCards || !workSummary) return undefined
 
@@ -1352,12 +1407,12 @@ function App() {
           y: (index) => endPosition(index).top,
           force3D: true,
           duration: .66,
-          stagger: .025,
+          stagger: ringStagger,
         }, 0)
         .to(workGrid, { clipPath: 'inset(0% 0% 0% 0%)', duration: .48 }, .14)
         .to(workIntro, { clipPath: 'inset(0% 0% 0% 0%)', x: 0, duration: .32 }, .32)
-        .to(workCards, { clipPath: 'circle(75% at 50% 50%)', duration: .24, stagger: .04 }, .57)
-        .to(travellingRings, { clipPath: 'circle(0% at 50% 50%)', duration: .14, stagger: .025 }, .66)
+        .to(workCards, { clipPath: 'circle(75% at 50% 50%)', duration: .24, stagger: cardStagger }, .57)
+        .to(travellingRings, { clipPath: 'circle(0% at 50% 50%)', duration: .14, stagger: ringStagger }, .66)
         .to(workRail, { clipPath: 'inset(0% 0% 0% 0%)', duration: .32 }, .68)
         .to(lowerCards, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .26 }, .78)
         .to(workSummary, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .22 }, .86)
@@ -1391,7 +1446,7 @@ function App() {
 
     const media = gsap.matchMedia()
 
-    media.add('(max-width: 600px) and (prefers-reduced-motion: no-preference)', () => {
+    media.add('(max-width: 860px) and (prefers-reduced-motion: no-preference), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (prefers-reduced-motion: no-preference)', () => {
       const scope = pageRef.current
       const services = Array.from(scope.querySelectorAll('.work-mobile-service'))
 
