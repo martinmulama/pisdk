@@ -5,3 +5,6 @@
 @import './styles/motion.css';
 @import './styles/tablet.css';
 @import './styles/mobile.css';
+/* Introduced for the mobile Work conclusion; desktop and tablet retain their
+   existing summary treatment without a duplicate call to action. */
+.work-mobile-outro { display: none; }

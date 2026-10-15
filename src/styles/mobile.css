@@ -121,6 +121,68 @@
   h1 { font-size: clamp(17px, 4.8vw, 20px); letter-spacing: -.035em; line-height: 1.22; }
   .intro br { display: none; }
   .intro h1 br + span::before { content: ' '; }
+  .hero--mobile-merge { padding-bottom: 0; }
+  /* The preloader curtain already supplies the mobile entrance. Keep the
+     hero title still beneath it instead of inheriting the desktop rise. */
+  .hero--mobile-merge .intro { transition: none; }
+  .page-shell:not(.hero-is-ready) .hero--mobile-merge .intro {
+    clip-path: inset(0);
+    transform: none;
+  }
+  .hero--mobile-merge > .story-images,
+  .hero--mobile-merge > .mission { display: none; }
+  .mobile-hero-merge {
+    position: relative;
+    order: 3;
+    width: calc(100% + 40px);
+    height: auto;
+    min-height: 0;
+    margin: 14px -20px 0;
+  }
+  .mobile-hero-merge__viewport {
+    position: relative;
+    width: 100%;
+    height: min(75svh, 630px);
+    overflow: clip;
+    background: #f3f4ec;
+  }
+  .mobile-hero-merge__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .mobile-merge__fill { fill: #d8dfca; }
+  .mobile-merge__ring {
+    fill: none;
+    stroke: var(--ring-green);
+    /* Keep the final merged outline optically equal to the 7px Impact film
+       ring rather than allowing the SVG group's scale to make it heavy. */
+    stroke-width: 7;
+    vector-effect: non-scaling-stroke;
+  }
+  .mobile-merge__ring--warm { stroke: var(--ring-warm); }
+  .mobile-hero-merge__mission {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1px minmax(0, 1fr);
+    width: min(calc(100% - 40px), 338px);
+    /* The large, final merged ring needs a clear reading break before the
+       mission starts. Reducing the trailing margin at the same time brings
+       the following Work title closer without crowding this copy. */
+    margin: 56px auto 24px;
+    column-gap: 14px;
+    will-change: transform;
+  }
+  .mobile-hero-merge__rule { width: 1px; background: #9ba885; }
+  .mobile-hero-merge__mission p {
+    margin: 0 0 20px;
+    color: #3d7474;
+    font-size: clamp(13px, 3.8vw, 15px);
+    line-height: 1.58;
+  }
+  .mobile-hero-merge__mission p + p { margin-top: 0; }
   .story-images {
     order: 3;
     display: grid;
@@ -141,7 +203,7 @@
 
   /* Mobile Work is ordinary document flow. The service UI belongs here rather
      than in tablet or desktop styles, so it can evolve independently. */
-  .what-we-do { display: block; width: 100%; height: auto; min-height: 0; margin: 0; padding: 0 0 64px; overflow: visible; }
+  .what-we-do { display: block; width: 100%; height: auto; min-height: 0; margin: 0; padding: 0 0 44px; overflow: visible; }
   .work-mobile-stage { display: none; }
   .work-mobile-scroll-list {
     position: relative;
@@ -232,13 +294,461 @@
     position: relative;
     top: auto;
     left: auto;
-    width: min(100% - 40px, 420px);
-    margin: 46px auto 0;
+    width: min(100% - 48px, 342px);
+    margin: 52px auto 0;
     padding: 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
     font-size: clamp(13px, 3.8vw, 15px);
+    font-weight: 400;
     line-height: 1.58;
+    letter-spacing: normal;
     text-align: left;
   }
+  .work-summary br { display: none; }
+  .what-we-do .work-mobile-outro {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 28px auto 0;
+  }
+  .work-mobile-outro__button {
+    position: relative;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    min-height: 48px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    background: transparent;
+    color: #fffdf5;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1;
+    text-decoration: none;
+    overflow: visible;
+  }
+  .work-mobile-outro__morph { position: absolute; z-index: 0; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .work-mobile-outro__morph path { fill: #5e8951; }
+  .work-mobile-outro__label,
+  .work-mobile-outro__arrow { position: relative; z-index: 1; display: inline-block; }
+  .work-mobile-outro__arrow { margin-left: 8px; font-size: 19px; line-height: 0; }
+
+  /* Mobile impact continues directly from the Work CTA. This is deliberately
+     a document-flow composition; tablet and desktop retain their own layouts. */
+  .impact {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    /* Pull the film upward into the Explore-to-play handoff. It remains in
+       document flow, so the CTA has a shorter, natural travel path. */
+    margin: -32px 0 0;
+    padding: 0 0 32px;
+    overflow: hidden;
+    background: #f3f4ec;
+    container-type: normal;
+  }
+  .impact-visual {
+    --impact-ring-width: 0px;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    padding: var(--impact-ring-width);
+    border-radius: 50%;
+    background: #f3f4ec;
+    overflow: hidden;
+  }
+  .impact-visual img { display: block; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
+  .impact-visual__ring { position: absolute; z-index: 2; inset: 0; border: var(--impact-ring-width) solid var(--impact-ring-color); border-radius: inherit; pointer-events: none; }
+  .impact-visual--feature {
+    --impact-ring-width: 7px;
+    --impact-ring-color: var(--ring-warm);
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: calc(100vw - 20px);
+    height: calc(100vw - 20px);
+    margin: 0 auto 30px;
+    clip-path: circle(75% at 50% 50%);
+  }
+  .impact-visual--feature img { object-position: 55% 50%; }
+  .impact-visual--before,
+  .impact-visual--after {
+    --impact-ring-width: 5px;
+    --impact-ring-color: var(--ring-green);
+    grid-row: 2;
+    width: min(31vw, 126px);
+    height: min(31vw, 126px);
+    margin: 0 auto;
+  }
+  .impact-visual--before { grid-column: 1; }
+  .impact-visual--after { grid-column: 2; }
+  .impact-visual--before img { object-position: 55% 54%; }
+  .impact-visual--after img { object-position: 62% 50%; }
+  .impact-visual__play {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: 70px;
+    height: 70px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgb(124 154 103 / 92%);
+    transform: translate(-50%, -50%);
+  }
+  .impact-visual__play::after {
+    width: 0;
+    height: 0;
+    margin-left: 4px;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 15px solid #f7f7ef;
+    content: '';
+  }
+  .impact-label {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    display: grid;
+    width: min(31vw, 126px);
+    height: auto;
+    min-height: 25px;
+    margin: 8px auto 30px;
+    place-items: center;
+    border-radius: 999px;
+    background: #789b65;
+    color: #fffdf5;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .impact-label--before { grid-column: 1; grid-row: 3; }
+  .impact-label--after { grid-column: 2; grid-row: 3; }
+  .impact-overview,
+  .impact-story,
+  .impact-cta,
+  .impact-tagline {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+  }
+  .impact-overview {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    width: min(100% - 40px, 342px);
+    margin: 18px auto 0;
+  }
+  .impact-overview h2 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(26px, 8vw, 34px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.16;
+  }
+  .impact-overview p {
+    margin: 18px 0 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(16px, 4.6vw, 18px);
+    font-weight: 400;
+    line-height: 1.42;
+  }
+  /* The key figures begin in the same ink as the surrounding copy. Their
+     terracotta layer is clipped from left to right by ScrollTrigger, giving
+     the text itself a noticeable paint-stroke reveal without an underline. */
+  .impact-overview strong {
+    --impact-stat-paint: 100%;
+    position: relative;
+    display: inline-block;
+    background-image: linear-gradient(#ca6538 0 0), linear-gradient(#0c4030 0 0);
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: var(--impact-stat-paint) 100%, 100% 100%;
+    color: transparent;
+    font-weight: 700;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .impact-story {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    width: min(100% - 40px, 342px);
+    min-height: 0;
+    margin: 42px auto 0;
+    padding-left: 14px;
+    border-left: 1px solid #8eac97;
+  }
+  .impact-story h3 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(20px, 6vw, 24px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.18;
+  }
+  .impact-story p {
+    margin: 18px 0 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(13px, 3.8vw, 15px);
+    font-weight: 400;
+    line-height: 1.58;
+  }
+  .impact-story p + p { margin-top: 18px; }
+  .impact-cta {
+    grid-column: 1 / -1;
+    grid-row: 6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    min-height: 48px;
+    margin: 32px auto 0;
+    padding: 12px 22px;
+    border-radius: 999px;
+    background: linear-gradient(105deg, #bd5432, #d8753c);
+    color: #fff8ed;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+  }
+  .impact-tagline { display: none; }
+
+  /* Get involved is the mobile counterpart to the desktop service capsule.
+     It begins as a full green field, then GSAP closes it around this compact,
+     legible two-by-two group of participation options. */
+  .get-involved {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 36px 20px 54px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #f3f4ec;
+  }
+  .get-involved__backdrop {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: auto;
+    background: var(--deep-navy-green);
+    clip-path: inset(25% 6% 21% 6% round 42px);
+    will-change: clip-path;
+  }
+  .get-involved__intro,
+  .involvement-options,
+  .get-involved__cta {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    transform: none;
+  }
+  .get-involved__intro {
+    z-index: 1;
+    width: 100%;
+    margin: 0;
+    text-align: center;
+  }
+  .get-involved__intro h2 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(26px, 8vw, 34px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.16;
+  }
+  .get-involved__intro p {
+    margin: 10px auto 0;
+    color: #245e5c;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(14px, 4vw, 16px);
+    font-weight: 400;
+    letter-spacing: -.035em;
+    line-height: 1.3;
+  }
+  .involvement-options {
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100%, 342px);
+    margin: 46px auto 42px;
+    gap: 14px;
+  }
+  .involvement-card {
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    aspect-ratio: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    border-radius: 50%;
+    text-align: center;
+  }
+  .involvement-card__icon,
+  .involvement-card--partner .involvement-card__icon,
+  .involvement-card--volunteer .involvement-card__icon,
+  .involvement-card--visit .involvement-card__icon {
+    width: auto;
+    height: clamp(22px, 6.4vw, 26px);
+    margin-top: 17%;
+    object-fit: contain;
+  }
+  .involvement-card h3 {
+    width: 84%;
+    margin: 7px 0 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(13px, 3.6vw, 15px);
+    font-weight: 600;
+    letter-spacing: -.05em;
+    line-height: 1.08;
+  }
+  .involvement-card p {
+    width: 82%;
+    margin: 7px 0 0;
+    color: #0c4030;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(10px, 2.85vw, 11.5px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.27;
+  }
+  .involvement-card p br { display: none; }
+  .get-involved__cta {
+    z-index: 1;
+    display: inline-flex;
+    width: max-content;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 12px 22px;
+    border-radius: 999px;
+    background: linear-gradient(105deg, #4b7148, #658c56);
+    color: #fffdf5;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+  .get-involved__cta span { margin-left: 8px; font-size: 19px; line-height: 0; }
+
+  /* A compact closing panel: the footer remains a distinct deep-green finish,
+     but no longer takes over a full phone screen after Get Involved. */
+  .site-footer {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 34px 20px 26px;
+    place-items: center;
+    gap: 16px;
+    text-align: center;
+  }
+  .site-footer__wordmark,
+  .site-footer__divider,
+  .site-footer__statement,
+  .site-footer__links,
+  .footer-social,
+  .site-footer__copyright,
+  .footer-principles {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+  }
+  .site-footer__wordmark {
+    font-size: clamp(34px, 10vw, 42px);
+    line-height: .92;
+  }
+  .site-footer__divider { display: none; }
+  .site-footer__statement {
+    width: min(100%, 310px);
+    margin: -1px 0 1px;
+    font-size: clamp(19px, 5.45vw, 22px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.16;
+  }
+  .site-footer__links {
+    display: grid;
+    width: min(100%, 326px);
+    gap: 10px;
+  }
+  .site-footer__link-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 10px 20px;
+  }
+  .site-footer__link-row a {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-bottom: 2px;
+    border-width: 1px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+  .footer-social { display: flex; gap: 9px; }
+  .footer-social__link { width: 31px; height: 31px; border-width: 1px; }
+  .site-footer__copyright {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .footer-principles {
+    display: flex;
+    width: min(100%, 330px);
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px 9px;
+    font-size: 6.5px;
+    letter-spacing: .17em;
+    line-height: 1.45;
+    white-space: normal;
+  }
+  .footer-principles__leaf { width: 23px; height: 30px; margin: 0 2px 0 0; }
 }
 
 /* Short phones preserve the same hierarchy while fitting each service row. */
