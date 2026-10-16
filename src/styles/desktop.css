@@ -1001,3 +1001,114 @@ h1 {
   }
 }
 
+/* Ultra-wide desktop -------------------------------------------------------
+   A 2560px desktop has enough room for the complete editorial layout and its
+   persistent side navigation.  Do not turn it into the compact laptop
+   composition.  Instead, give the Hero and the service rail one shared set
+   of circle measurements: the row has the same left edge, diameter and
+   cadence in both sections.  That keeps the handoff level and leaves a clean
+   dedicated reading column for the Work heading. */
+@media (min-width: 1800px) and (min-height: 1000px) {
+  .desktop-nav { display: grid; }
+  .mobile-hero-header { display: contents; }
+  .mobile-menu-toggle,
+  .mobile-nav { display: none; }
+
+  .hero {
+    --ultra-wide-ring-size: 14.14cqw;
+    /* Move the row clear of the enlarged feature ring, then tighten the
+       cadence by exactly the reclaimed amount so its final circle retains a
+       respectful gutter before the persistent side menu. */
+    --ultra-wide-ring-gap: 2.1cqw;
+    /* The feature ring ends at 25.368cqw on the centred wide canvas.
+       Adding the shared 2.1cqw gap puts the first story ring at 27.468cqw. */
+    --ultra-wide-ring-left: 27.468%;
+  }
+
+  /* At this canvas size the left visual has room to retain its full editorial
+     scale.  Override the safety cap used by shorter fullscreen laptops so its
+     outer ring shares the story row's 27.294cqw centreline. */
+  .feature-image {
+    width: 25.704cqw;
+    height: 38.946cqw;
+  }
+
+  /* The image's recreated outer-ring centre is at 27.294cqw.  Placing the
+     four ring centres on that same line prevents the wide composition from
+     reading as a tilted or disconnected rail. */
+  .story-images {
+    top: 20.224cqw;
+    left: var(--ultra-wide-ring-left);
+    gap: var(--ultra-wide-ring-gap);
+    flex-wrap: nowrap;
+  }
+  .story-image {
+    width: var(--ultra-wide-ring-size);
+    height: var(--ultra-wide-ring-size);
+  }
+
+  .what-we-do {
+    --ultra-wide-card-size: 14.14cqw;
+    --ultra-wide-card-gap: 2.1cqw;
+  }
+  .work-top-grid {
+    /* Its .8cqw inset makes the first service circle begin at 27.468cqw—
+       exactly the Hero row's start edge. */
+    top: 3.2%;
+    left: 26.668%;
+    grid-template-columns: repeat(4, var(--ultra-wide-card-size));
+    align-items: center;
+    width: 64.46cqw;
+    height: 15.74cqw;
+    padding: .8cqw;
+    gap: var(--ultra-wide-card-gap);
+    border-radius: 9.5cqw;
+  }
+  .work-top-grid .work-card {
+    width: var(--ultra-wide-card-size);
+    height: var(--ultra-wide-card-size);
+    padding: .96cqw .72cqw .6cqw;
+  }
+  .work-top-grid .work-card__icon { height: 2.1cqw; }
+  .work-top-grid .work-card h3 {
+    margin: .42cqw 0 .28cqw;
+    font-size: clamp(13px, 1.02cqw, 22px);
+  }
+  .work-top-grid .work-card p {
+    width: 82%;
+    font-size: clamp(10px, .82cqw, 16px);
+    line-height: 1.3;
+  }
+
+  .work-rail {
+    top: 3.2%;
+    left: 26.668%;
+    width: 15.74cqw;
+    /* End just below the final lower circle instead of extending to the
+       section's bottom edge as it does in the standard desktop rail. */
+    bottom: auto;
+    height: 47.75cqw;
+    border-radius: 7.87cqw 0 7.87cqw 7.87cqw;
+  }
+  /* Keep the heading entirely in the reading column; it no longer intrudes
+     into the orange service circle when the canvas becomes very wide. */
+  .work-intro {
+    top: 25.7%;
+    left: 3.5%;
+    width: 14%;
+  }
+  .work-intro h2 { font-size: clamp(24px, 1.5cqw, 38px); }
+  .work-intro__button { width: 13.4cqw; }
+
+  .work-lower-cards {
+    top: 31.8%;
+    left: 27.468%;
+    width: var(--ultra-wide-card-size);
+  }
+  .work-card--research,
+  .work-card--forums { height: var(--ultra-wide-card-size); }
+  /* Match the clear gap above Research with the gap before the Forums card. */
+  .work-lower-cards .work-card--forums { margin-top: 1.22cqw; }
+  .work-summary { top: 55.5%; left: 53.8%; width: 36%; }
+}
+

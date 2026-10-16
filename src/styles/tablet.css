@@ -1,6 +1,7 @@
-/* Tablet layout (601px–860px). These overrides preserve the desktop visual
-   system while switching sections into a readable document-flow layout. */
-@media (max-width: 860px) {
+/* Tablet layout: portrait up to 860px and compact landscape tablets up to
+   1100px wide. These overrides preserve the visual system while switching
+   sections into a readable document-flow layout. */
+@media (max-width: 860px), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) {
   .hero { width: 100%; height: auto; min-height: 100svh; padding: 24px 24px 48px; display: flex; flex-direction: column; align-items: center; }
   .brand { position: relative; top: auto; left: auto; transform: scale(.72); transform-origin: center; margin: -10px 0 8px; }
   .desktop-nav { display: none; }
@@ -14,18 +15,45 @@
   .mission p { font-size: 12px; line-height: 1.62; }
   .tagline { position: relative; left: auto; bottom: auto; order: 6; margin-top: 18px; font-size: 7px; white-space: normal; flex-wrap: wrap; justify-content: center; }
 
-  .preloader-sequence { top: 43%; width: 100vw; }
-  .preloader-step:nth-child(2) { left: 22%; }
-  .preloader-step:nth-child(3) { left: 44%; }
-  .preloader-step:nth-child(4) { left: 66%; }
-  .preloader-step:nth-child(5) { left: 88%; }
-  .preloader-dot__copy { padding: 14%; }
-  .preloader-dot__metric i { font-size: clamp(14px, 4.2vw, 18px); }
-  .preloader-dot__metric strong { font-size: clamp(36px, 10vw, 48px); }
-  .preloader-dot__copy em { font-size: clamp(13px, 3.6vw, 16px); }
-  .preloader-step__caption { top: clamp(84px, 24vw, 100px); max-width: 230px; }
-  .preloader-step__caption span { font-size: clamp(16px, 4.5vw, 20px); }
-  .preloader-step__caption small { margin-top: 11px; font-size: clamp(9px, 2.6vw, 11px); }
+  /* The compact-screen preloader mirrors the phone's vertical knot thread.
+     The larger tablet stage gives each statistic more room rather than
+     reverting to the desktop's horizontal sequence. */
+  .preloader { background: #06432f; padding: 0; }
+  .preloader-sequence { inset: 0; width: auto; height: auto; transform: none; }
+  .preloader-sequence__line {
+    top: 15%; right: auto; bottom: auto; left: 50%; width: 1px; height: 72%;
+    transform: translateX(-50%); background: rgba(219, 226, 174, .66);
+  }
+  .preloader-step { left: 50% !important; width: 0; }
+  .preloader-step:nth-child(2) { top: 15%; }
+  .preloader-step:nth-child(3) { top: 39%; }
+  .preloader-step:nth-child(4) { top: 63%; }
+  .preloader-step:nth-child(5) { top: 87%; }
+  .preloader-dot__copy { padding: 12%; justify-content: center; }
+  .preloader-dot__mobile-label {
+    display: block;
+    margin-bottom: 8px;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(15px, 2.3vw, 18px);
+    font-weight: 400;
+    letter-spacing: -.035em;
+    line-height: 1.05;
+    text-transform: none;
+  }
+  .preloader-dot__metric { display: flex; align-items: baseline; justify-content: center; gap: .22em; white-space: nowrap; }
+  .preloader-dot__metric i { margin: 0; font-size: clamp(22px, 3.4vw, 27px); font-weight: 500; letter-spacing: -.05em; line-height: .96; }
+  .preloader-dot__metric strong { font-size: clamp(32px, 5.1vw, 42px); font-weight: 600; letter-spacing: -.065em; line-height: .96; }
+  .preloader-dot__copy em { margin-top: 5px; font-size: clamp(27px, 4.2vw, 34px); font-weight: 500; letter-spacing: -.05em; line-height: .95; }
+  .preloader-dot__mobile-support {
+    display: block;
+    margin-top: 11px;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(15px, 2.3vw, 18px);
+    font-weight: 400;
+    letter-spacing: -.04em;
+    line-height: 1.16;
+  }
+  .preloader-step__caption { display: none; }
 
   .what-we-do {
     width: 100%;
@@ -138,4 +166,1317 @@
   .site-footer__copyright { font-size: 15px; }
   .footer-principles { width: min(100%, 600px); flex-wrap: wrap; justify-content: center; gap: 11px; font-size: 8px; line-height: 1.5; white-space: normal; }
   .footer-principles__leaf { width: 34px; height: 44px; margin-right: 3px; }
+}
+
+/* Tablet hero (601px–860px). This intentionally uses the same vertical
+   narrative as the phone hero rather than scaling down the desktop collage.
+   The SVG remains a single coordinate system, so the later circle merge has
+   the same clean, non-crossing paths in portrait and landscape. */
+@media (min-width: 601px) and (max-width: 860px), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) {
+  .hero {
+    align-items: stretch;
+    padding: 18px 34px 0;
+  }
+  .mobile-hero-header {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: 1;
+    width: 100%;
+    min-height: 54px;
+  }
+  .mobile-hero-header .brand {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(46vw, 286px);
+    height: auto;
+    aspect-ratio: 6.56;
+    margin: 0;
+    background-size: 284.6% auto;
+    background-position: 53.3% 2.8%;
+    transform: none;
+  }
+  .mobile-menu-toggle {
+    position: absolute;
+    right: 0;
+    display: grid;
+    width: 52px;
+    height: 52px;
+    padding: 11px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    place-content: center;
+    gap: 6px;
+  }
+  .mobile-menu-toggle span {
+    display: block;
+    width: 29px;
+    height: 2px;
+    border-radius: 999px;
+    background: #0c4030;
+    transition: transform .22s ease, opacity .18s ease;
+  }
+  .mobile-menu-toggle.is-open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .mobile-menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .mobile-menu-toggle.is-open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .mobile-nav {
+    position: absolute;
+    z-index: 5;
+    top: 62px;
+    right: 0;
+    display: grid;
+    width: min(248px, calc(100vw - 68px));
+    padding: 20px 22px;
+    border: 1px solid rgba(12, 64, 48, .16);
+    border-radius: 18px;
+    background: rgba(243, 244, 236, .98);
+    box-shadow: 0 16px 34px rgba(6, 55, 37, .14);
+    gap: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .24s cubic-bezier(.16, 1, .3, 1);
+  }
+  .mobile-nav.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .mobile-nav a {
+    color: #155d5e;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .feature-image { display: none; }
+  .intro {
+    order: 2;
+    width: min(100%, 640px);
+    margin: 18px auto 0;
+    text-align: left;
+  }
+  .intro h1 {
+    font-size: clamp(29px, 4.35vw, 35px);
+    letter-spacing: -.04em;
+    line-height: 1.14;
+  }
+  .intro br { display: none; }
+  .intro h1 br + span::before { content: ' '; }
+  .hero--mobile-merge { padding-bottom: 0; }
+  .hero--mobile-merge .intro { transition: none; }
+  .page-shell:not(.hero-is-ready) .hero--mobile-merge .intro {
+    clip-path: inset(0);
+    transform: none;
+  }
+  .hero--mobile-merge > .story-images,
+  .hero--mobile-merge > .mission,
+  .hero--mobile-merge .tagline { display: none; }
+  .mobile-hero-merge {
+    position: relative;
+    order: 3;
+    width: min(100%, 560px);
+    min-height: 0;
+    margin: 20px auto 0;
+  }
+  .mobile-hero-merge__viewport {
+    position: relative;
+    width: 100%;
+    height: min(69svh, 700px);
+    overflow: clip;
+    background: #f3f4ec;
+  }
+  .mobile-hero-merge__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .mobile-merge__fill { fill: #d8dfca; }
+  .mobile-merge__ring {
+    fill: none;
+    stroke: var(--ring-green);
+    stroke-width: 7;
+    vector-effect: non-scaling-stroke;
+  }
+  .mobile-merge__ring--warm { stroke: var(--ring-warm); }
+  .mobile-hero-merge__mission {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1px minmax(0, 1fr);
+    width: min(calc(100% - 76px), 590px);
+    margin: 60px auto 38px;
+    column-gap: 20px;
+    will-change: transform;
+  }
+  .mobile-hero-merge__rule { width: 1px; background: #9ba885; }
+  .mobile-hero-merge__mission p {
+    margin: 0 0 24px;
+    color: #3d7474;
+    font-size: clamp(14px, 2vw, 16px);
+    line-height: 1.62;
+  }
+  .mobile-hero-merge__mission p + p { margin-top: 0; }
+
+  /* Tablet Work is the phone's linear service story, enlarged—not a compact
+     desktop grid. Each row keeps its visual circle on the left and its calm,
+     readable explanation on the right. */
+  .what-we-do {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0 0 76px;
+    overflow: visible;
+  }
+  .work-mobile-stage { display: none; }
+  .work-mobile-scroll-list {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 30px 0 42px;
+    overflow: hidden;
+    background: radial-gradient(circle at 39% 18%, #174b2e 0%, #0d4027 47%, #08341e 100%);
+  }
+  .work-mobile-service {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 42% minmax(0, 1fr);
+    align-items: center;
+    min-height: clamp(238px, 32vw, 274px);
+    margin: 0;
+    padding: 0 clamp(30px, 6vw, 50px) 0 clamp(20px, 4vw, 34px);
+    column-gap: clamp(14px, 2.4vw, 24px);
+  }
+  .work-mobile-service__circle {
+    display: flex;
+    grid-column: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    width: clamp(178px, 28vw, 218px);
+    height: clamp(178px, 28vw, 218px);
+    padding: 18px 14px;
+    border-radius: 50%;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+  .work-mobile-service--recovery .work-mobile-service__circle { background: var(--ring-warm); }
+  .work-mobile-service--community .work-mobile-service__circle { background: radial-gradient(circle at 43% 31%, #d5e8bd, #bdd9a3 72%, #a8ca91); }
+  .work-mobile-service--training .work-mobile-service__circle { background: radial-gradient(circle at 40% 30%, #fffdf3, #edf1df 78%, #dce6ca); }
+  .work-mobile-service--consultation .work-mobile-service__circle { background: radial-gradient(circle at 42% 30%, #d6e9bc, #bbd89e 70%, #a7c98b); }
+  .work-mobile-service--research .work-mobile-service__circle { background: radial-gradient(circle at 41% 26%, #f8f9ed, #e9efd9 73%, #d6e2c2); }
+  .work-mobile-service--forums .work-mobile-service__circle { background: radial-gradient(circle at 43% 28%, #d3e9b4, #badb9b 70%, #a3c889); }
+  .work-mobile-service__circle img { display: block; width: auto; height: 38px; margin: 0; }
+  .work-mobile-service__circle h3 {
+    margin: 9px 0 0;
+    color: #0b3f2b;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -.055em;
+    text-align: center;
+  }
+  .work-mobile-service p {
+    grid-column: 2;
+    margin: 0;
+    color: #d7e2cf;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(15px, 2.15vw, 17px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.46;
+    will-change: transform, clip-path;
+  }
+  .work-intro {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 48px 40px 34px;
+    background: #f3f4ec;
+    text-align: center;
+  }
+  .work-intro h2 {
+    width: auto;
+    margin: 0;
+    color: #0c4030;
+    font-size: clamp(29px, 4.45vw, 36px);
+    font-weight: 600;
+    line-height: 1.16;
+    letter-spacing: -.04em;
+  }
+  .work-intro__button { display: none; }
+  .work-summary {
+    position: relative;
+    width: min(calc(100% - 112px), 560px);
+    margin: 58px auto 0;
+    padding: 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(15px, 2.15vw, 17px);
+    font-weight: 400;
+    line-height: 1.6;
+    text-align: left;
+  }
+  .work-summary br { display: none; }
+  .what-we-do .work-mobile-outro {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 32px auto 0;
+  }
+  .work-mobile-outro__button {
+    position: relative;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 216px;
+    min-height: 54px;
+    padding: 14px 25px;
+    border-radius: 999px;
+    background: transparent;
+    color: #fffdf5;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1;
+    text-decoration: none;
+    overflow: visible;
+  }
+  .work-mobile-outro__morph { position: absolute; z-index: 0; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .work-mobile-outro__morph path { fill: #5e8951; }
+  .work-mobile-outro__label,
+  .work-mobile-outro__arrow { position: relative; z-index: 1; display: inline-block; }
+  .work-mobile-outro__arrow { margin-left: 8px; font-size: 21px; line-height: 0; }
+
+  /* Impact continues from the tablet Explore control in the same document
+     flow as mobile. Its film diameter is deliberately the same as the final
+     circle produced by the tablet hero merge: 560px canvas less its visible
+     9px SVG allowance. */
+  .impact {
+    --tablet-impact-film-size: min(calc(100vw - 56px), 551px);
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: -38px 0 0;
+    padding: 0 0 54px;
+    overflow: hidden;
+    background: #f3f4ec;
+    container-type: normal;
+  }
+  .impact-visual {
+    --impact-ring-width: 0px;
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    padding: var(--impact-ring-width);
+    overflow: hidden;
+    border-radius: 50%;
+    background: #f3f4ec;
+  }
+  .impact-visual img { display: block; width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
+  .impact-visual__ring { position: absolute; z-index: 2; inset: 0; border: var(--impact-ring-width) solid var(--impact-ring-color); border-radius: inherit; pointer-events: none; }
+  .impact-visual--feature {
+    --impact-ring-width: 8px;
+    --impact-ring-color: var(--ring-warm);
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: var(--tablet-impact-film-size);
+    height: var(--tablet-impact-film-size);
+    margin: 0 auto 38px;
+    clip-path: circle(75% at 50% 50%);
+  }
+  .impact-visual--feature img { object-position: 55% 50%; }
+  .impact-visual--before,
+  .impact-visual--after {
+    --impact-ring-width: 6px;
+    --impact-ring-color: var(--ring-green);
+    grid-row: 2;
+    width: min(27vw, 184px);
+    height: min(27vw, 184px);
+    margin: 0 auto;
+  }
+  .impact-visual--before { grid-column: 1; }
+  .impact-visual--after { grid-column: 2; }
+  .impact-visual--before img { object-position: 55% 54%; }
+  .impact-visual--after img { object-position: 62% 50%; }
+  .impact-visual__play {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    width: 82px;
+    height: 82px;
+    place-items: center;
+    border-radius: 50%;
+    background: rgb(124 154 103 / 92%);
+    transform: translate(-50%, -50%);
+  }
+  .impact-visual__play::after {
+    width: 0;
+    height: 0;
+    margin-left: 5px;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 18px solid #f7f7ef;
+    content: '';
+  }
+  .impact-label {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    display: grid;
+    width: min(27vw, 184px);
+    min-height: 30px;
+    margin: 10px auto 38px;
+    place-items: center;
+    border-radius: 999px;
+    background: #789b65;
+    color: #fffdf5;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .2em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .impact-label--before { grid-column: 1; grid-row: 3; }
+  .impact-label--after { grid-column: 2; grid-row: 3; }
+  .impact-overview,
+  .impact-story,
+  .impact-cta,
+  .impact-tagline {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+  }
+  .impact-overview {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    width: min(calc(100% - 96px), 590px);
+    margin: 28px auto 0;
+  }
+  .impact-overview h2 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(32px, 4.5vw, 38px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.16;
+  }
+  .impact-overview p {
+    margin: 20px 0 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(17px, 2.4vw, 19px);
+    font-weight: 400;
+    line-height: 1.46;
+  }
+  .impact-overview strong {
+    --impact-stat-paint: 100%;
+    position: relative;
+    display: inline-block;
+    background-image: linear-gradient(#ca6538 0 0), linear-gradient(#0c4030 0 0);
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: var(--impact-stat-paint) 100%, 100% 100%;
+    color: transparent;
+    font-weight: 700;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .impact-story {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    width: min(calc(100% - 96px), 590px);
+    min-height: 0;
+    margin: 52px auto 0;
+    padding-left: 20px;
+    border-left: 1px solid #8eac97;
+  }
+  .impact-story h3 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(26px, 3.7vw, 31px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.18;
+  }
+  .impact-story p {
+    margin: 20px 0 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(15px, 2.1vw, 17px);
+    font-weight: 400;
+    line-height: 1.6;
+  }
+  .impact-story p + p { margin-top: 20px; }
+  .impact-cta {
+    grid-column: 1 / -1;
+    grid-row: 6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max-content;
+    min-height: 54px;
+    margin: 38px auto 0;
+    padding: 14px 26px;
+    border-radius: 999px;
+    background: linear-gradient(105deg, #bd5432, #d8753c);
+    color: #fff8ed;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+  }
+  .impact-tagline { display: none; }
+}
+
+@media (min-width: 601px) and (max-width: 1100px) and (max-height: 900px) and (orientation: landscape) {
+  .hero { padding: 8px 38px 0; }
+  .mobile-hero-header { min-height: 40px; }
+  .mobile-hero-header .brand { width: min(34vw, 250px); }
+  .intro { width: min(100%, 730px); margin-top: 6px; }
+  .intro h1 { font-size: clamp(24px, 2.75vw, 28px); line-height: 1.1; }
+  .mobile-hero-merge { width: min(100%, 500px); margin-top: 8px; }
+  /* The finished construction circle is intentionally almost 500px wide at
+     this breakpoint. Give the SVG stage enough vertical runway for its full
+     lower arc plus the mission gap; the former 450px cap inevitably sliced
+     that arc on a 1024 × 768 laptop. */
+  .mobile-hero-merge__viewport { height: min(75svh, 580px); }
+  .mobile-hero-merge__mission { width: min(calc(100% - 64px), 590px); margin-top: 44px; }
+  .preloader-sequence__line { top: 18%; height: 69%; }
+  .preloader-step:nth-child(2) { top: 18%; }
+  .preloader-step:nth-child(3) { top: 41%; }
+  .preloader-step:nth-child(4) { top: 64%; }
+  .preloader-step:nth-child(5) { top: 87%; }
+  .what-we-do { padding: 0 0 62px; }
+  .work-intro { padding: 38px 48px 28px; }
+  .work-intro h2 { font-size: clamp(28px, 3.45vw, 34px); }
+  .work-mobile-scroll-list { padding: 24px 0 32px; }
+  .work-mobile-service {
+    grid-template-columns: 37% minmax(0, 1fr);
+    min-height: 224px;
+    padding-right: clamp(38px, 7vw, 72px);
+  }
+  .work-mobile-service__circle { width: 184px; height: 184px; }
+  .work-mobile-service__circle img { height: 33px; }
+  .work-mobile-service__circle h3 { font-size: 17px; }
+  .work-mobile-service p { font-size: 15px; line-height: 1.42; }
+  .work-summary { width: min(calc(100% - 160px), 590px); margin-top: 50px; }
+  /* Landscape uses the 500px hero-merge canvas, so the final hero ring is
+     491px after its outline allowance. Carry that exact scale into Impact. */
+  .impact {
+    --tablet-impact-film-size: min(calc(100vw - 96px), 491px);
+    margin-top: -32px;
+    padding-bottom: 46px;
+  }
+  .impact-visual--feature { margin-bottom: 30px; }
+  .impact-visual--before,
+  .impact-visual--after,
+  .impact-label { width: min(19vw, 160px); }
+  .impact-visual--before,
+  .impact-visual--after { height: min(19vw, 160px); }
+  .impact-label { min-height: 28px; margin-bottom: 32px; font-size: 9px; }
+  .impact-overview,
+  .impact-story { width: min(calc(100% - 180px), 610px); }
+  .impact-overview { margin-top: 22px; }
+  .impact-overview h2 { font-size: clamp(30px, 3.6vw, 35px); }
+  .impact-overview p { font-size: 16px; }
+  .impact-story { margin-top: 42px; }
+  .impact-story h3 { font-size: 27px; }
+  .impact-story p { font-size: 15px; }
+}
+
+/* Get Involved follows the tablet's mobile-first story in portrait: a
+   generously scaled two-by-two set of circles, with the green canvas closing
+   around their shared silhouette. This protects the readable type scale that
+   the Hero, Work, and Impact sections establish above. */
+@media (min-width: 601px) and (max-width: 860px), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) {
+  .get-involved {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 54px 48px 60px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #f3f4ec;
+  }
+  .get-involved__backdrop {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    width: auto;
+    background: var(--deep-navy-green);
+    clip-path: inset(24% 5% 19% 5% round 52px);
+    will-change: clip-path;
+  }
+  .get-involved__intro,
+  .involvement-options,
+  .get-involved__cta {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    transform: none;
+  }
+  .get-involved__intro {
+    z-index: 1;
+    width: 100%;
+    margin: 0;
+    text-align: center;
+  }
+  .get-involved__intro h2 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(32px, 4.7vw, 38px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.16;
+  }
+  .get-involved__intro p {
+    margin: 12px auto 0;
+    color: #245e5c;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(16px, 2.3vw, 18px);
+    font-weight: 400;
+    letter-spacing: -.035em;
+    line-height: 1.3;
+  }
+  .involvement-options {
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100%, 544px);
+    margin: 44px auto 46px;
+    gap: 22px;
+  }
+  .involvement-card {
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    aspect-ratio: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    border-radius: 50%;
+    text-align: center;
+  }
+  .involvement-card__icon,
+  .involvement-card--partner .involvement-card__icon,
+  .involvement-card--volunteer .involvement-card__icon,
+  .involvement-card--visit .involvement-card__icon {
+    width: auto;
+    height: clamp(42px, 6.1vw, 48px);
+    margin-top: 17%;
+    object-fit: contain;
+  }
+  .involvement-card h3 {
+    width: 84%;
+    margin: 11px 0 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(16px, 2.45vw, 19px);
+    font-weight: 600;
+    letter-spacing: -.05em;
+    line-height: 1.08;
+  }
+  .involvement-card p {
+    width: 82%;
+    margin: 10px 0 0;
+    color: #0c4030;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(12px, 1.8vw, 14px);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.28;
+  }
+  .involvement-card p br { display: none; }
+  .get-involved__cta {
+    z-index: 1;
+    display: inline-flex;
+    width: max-content;
+    min-height: 54px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 14px 26px;
+    border-radius: 999px;
+    background: linear-gradient(105deg, #4b7148, #658c56);
+    color: #fffdf5;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+  .get-involved__cta span { margin-left: 8px; font-size: 21px; line-height: 0; }
+
+  /* A tablet footer retains the desktop information hierarchy but uses a
+     compact two-column grid. It is far calmer than a tall phone stack while
+     leaving every navigation item easy to scan and tap. */
+  .site-footer {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 52px 52px 34px;
+    grid-template-columns: minmax(185px, .76fr) minmax(290px, 1.24fr);
+    grid-template-areas:
+      'wordmark links'
+      'statement links'
+      'social social'
+      'copyright copyright'
+      'principles principles';
+    align-items: start;
+    gap: 22px 46px;
+    text-align: left;
+  }
+  .site-footer__wordmark,
+  .site-footer__divider,
+  .site-footer__statement,
+  .site-footer__links,
+  .footer-social,
+  .site-footer__copyright,
+  .footer-principles {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+  }
+  .site-footer__wordmark {
+    grid-area: wordmark;
+    align-self: end;
+    color: #fffdf2;
+    font-size: clamp(42px, 6.2vw, 50px);
+    line-height: .94;
+  }
+  .site-footer__divider { display: none; }
+  .site-footer__statement {
+    grid-area: statement;
+    width: min(100%, 270px);
+    margin: 0;
+    color: #fffdf2;
+    font-size: clamp(21px, 3.25vw, 26px);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.18;
+  }
+  .site-footer__links {
+    grid-area: links;
+    display: grid;
+    width: 100%;
+    gap: 11px;
+  }
+  .site-footer__link-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 10px 24px;
+  }
+  .site-footer__link-row a {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0;
+    padding-bottom: 3px;
+    border-width: 1px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.22;
+  }
+  .footer-social {
+    grid-area: social;
+    display: flex;
+    justify-self: start;
+    gap: 10px;
+  }
+  .footer-social__link { width: 34px; height: 34px; border-width: 1px; }
+  .site-footer__copyright {
+    grid-area: copyright;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .footer-principles {
+    grid-area: principles;
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    font-size: 7px;
+    letter-spacing: .2em;
+    line-height: 1.45;
+    white-space: normal;
+  }
+  .footer-principles__leaf { width: 27px; height: 36px; margin: 0 3px 0 0; }
+}
+
+/* A landscape tablet has enough width for the horizontal four-circle rail.
+   Here it inherits the desktop's capsule idea at a deliberately smaller,
+   readable scale instead of stretching the portrait grid sideways. */
+@media (min-width: 861px) and (max-width: 1100px) and (max-height: 900px) and (orientation: landscape) {
+  .get-involved { padding: 46px 54px 54px; }
+  .get-involved__intro h2 { font-size: clamp(30px, 3.4vw, 36px); }
+  .get-involved__intro p { margin-top: 9px; font-size: 16px; }
+  .involvement-options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: min(100%, 900px);
+    margin: 40px auto 38px;
+    gap: 20px;
+  }
+  .involvement-card__icon,
+  .involvement-card--partner .involvement-card__icon,
+  .involvement-card--volunteer .involvement-card__icon,
+  .involvement-card--visit .involvement-card__icon { height: 38px; }
+  .involvement-card h3 { margin-top: 9px; font-size: 16px; }
+  .involvement-card p { margin-top: 8px; font-size: 11.5px; line-height: 1.25; }
+  .get-involved__cta { min-height: 50px; padding: 13px 24px; font-size: 15px; }
+
+  .site-footer {
+    padding: 42px 56px 30px;
+    grid-template-columns: minmax(145px, .55fr) minmax(250px, 1fr) minmax(390px, 1.55fr);
+    grid-template-areas:
+      'wordmark statement links'
+      'principles principles social'
+      'copyright copyright social';
+    align-items: center;
+    gap: 26px 32px;
+  }
+  .site-footer__wordmark { align-self: start; font-size: 43px; }
+  .site-footer__statement { width: 100%; font-size: 21px; }
+  .site-footer__links { gap: 9px; }
+  .site-footer__link-row { gap: 8px 18px; }
+  .site-footer__link-row a { font-size: 12px; }
+  .footer-social { align-self: end; justify-self: end; gap: 9px; }
+  .footer-social__link { width: 32px; height: 32px; }
+  .site-footer__copyright { justify-self: start; font-size: 12px; white-space: nowrap; }
+  .footer-principles { justify-self: start; width: max-content; gap: 6px 9px; font-size: 6px; white-space: nowrap; }
+  .footer-principles__leaf { width: 24px; height: 32px; }
+}
+
+/* Large portrait tablets (for example the 1032 × 1376 iPad Pro) have enough
+   width for the desktop visual system, but not for a persistent side menu.
+   Keep the desktop story intact, reclaim that right gutter for the ring row,
+   and use the compact menu control instead. */
+@media (min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait) {
+  .hero {
+    --large-tablet-ring-size: 15.3cqw;
+    --large-tablet-ring-top: clamp(350px, 30svh, 410px);
+    position: relative;
+    width: 100%;
+    /* Keep Work below the first viewport. That lets the desktop handoff
+       initialise at rest instead of advancing its fixed rings on page load. */
+    height: 100svh;
+    margin: 0;
+    container-type: inline-size;
+  }
+  .desktop-nav { display: none; }
+  .mobile-hero-header {
+    position: absolute;
+    z-index: 5;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: block;
+    height: 90px;
+  }
+  .mobile-hero-header .brand {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    width: 26.25cqw;
+    height: 4cqw;
+    margin: 0;
+    transform: translateX(-50%);
+  }
+  .mobile-menu-toggle {
+    position: absolute;
+    top: 20px;
+    right: 28px;
+    z-index: 6;
+    display: grid;
+    width: 52px;
+    height: 52px;
+    padding: 11px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    place-content: center;
+    gap: 6px;
+  }
+  .mobile-menu-toggle span {
+    display: block;
+    width: 29px;
+    height: 2px;
+    border-radius: 999px;
+    background: #0c4030;
+    transition: transform .22s ease, opacity .18s ease;
+  }
+  .mobile-menu-toggle.is-open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .mobile-menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .mobile-menu-toggle.is-open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .mobile-nav {
+    position: absolute;
+    z-index: 5;
+    top: 78px;
+    right: 28px;
+    display: grid;
+    width: 250px;
+    padding: 20px 22px;
+    border: 1px solid rgba(12, 64, 48, .16);
+    border-radius: 18px;
+    background: rgba(243, 244, 236, .98);
+    box-shadow: 0 16px 34px rgba(6, 55, 37, .14);
+    gap: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .24s cubic-bezier(.16, 1, .3, 1);
+  }
+  .mobile-nav.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .mobile-nav a {
+    color: #155d5e;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+
+  /* The feature circle and ring row share one horizontal centreline. Lowering
+     the image keeps the tall viewport composed around its main visual pivot. */
+  .feature-image {
+    top: calc(var(--large-tablet-ring-top) + (var(--large-tablet-ring-size) / 2) - 22.4cqw);
+    left: 0;
+    width: 29vw;
+    height: 44.8cqw;
+  }
+  .intro {
+    top: 8.2svh;
+    left: 30%;
+    width: 65%;
+  }
+  h1 {
+    font-size: clamp(22px, 2.35cqw, 27px);
+    line-height: 1.16;
+  }
+  .story-images {
+    top: var(--large-tablet-ring-top);
+    /* Keep every source-ring centre on the same x coordinate as its
+       destination card below. This makes the handoff a straight, calm rise
+       rather than four diagonal tracks. */
+    left: 30%;
+    align-items: flex-start;
+    gap: 2.55cqw;
+    flex-wrap: nowrap;
+  }
+  .story-image {
+    width: var(--large-tablet-ring-size);
+    height: var(--large-tablet-ring-size);
+  }
+  .story-image::after { border-width: .78cqw; }
+  .mission {
+    top: calc(var(--large-tablet-ring-top) + var(--large-tablet-ring-size) + 12.5cqw);
+    left: 51%;
+    width: 42%;
+    column-gap: 20px;
+  }
+  .mission-rule { height: 23cqw; }
+  .mission p { margin: 0 0 20px; font-size: clamp(14px, 1.52vw, 16px); line-height: 1.58; }
+  .tagline {
+    top: calc(var(--large-tablet-ring-top) + var(--large-tablet-ring-size) + 47.5cqw);
+    bottom: auto;
+    left: 4%;
+    font-size: 8px;
+  }
+
+  /* Portrait tablet Work canvas ------------------------------------------------
+     The full-width hero gives us a wider row than the legacy desktop canvas.
+     Retain that row here: each service card starts on exactly the same centre
+     as its corresponding hero ring. The handoff can therefore move as one
+     aligned rail, while the larger Work canvas has room for the copy below. */
+  .what-we-do {
+    --large-portrait-work-card: 15.3cqw;
+    --large-portrait-work-gap: 2.55cqw;
+    position: relative;
+    width: 100%;
+    /* This is a content canvas, not another full screen. Its compact height
+       ends shortly after the two lower circles, leaving the Impact circle to
+       provide the next visual beat rather than an empty runway. */
+    height: 58cqw;
+    margin: 0 auto var(--work-impact-runway);
+    container-type: inline-size;
+  }
+  .work-top-grid {
+    top: 5.8%;
+    left: 29.2%;
+    grid-template-columns: repeat(4, var(--large-portrait-work-card));
+    align-items: center;
+    width: 70.45cqw;
+    height: 16.9cqw;
+    padding: .8cqw;
+    gap: var(--large-portrait-work-gap);
+    border-radius: 9cqw;
+  }
+  .work-top-grid .work-card {
+    width: var(--large-portrait-work-card);
+    height: var(--large-portrait-work-card);
+    padding: 1.08cqw .68cqw .6cqw;
+  }
+  .work-top-grid .work-card__icon { height: 2.25cqw; }
+  .work-top-grid .work-card h3 { margin: .44cqw 0 .3cqw; font-size: clamp(13px, 1.12cqw, 18px); }
+  .work-top-grid .work-card p { width: 84%; font-size: clamp(9px, .9cqw, 13px); line-height: 1.31; }
+  .work-rail {
+    top: 5.8%;
+    left: 29.2%;
+    width: 16.9cqw;
+    bottom: auto;
+    /* Carry the rail just beyond the separated Research / ESPJ stack. */
+    height: 50cqw;
+    border-radius: 8.45cqw 0 8.45cqw 8.45cqw;
+  }
+  .work-intro { top: 32%; left: 4%; width: 23%; }
+  .work-intro h2 { font-size: clamp(22px, 2.4cqw, 27px); }
+  .work-intro__button { width: 17cqw; height: 4.1cqw; margin-top: 1.7cqw; font-size: clamp(12px, 1.18cqw, 14px); }
+  /* Start below—not inside—the first orange service circle. */
+  .work-lower-cards { top: 35.6%; left: 30%; width: 15.3cqw; }
+  .work-card--research,
+  .work-card--forums { height: 15.3cqw; padding: 1.02cqw .62cqw .52cqw; }
+  .work-lower-cards .work-card__icon { height: 2.2cqw; }
+  .work-lower-cards .work-card h3 { margin: .38cqw 0 .68cqw; font-size: clamp(12px, 1.04cqw, 16px); }
+  .work-lower-cards .work-card p { font-size: clamp(9px, .88cqw, 12px); line-height: 1.32; }
+  .work-lower-cards .work-card--forums { margin-top: .85cqw; }
+  .work-summary { top: 47%; left: 52%; width: 40%; font-size: clamp(13px, 1.42cqw, 16px); }
+}
+
+/* Large landscape tablets and 1440px-class laptops have a desktop-width
+   canvas but a limited vertical runway. Keep the desktop composition, reclaim
+   the navigation gutter, and place the feature circle and the four-ring rail
+   on a single calm horizontal axis. */
+@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 1100px) and (orientation: landscape) {
+  .hero {
+    --large-landscape-ring-size: 14.14cqw;
+    /* Keep the image-ring centre and story-ring centres level, while bringing
+       the system up slightly on 1440 × 900 and shorter laptop displays. */
+    --large-landscape-ring-top: clamp(320px, 37.8svh, 404px);
+    /* Leave a deliberate reading column for the Work heading once this row
+       becomes the service canvas. */
+    --large-landscape-ring-left: 26%;
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    margin: 0;
+    container-type: inline-size;
+  }
+  .desktop-nav { display: none; }
+  .mobile-hero-header {
+    position: absolute;
+    z-index: 5;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: block;
+    height: 78px;
+  }
+  .mobile-hero-header .brand {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    /* Preserve the exact source-crop ratio so the final “K” remains inside
+       the mark at this width. */
+    width: 26.25cqw;
+    height: 4cqw;
+    margin: 0;
+    transform: translateX(-50%);
+  }
+  .mobile-menu-toggle {
+    position: absolute;
+    top: 13px;
+    right: 26px;
+    z-index: 6;
+    display: grid;
+    width: 48px;
+    height: 48px;
+    padding: 10px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    place-content: center;
+    gap: 6px;
+  }
+  .mobile-menu-toggle span {
+    display: block;
+    width: 27px;
+    height: 2px;
+    border-radius: 999px;
+    background: #0c4030;
+    transition: transform .22s ease, opacity .18s ease;
+  }
+  .mobile-menu-toggle.is-open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .mobile-menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+  .mobile-menu-toggle.is-open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+  .mobile-nav {
+    position: absolute;
+    z-index: 5;
+    top: 68px;
+    right: 26px;
+    display: grid;
+    width: 240px;
+    padding: 18px 21px;
+    border: 1px solid rgba(12, 64, 48, .16);
+    border-radius: 18px;
+    background: rgba(243, 244, 236, .98);
+    box-shadow: 0 16px 34px rgba(6, 55, 37, .14);
+    gap: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .24s cubic-bezier(.16, 1, .3, 1);
+  }
+  .mobile-nav.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .mobile-nav a {
+    color: #155d5e;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .feature-image {
+    /* The pseudo-ring's centre is 14.75vw below this top edge. Align it to
+       the middle of the photographic-ring row rather than its upper edge. */
+    top: calc(var(--large-landscape-ring-top) + (var(--large-landscape-ring-size) / 2) - 14.75vw);
+    left: 0;
+    width: min(25.704cqw, 19.15vw);
+    height: min(38.946cqw, 29vw);
+  }
+  .intro {
+    top: 12.2svh;
+    left: 22%;
+    width: 68%;
+  }
+  h1 {
+    font-size: clamp(20px, 1.8cqw, 26px);
+    line-height: 1.16;
+  }
+  .story-images {
+    top: var(--large-landscape-ring-top);
+    left: var(--large-landscape-ring-left);
+    align-items: flex-start;
+    gap: 4.2cqw;
+    flex-wrap: nowrap;
+  }
+  .story-image {
+    width: var(--large-landscape-ring-size);
+    height: var(--large-landscape-ring-size);
+  }
+  .mission {
+    top: calc(var(--large-landscape-ring-top) + var(--large-landscape-ring-size) + 5.8cqw);
+    left: 45.5%;
+    width: 43.5%;
+    column-gap: 2cqw;
+  }
+  .mission-rule { height: 14.2cqw; }
+  .mission p { margin: 0 0 1.25cqw; font-size: clamp(12px, 1.06cqw, 15px); line-height: 1.58; }
+  .tagline {
+    top: calc(var(--large-landscape-ring-top) + var(--large-landscape-ring-size) + 29.4cqw);
+    bottom: auto;
+    left: 3.5%;
+    font-size: 7px;
+  }
+
+  /* Landscape tablet Work canvas ---------------------------------------------
+     With the side navigation collapsed, the top service rail can use the
+     entire composition. Its four cards deliberately share the hero row's
+     centres (26% + one half ring, then the same 18.34cqw cadence), which
+     keeps all travelling rings level for the complete scroll scrub. */
+  .what-we-do {
+    /* Match the hero rail exactly: the handoff should finish as an actual
+       circle-on-circle contact, not a smaller photographic ring floating in
+       the centre of a larger service card. */
+    --large-landscape-work-card: 14.14cqw;
+    --large-landscape-work-gap: 4.2cqw;
+    position: relative;
+    width: 100%;
+    /* Stop the green shape with the completed lower-card stack instead of
+       carrying a dark vertical tail through the rest of the viewport. */
+    height: 58cqw;
+    margin: 0 auto var(--work-impact-runway);
+    container-type: inline-size;
+  }
+  .work-top-grid {
+    top: 6.5%;
+    /* The .8cqw inset puts the first circle at 26%, exactly where the first
+       hero ring begins. The remaining three retain the 4.2cqw hero cadence. */
+    left: 25.2%;
+    grid-template-columns: repeat(4, var(--large-landscape-work-card));
+    align-items: center;
+    width: 70.76cqw;
+    height: 15.74cqw;
+    padding: .8cqw;
+    gap: var(--large-landscape-work-gap);
+    border-radius: 9.5cqw;
+  }
+  .work-top-grid .work-card {
+    width: var(--large-landscape-work-card);
+    height: var(--large-landscape-work-card);
+    padding: .82cqw .68cqw .52cqw;
+  }
+  .work-top-grid .work-card__icon { height: 1.78cqw; }
+  .work-top-grid .work-card h3 { margin: .32cqw 0 .2cqw; font-size: clamp(11px, .9cqw, 14px); line-height: 1.08; }
+  .work-top-grid .work-card p { width: 80%; font-size: clamp(8px, .72cqw, 10px); line-height: 1.27; }
+  .work-rail {
+    top: 6.5%;
+    left: 25.2%;
+    width: 15.74cqw;
+    bottom: auto;
+    /* The rail ends with the final lower circle, rather than leaving a long
+       tail or clipping the deliberate gaps in the vertical stack. */
+    height: 47.5cqw;
+    border-radius: 7.87cqw 0 7.87cqw 7.87cqw;
+  }
+  .work-intro { top: 35%; left: 3.5%; width: 19.5%; }
+  .work-intro h2 { font-size: clamp(20px, 1.86cqw, 26px); }
+  .work-intro__button { width: 15.2cqw; height: 3.7cqw; margin-top: 1.5cqw; font-size: clamp(11px, 1cqw, 14px); }
+  /* Match the desktop rhythm: a small clear gap after Deconstruction, then
+     one equally clear gap between Research and the ESPJ forum circle. */
+  .work-lower-cards { top: 33.45%; left: 26%; width: 14.14cqw; }
+  .work-card--research,
+  .work-card--forums { height: 14.14cqw; padding: .96cqw .6cqw .5cqw; }
+  .work-lower-cards .work-card__icon { height: 2.26cqw; }
+  .work-lower-cards .work-card h3 { margin: .4cqw 0 .72cqw; font-size: clamp(12px, 1.02cqw, 16px); }
+  .work-lower-cards .work-card p { font-size: clamp(9px, .82cqw, 12px); line-height: 1.32; }
+  .work-lower-cards .work-card--forums { margin-top: .85cqw; }
+  .work-summary { top: 48%; left: 55%; width: 36%; font-size: clamp(12px, 1.02cqw, 15px); }
+}
+
+/* A 1440 × 900 laptop has less runway below the hero row than the iPad Pro
+   landscape. Anchor the tagline to the lower edge rather than letting its
+   desktop percentage fall outside the first screen. */
+@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 900px) and (orientation: landscape) {
+  .tagline { top: auto; bottom: 26px; }
+}
+
+/* 1440px desktop ----------------------------------------------------------
+   This is a desktop composition, not a stretched tablet. Keep the permanent
+   side navigation, then use one deliberately compact circle rail to preserve
+   air around both the large left feature ring and the navigation gutter. The
+   Work cards use the very same measurements, so the scroll handoff is level
+   instead of drifting diagonally. */
+@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 1100px) and (orientation: landscape) {
+  .desktop-nav { display: grid; }
+  .mobile-hero-header {
+    position: static;
+    display: contents;
+    height: auto;
+  }
+  .mobile-hero-header .brand {
+    top: 1.074cqw;
+    left: calc(50% - 11.515cqw);
+    width: 26.25cqw;
+    height: 4cqw;
+    margin: 0;
+    transform: none;
+  }
+  .mobile-menu-toggle,
+  .mobile-nav { display: none; }
+
+  .hero {
+    --large-landscape-ring-size: 12.7cqw;
+    --large-landscape-ring-top: 20.944cqw;
+    /* The enlarged feature ring ends at 25.537cqw. Keep exactly one shared
+       2cqw gap before the first story circle. */
+    --large-landscape-ring-left: 27.537%;
+  }
+  .feature-image {
+    top: 7.49cqw;
+    left: 0;
+    /* Override the short-laptop image cap with the actual 1440 desktop
+       feature scale. This preserves the centreline used by the ring row. */
+    width: 25.704cqw !important;
+    height: 38.946cqw !important;
+  }
+  .intro { top: 12.2svh; left: 26.3%; width: 51.5%; }
+  h1 { font-size: clamp(20px, 1.8cqw, 26px); }
+  .story-images { gap: 2cqw; }
+  .mission {
+    left: 45.5%;
+    width: 39.5%;
+  }
+
+  .what-we-do {
+    --large-landscape-work-card: 12.7cqw;
+    --large-landscape-work-gap: 2cqw;
+  }
+  .work-top-grid {
+    /* An .8cqw inset positions the first service circle at 27.537cqw, the
+       same left edge as the first Hero ring. */
+    left: 26.737%;
+    grid-template-columns: repeat(4, var(--large-landscape-work-card));
+    width: 58.4cqw;
+    height: 14.3cqw;
+    gap: var(--large-landscape-work-gap);
+  }
+  .work-top-grid .work-card {
+    width: var(--large-landscape-work-card);
+    height: var(--large-landscape-work-card);
+    padding: .78cqw .62cqw .48cqw;
+  }
+  .work-top-grid .work-card__icon { height: 1.66cqw; }
+  .work-top-grid .work-card h3 { margin: .3cqw 0 .18cqw; font-size: clamp(11px, .82cqw, 13px); }
+  .work-top-grid .work-card p { width: 80%; font-size: clamp(8px, .66cqw, 10px); line-height: 1.26; }
+  .work-rail {
+    left: 26.737%;
+    width: 14.3cqw;
+    height: 43.5cqw;
+  }
+  .work-intro { left: 3.5%; width: 19.5%; }
+  .work-lower-cards { left: 27.537%; width: 12.7cqw; }
+  .work-card--research,
+  .work-card--forums { height: 12.7cqw; }
+  /* The second lower card gets the same 2.25cqw breathing room as the first
+     lower card receives beneath the top service circle. */
+  .work-lower-cards .work-card--forums { margin-top: 2.25cqw; }
+  .work-summary { left: 55%; width: 30.5%; }
 }
