@@ -666,7 +666,11 @@
   .intro { width: min(100%, 730px); margin-top: 6px; }
   .intro h1 { font-size: clamp(24px, 2.75vw, 28px); line-height: 1.1; }
   .mobile-hero-merge { width: min(100%, 500px); margin-top: 8px; }
-  .mobile-hero-merge__viewport { height: min(72svh, 450px); }
+  /* The finished construction circle is intentionally almost 500px wide at
+     this breakpoint. Give the SVG stage enough vertical runway for its full
+     lower arc plus the mission gap; the former 450px cap inevitably sliced
+     that arc on a 1024 × 768 laptop. */
+  .mobile-hero-merge__viewport { height: min(75svh, 580px); }
   .mobile-hero-merge__mission { width: min(calc(100% - 64px), 590px); margin-top: 44px; }
   .preloader-sequence__line { top: 18%; height: 69%; }
   .preloader-step:nth-child(2) { top: 18%; }
@@ -1185,14 +1189,16 @@
   .work-summary { top: 47%; left: 52%; width: 40%; font-size: clamp(13px, 1.42cqw, 16px); }
 }
 
-/* The same large tablet in landscape has a desktop-width canvas but a touch
-   device's limited vertical runway. Keep the desktop composition, reclaim the
-   navigation gutter, and place the feature circle and the four-ring rail on
-   a single calm horizontal axis. */
-@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 901px) and (max-height: 1100px) and (orientation: landscape) {
+/* Large landscape tablets and 1440px-class laptops have a desktop-width
+   canvas but a limited vertical runway. Keep the desktop composition, reclaim
+   the navigation gutter, and place the feature circle and the four-ring rail
+   on a single calm horizontal axis. */
+@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 1100px) and (orientation: landscape) {
   .hero {
     --large-landscape-ring-size: 14.14cqw;
-    --large-landscape-ring-top: clamp(376px, 37.8svh, 404px);
+    /* Keep the image-ring centre and story-ring centres level, while bringing
+       the system up slightly on 1440 × 900 and shorter laptop displays. */
+    --large-landscape-ring-top: clamp(320px, 37.8svh, 404px);
     /* Leave a deliberate reading column for the Work heading once this row
        becomes the service canvas. */
     --large-landscape-ring-left: 26%;
@@ -1326,8 +1332,11 @@
      centres (26% + one half ring, then the same 18.34cqw cadence), which
      keeps all travelling rings level for the complete scroll scrub. */
   .what-we-do {
-    --large-landscape-work-card: 16.4cqw;
-    --large-landscape-work-gap: 1.94cqw;
+    /* Match the hero rail exactly: the handoff should finish as an actual
+       circle-on-circle contact, not a smaller photographic ring floating in
+       the centre of a larger service card. */
+    --large-landscape-work-card: 14.14cqw;
+    --large-landscape-work-gap: 4.2cqw;
     position: relative;
     width: 100%;
     /* Stop the green shape with the completed lower-card stack instead of
@@ -1338,13 +1347,13 @@
   }
   .work-top-grid {
     top: 6.5%;
-    /* .8cqw inset puts the first card at 24.87cqw: its centre matches the
-       shifted first hero ring exactly. */
-    left: 24.07%;
+    /* The .8cqw inset puts the first circle at 26%, exactly where the first
+       hero ring begins. The remaining three retain the 4.2cqw hero cadence. */
+    left: 25.2%;
     grid-template-columns: repeat(4, var(--large-landscape-work-card));
     align-items: center;
-    width: 73.02cqw;
-    height: 18cqw;
+    width: 70.76cqw;
+    height: 15.74cqw;
     padding: .8cqw;
     gap: var(--large-landscape-work-gap);
     border-radius: 9.5cqw;
@@ -1352,32 +1361,122 @@
   .work-top-grid .work-card {
     width: var(--large-landscape-work-card);
     height: var(--large-landscape-work-card);
-    padding: 1.15cqw .72cqw .62cqw;
+    padding: .82cqw .68cqw .52cqw;
   }
-  .work-top-grid .work-card__icon { height: 2.35cqw; }
-  .work-top-grid .work-card h3 { margin: .45cqw 0 .3cqw; font-size: clamp(13px, 1.08cqw, 17px); }
-  .work-top-grid .work-card p { width: 84%; font-size: clamp(9px, .84cqw, 12px); line-height: 1.31; }
+  .work-top-grid .work-card__icon { height: 1.78cqw; }
+  .work-top-grid .work-card h3 { margin: .32cqw 0 .2cqw; font-size: clamp(11px, .9cqw, 14px); line-height: 1.08; }
+  .work-top-grid .work-card p { width: 80%; font-size: clamp(8px, .72cqw, 10px); line-height: 1.27; }
   .work-rail {
     top: 6.5%;
-    left: 24.07%;
-    width: 18cqw;
+    left: 25.2%;
+    width: 15.74cqw;
     bottom: auto;
     /* The rail ends with the final lower circle, rather than leaving a long
        tail or clipping the deliberate gaps in the vertical stack. */
-    height: 52.5cqw;
-    border-radius: 9cqw 0 9cqw 9cqw;
+    height: 47.5cqw;
+    border-radius: 7.87cqw 0 7.87cqw 7.87cqw;
   }
   .work-intro { top: 35%; left: 3.5%; width: 19.5%; }
   .work-intro h2 { font-size: clamp(20px, 1.86cqw, 26px); }
   .work-intro__button { width: 15.2cqw; height: 3.7cqw; margin-top: 1.5cqw; font-size: clamp(11px, 1cqw, 14px); }
   /* Match the desktop rhythm: a small clear gap after Deconstruction, then
      one equally clear gap between Research and the ESPJ forum circle. */
-  .work-lower-cards { top: 37.3%; left: 24.87%; width: 16.4cqw; }
+  .work-lower-cards { top: 33.45%; left: 26%; width: 14.14cqw; }
   .work-card--research,
-  .work-card--forums { height: 16.4cqw; padding: 1.08cqw .65cqw .55cqw; }
+  .work-card--forums { height: 14.14cqw; padding: .96cqw .6cqw .5cqw; }
   .work-lower-cards .work-card__icon { height: 2.26cqw; }
   .work-lower-cards .work-card h3 { margin: .4cqw 0 .72cqw; font-size: clamp(12px, 1.02cqw, 16px); }
   .work-lower-cards .work-card p { font-size: clamp(9px, .82cqw, 12px); line-height: 1.32; }
   .work-lower-cards .work-card--forums { margin-top: .85cqw; }
   .work-summary { top: 48%; left: 55%; width: 36%; font-size: clamp(12px, 1.02cqw, 15px); }
+}
+
+/* A 1440 × 900 laptop has less runway below the hero row than the iPad Pro
+   landscape. Anchor the tagline to the lower edge rather than letting its
+   desktop percentage fall outside the first screen. */
+@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 900px) and (orientation: landscape) {
+  .tagline { top: auto; bottom: 26px; }
+}
+
+/* 1440px desktop ----------------------------------------------------------
+   This is a desktop composition, not a stretched tablet. Keep the permanent
+   side navigation, then use one deliberately compact circle rail to preserve
+   air around both the large left feature ring and the navigation gutter. The
+   Work cards use the very same measurements, so the scroll handoff is level
+   instead of drifting diagonally. */
+@media (min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 1100px) and (orientation: landscape) {
+  .desktop-nav { display: grid; }
+  .mobile-hero-header {
+    position: static;
+    display: contents;
+    height: auto;
+  }
+  .mobile-hero-header .brand {
+    top: 1.074cqw;
+    left: calc(50% - 11.515cqw);
+    width: 26.25cqw;
+    height: 4cqw;
+    margin: 0;
+    transform: none;
+  }
+  .mobile-menu-toggle,
+  .mobile-nav { display: none; }
+
+  .hero {
+    --large-landscape-ring-size: 12.7cqw;
+    --large-landscape-ring-top: 20.944cqw;
+    /* The enlarged feature ring ends at 25.537cqw. Keep exactly one shared
+       2cqw gap before the first story circle. */
+    --large-landscape-ring-left: 27.537%;
+  }
+  .feature-image {
+    top: 7.49cqw;
+    left: 0;
+    /* Override the short-laptop image cap with the actual 1440 desktop
+       feature scale. This preserves the centreline used by the ring row. */
+    width: 25.704cqw !important;
+    height: 38.946cqw !important;
+  }
+  .intro { top: 12.2svh; left: 26.3%; width: 51.5%; }
+  h1 { font-size: clamp(20px, 1.8cqw, 26px); }
+  .story-images { gap: 2cqw; }
+  .mission {
+    left: 45.5%;
+    width: 39.5%;
+  }
+
+  .what-we-do {
+    --large-landscape-work-card: 12.7cqw;
+    --large-landscape-work-gap: 2cqw;
+  }
+  .work-top-grid {
+    /* An .8cqw inset positions the first service circle at 27.537cqw, the
+       same left edge as the first Hero ring. */
+    left: 26.737%;
+    grid-template-columns: repeat(4, var(--large-landscape-work-card));
+    width: 58.4cqw;
+    height: 14.3cqw;
+    gap: var(--large-landscape-work-gap);
+  }
+  .work-top-grid .work-card {
+    width: var(--large-landscape-work-card);
+    height: var(--large-landscape-work-card);
+    padding: .78cqw .62cqw .48cqw;
+  }
+  .work-top-grid .work-card__icon { height: 1.66cqw; }
+  .work-top-grid .work-card h3 { margin: .3cqw 0 .18cqw; font-size: clamp(11px, .82cqw, 13px); }
+  .work-top-grid .work-card p { width: 80%; font-size: clamp(8px, .66cqw, 10px); line-height: 1.26; }
+  .work-rail {
+    left: 26.737%;
+    width: 14.3cqw;
+    height: 43.5cqw;
+  }
+  .work-intro { left: 3.5%; width: 19.5%; }
+  .work-lower-cards { left: 27.537%; width: 12.7cqw; }
+  .work-card--research,
+  .work-card--forums { height: 12.7cqw; }
+  /* The second lower card gets the same 2.25cqw breathing room as the first
+     lower card receives beneath the top service circle. */
+  .work-lower-cards .work-card--forums { margin-top: 2.25cqw; }
+  .work-summary { left: 55%; width: 30.5%; }
 }

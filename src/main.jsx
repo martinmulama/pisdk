@@ -805,6 +805,10 @@ function App() {
         const bounds = viewport.getBoundingClientRect()
         const scale = Math.min(bounds.width / viewBox.width, bounds.height / viewBox.height)
         const verticalInset = (bounds.height - viewBox.height * scale) / 2
+        // Reserve a real visual clearance below the completed circle. This
+        // includes its non-scaling outline and avoids a lower-edge crop when
+        // tablet browser chrome reduces the stable viewport height.
+        const settleInset = 18
         // Match the mobile Impact film's *outer* diameter exactly. SVG circle
         // geometry sits beneath its stroke, so reserve the 7px outline inside
         // that diameter rather than letting the scaled border overflow it.
@@ -818,22 +822,24 @@ function App() {
         const finalDiameter = Math.min(
           window.innerWidth - 20 - finalRingWidth,
           bounds.width - finalRingWidth - 2,
+          bounds.height - (settleInset * 2) - finalRingWidth,
         )
         const finalRadius = finalDiameter / 2
         const visualFinalRadius = finalRadius + finalRingWidth / 2
         const finalScale = finalDiameter / (ringRadius * 2 * scale)
         const desiredCentre = Math.max(visualFinalRadius + 16, Math.min(220, window.innerHeight * .25))
-        const readingGap = 56
-        // Leave a small stage inset below the enlarged ring. This removes the
-        // clipped edge while preserving the deliberate reading gap above the
-        // mission block that follows it.
-        const settleInset = 10
-        const scrollDistance = Math.max(80, bounds.height + readingGap - desiredCentre - visualFinalRadius - readingGap - settleInset)
+        const settledCentre = Math.max(
+          visualFinalRadius + settleInset,
+          bounds.height - visualFinalRadius - settleInset,
+        )
+        // The circle travels only as far as its fully visible resting point;
+        // the following mission copy stays in normal document flow below it.
+        const scrollDistance = Math.max(48, settledCentre - desiredCentre)
 
         return {
           scrollDistance,
           finalScale,
-          finalY: (desiredCentre + scrollDistance - verticalInset) / scale,
+          finalY: (settledCentre - verticalInset) / scale,
         }
       }
 
@@ -946,7 +952,7 @@ function App() {
         '(min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait)'
       ).matches
       const isLargeTabletLandscape = window.matchMedia(
-        '(min-width: 1200px) and (max-width: 1450px) and (min-height: 901px) and (max-height: 1100px) and (orientation: landscape)'
+        '(min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 1100px) and (orientation: landscape)'
       ).matches
       const impactStart = isLargeTabletPortrait
         ? 'top 65%'
@@ -1287,7 +1293,8 @@ function App() {
       // tablet orientations travel and resolve as one composed system.
       const usesAlignedTabletHandoff = window.matchMedia(
         '(min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait), ' +
-        '(min-width: 1200px) and (max-width: 1450px) and (min-height: 901px) and (max-height: 1100px) and (orientation: landscape)'
+        '(min-width: 1200px) and (max-width: 1450px) and (min-height: 760px) and (max-height: 1100px) and (orientation: landscape), ' +
+        '(min-width: 1800px) and (min-height: 1000px) and (orientation: landscape)'
       ).matches
       const ringStagger = usesAlignedTabletHandoff ? 0 : .025
       const cardStagger = usesAlignedTabletHandoff ? 0 : .04
@@ -1386,6 +1393,8 @@ function App() {
         defaults: { ease: 'none' },
         scrollTrigger: {
           trigger: workSection,
+          // Begin at the first scroll beat, retaining the immediate Hero-to-
+          // Work handoff used by the earlier desktop interaction.
           start: 'top bottom',
           end: 'top 8%',
           scrub: .7,
