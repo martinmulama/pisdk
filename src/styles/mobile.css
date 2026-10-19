@@ -66,6 +66,29 @@
     width: 100%;
     min-height: 36px;
   }
+  /* The Hero remains completely clear of a fixed header. As soon as its
+     bottom leaves the viewport, this same header becomes the site control. */
+  .page-shell.mobile-nav-is-sticky .mobile-hero-header {
+    position: fixed;
+    z-index: 20;
+    top: max(10px, env(safe-area-inset-top));
+    right: 12px;
+    left: 12px;
+    width: auto;
+    min-height: 54px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: #f3f4ec;
+    box-shadow: 0 8px 22px rgba(6, 55, 37, .12);
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-menu-toggle {
+    right: 6px;
+    background: #f3f4ec;
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-nav {
+    top: calc(100% + 8px);
+    background: #f3f4ec;
+  }
   .mobile-hero-header .brand {
     position: relative;
     top: auto;
@@ -324,7 +347,7 @@
     min-height: 48px;
     padding: 12px 22px;
     border-radius: 999px;
-    background: transparent;
+    background: #5e8951;
     color: #fffdf5;
     font-family: 'Montserrat', Arial, sans-serif;
     font-size: 13px;
@@ -334,8 +357,6 @@
     text-decoration: none;
     overflow: visible;
   }
-  .work-mobile-outro__morph { position: absolute; z-index: 0; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-  .work-mobile-outro__morph path { fill: #5e8951; }
   .work-mobile-outro__label,
   .work-mobile-outro__arrow { position: relative; z-index: 1; display: inline-block; }
   .work-mobile-outro__arrow { margin-left: 8px; font-size: 19px; line-height: 0; }
@@ -380,7 +401,8 @@
     width: calc(100vw - 20px);
     height: calc(100vw - 20px);
     margin: 0 auto 30px;
-    clip-path: circle(75% at 50% 50%);
+    /* The element is already a clipped circle through border-radius and
+       overflow. GSAP only scales it during the mobile CTA handoff. */
   }
   .impact-visual--feature img { object-position: 55% 50%; }
   .impact-visual--before,
@@ -558,11 +580,11 @@
   .get-involved__backdrop {
     position: absolute;
     z-index: 0;
-    inset: 0;
+    inset: 25% 6% 21% 6%;
     width: auto;
     background: var(--deep-navy-green);
-    clip-path: inset(25% 6% 21% 6% round 42px);
-    will-change: clip-path;
+    border-radius: 42px;
+    contain: paint;
   }
   .get-involved__intro,
   .involvement-options,
@@ -749,6 +771,14 @@
     white-space: normal;
   }
   .footer-principles__leaf { width: 23px; height: 30px; margin: 0 2px 0 0; }
+}
+
+/* Reserve a clean edge lane for the menu control on the narrowest phones.
+   Without it, the control can visually cover the final orange K in PISDK. */
+@media (max-width: 360px) {
+  .mobile-hero-header .brand { width: min(59vw, 190px); }
+  .mobile-menu-toggle,
+  .page-shell.mobile-nav-is-sticky .mobile-menu-toggle { right: -16px; }
 }
 
 /* Short phones preserve the same hierarchy while fitting each service row. */

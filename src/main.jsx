@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client'
+import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -216,48 +217,129 @@ function Brand() {
 
 function DesktopNav() {
   const navRef = useRef(null)
+  const navBrandRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [hoveredIndex, setHoveredIndex] = useState(null)
-  const [indicatorY, setIndicatorY] = useState(0)
-  const indicatorIndex = hoveredIndex ?? activeIndex
+  const [navHalfHeight, setNavHalfHeight] = useState(100)
 
-  const syncIndicator = useCallback(() => {
+  const syncNavHeight = useCallback(() => {
     const nav = navRef.current
-    const target = nav?.querySelector(`[data-nav-index="${indicatorIndex}"]`)
-    if (target) setIndicatorY(target.offsetTop + target.offsetHeight / 2)
-  }, [indicatorIndex])
+    if (nav) {
+      const nextHalfHeight = nav.offsetHeight / 2
+      setNavHalfHeight((current) => Math.abs(current - nextHalfHeight) < .5 ? current : nextHalfHeight)
+    }
+  }, [])
 
   useLayoutEffect(() => {
-    syncIndicator()
-    window.addEventListener('resize', syncIndicator)
-    return () => window.removeEventListener('resize', syncIndicator)
-  }, [syncIndicator])
+    syncNavHeight()
+    window.addEventListener('resize', syncNavHeight)
+    return () => window.removeEventListener('resize', syncNavHeight)
+  }, [syncNavHeight])
+
+  useLayoutEffect(() => {
+    const media = gsap.matchMedia()
+
+    media.add('(min-width: 1200px) and (orientation: landscape)', () => {
+      const source = document.querySelector('.hero .brand')
+      const destination = navBrandRef.current
+      const hero = document.querySelector('.hero')
+      const nav = navRef.current
+      if (!source || !destination || !hero || !nav) return undefined
+
+      // One lock-up travels — it begins as the complete centred logo and
+      // settles as the PISDK emblem plus initials, without the institute name.
+      const targetWidth = () => Math.min(154, Math.max(136, window.innerWidth * .09))
+      const targetHeight = () => targetWidth() / 3.43
+      const resetAtSource = () => {
+        const sourceBounds = source.getBoundingClientRect()
+        gsap.set(destination, {
+          visibility: 'visible',
+          left: sourceBounds.left,
+          top: sourceBounds.top,
+          width: sourceBounds.width,
+          height: sourceBounds.height,
+          backgroundSize: '284.57% auto',
+          backgroundPosition: '53.31% 2.82%',
+          clipPath: 'inset(0 0 0 0)',
+          x: 0,
+          y: 0,
+        })
+      }
+      const targetLeft = () => {
+        const navBounds = nav.getBoundingClientRect()
+        return navBounds.left + (navBounds.width - targetWidth()) / 2
+      }
+      const targetTop = () => Math.max(22, Math.min(34, window.innerHeight * .032))
+
+      // Hiding the source immediately—not by fading it—makes the overlay the
+      // sole visible logo for the whole journey and prevents a double-logo
+      // mirage at the handoff point.
+      resetAtSource()
+      gsap.set(source, { visibility: 'hidden' })
+
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: hero,
+          start: 'top top',
+          end: '35% top',
+          scrub: .35,
+          invalidateOnRefresh: true,
+          onRefreshInit: resetAtSource,
+        },
+      })
+
+      timeline.to(destination, {
+        left: targetLeft,
+        top: targetTop,
+        width: targetWidth,
+        height: targetHeight,
+        backgroundSize: '547.2% auto',
+        backgroundPosition: '63.4% 2.1%',
+        ease: 'none',
+      }, 0)
+
+      return () => {
+        gsap.set(source, { clearProps: 'visibility' })
+        gsap.set(destination, { clearProps: 'all' })
+      }
+    })
+
+    return () => media.revert()
+  }, [])
 
   return (
-    <nav
-      ref={navRef}
-      className="desktop-nav"
-      aria-label="Primary navigation"
-      onMouseLeave={() => setHoveredIndex(null)}
-      style={{ '--nav-indicator-y': `${indicatorY}px` }}
-    >
-      {menu.map((item, index) => (
+    <>
+      <nav
+        ref={navRef}
+        className="desktop-nav"
+        aria-label="Primary navigation"
+        style={{
+          '--nav-half-height': `${navHalfHeight}px`,
+        }}
+      >
+        {menu.map((item, index) => (
+          <a
+            className={index === activeIndex ? 'active' : ''}
+            data-nav-index={index}
+            href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
+            key={item}
+            aria-current={index === activeIndex ? 'page' : undefined}
+            onClick={() => setActiveIndex(index)}
+          >
+            {item}
+          </a>
+        ))}
+      </nav>
+      {createPortal(
         <a
-          className={index === activeIndex ? 'active' : ''}
-          data-nav-index={index}
-          href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
-          key={item}
-          aria-current={index === activeIndex ? 'page' : undefined}
-          onMouseEnter={() => setHoveredIndex(index)}
-          onFocus={() => setHoveredIndex(index)}
-          onBlur={() => setHoveredIndex(null)}
-          onClick={() => setActiveIndex(index)}
-        >
-          {item}
-        </a>
-      ))}
-      <span className="desktop-nav__indicator" aria-hidden="true" />
-    </nav>
+          ref={navBrandRef}
+          className="desktop-nav__brand"
+          href="#top"
+          aria-label="Back to the PISDK homepage"
+          style={{ '--reference-image': `url(${referenceImage})` }}
+        />,
+        document.body
+      )}
+    </>
   )
 }
 
@@ -323,18 +405,6 @@ function MobileWorkService({ service }) {
   )
 }
 
-// Identical SVG command structures allow the CTA's path to interpolate from a
-// pill into the ellipse that becomes a true circle after its final transform.
-// Keeping this as a tiny path calculation avoids a heavier morphing plugin.
-function mobileExploreMorphPath(progress = 0) {
-  const mix = (from, to) => from + (to - from) * progress
-  const left = mix(24, 95)
-  const right = mix(166, 95)
-  const controlNear = mix(179.25, 147.5)
-  const controlFar = mix(10.75, 42.5)
-  return `M ${left} 0 L ${right} 0 C ${controlNear} 0 190 10.75 190 24 C 190 37.25 ${controlNear} 48 ${right} 48 L ${left} 48 C ${controlFar} 48 0 37.25 0 24 C 0 10.75 ${controlFar} 0 ${left} 0 Z`
-}
-
 function WhatWeDo() {
   return (
     <section className="what-we-do" id="our-work" aria-labelledby="work-heading">
@@ -360,9 +430,6 @@ function WhatWeDo() {
       <p className="work-summary">We work across the entire circular ecosystem—<br />{' '}connecting people, resources and knowledge<br />{' '}to create lasting change in Kenya’s communities.</p>
       <div className="work-mobile-outro">
         <a className="work-mobile-outro__button" href="#current-pilots">
-          <svg className="work-mobile-outro__morph" viewBox="0 0 190 48" preserveAspectRatio="none" aria-hidden="true">
-            <path data-mobile-explore-morph d={mobileExploreMorphPath()} />
-          </svg>
           <span className="work-mobile-outro__label">Explore our work</span>
           <span className="work-mobile-outro__arrow" aria-hidden="true">→</span>
         </a>
@@ -374,7 +441,7 @@ function WhatWeDo() {
 function ImpactVisual({ className, label, image, showPlay = false }) {
   return (
     <div className={`impact-visual ${className}`}>
-      <img src={image} alt={label} />
+      <img src={image} alt={label} loading="lazy" decoding="async" />
       <span className="impact-visual__ring" aria-hidden="true" />
       {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
     </div>
@@ -705,6 +772,37 @@ function App() {
     if (!isPreloaderDone) return undefined
     const revealFrame = requestAnimationFrame(() => setIsHeroReady(true))
     return () => cancelAnimationFrame(revealFrame)
+  }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isPreloaderDone || !pageRef.current) return undefined
+
+    const media = gsap.matchMedia()
+    media.add('(max-width: 860px), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px), (min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait)', () => {
+      const shell = pageRef.current
+      const hero = shell.querySelector('.hero')
+      if (!hero) return undefined
+
+      const setStickyNavigation = (isSticky) => {
+        shell.classList.toggle('mobile-nav-is-sticky', isSticky)
+      }
+
+      const trigger = ScrollTrigger.create({
+        trigger: hero,
+        start: 'bottom top',
+        onEnter: () => setStickyNavigation(true),
+        onLeaveBack: () => setStickyNavigation(false),
+        onRefresh: (self) => setStickyNavigation(self.scroll() >= self.start),
+      })
+
+      setStickyNavigation(window.scrollY >= trigger.start)
+      return () => {
+        setStickyNavigation(false)
+        trigger.kill()
+      }
+    })
+
+    return () => media.revert()
   }, [isPreloaderDone])
 
   useEffect(() => {
@@ -1060,30 +1158,37 @@ function App() {
       const scope = pageRef.current
       const source = scope.querySelector('.work-mobile-outro__button')
       const sourceContent = scope.querySelectorAll('.work-mobile-outro__label, .work-mobile-outro__arrow')
-      const sourceShape = scope.querySelector('[data-mobile-explore-morph]')
       const impact = scope.querySelector('.impact')
       const feature = scope.querySelector('.impact-visual--feature')
       const play = feature?.querySelector('.impact-visual__play')
 
-      if (!source || !sourceShape || !impact || !feature || !play) return undefined
+      if (!source || !impact || !feature || !play) return undefined
 
       // Both controls live in normal flow. Their document-coordinate delta is
       // stable while scrolling, so the CTA can travel into the centre of the
       // incoming film without pinning or a fixed overlay.
       const handoffVector = () => {
         const sourceBox = source.getBoundingClientRect()
-        const playBox = play.getBoundingClientRect()
+        // The play mark is deliberately scaled to zero at the start, so its
+        // own client rect has no usable dimensions. The film's centre is the
+        // exact same final destination and remains measurable throughout.
+        const featureBox = feature.getBoundingClientRect()
         return {
-          x: playBox.left + playBox.width / 2 - (sourceBox.left + sourceBox.width / 2),
-          y: playBox.top + playBox.height / 2 - (sourceBox.top + sourceBox.height / 2),
+          // A refresh may happen while the CTA is part-way through its
+          // transform. Remove its current translation from this measurement
+          // so its natural-flow centre remains the handoff origin.
+          x: featureBox.left + featureBox.width / 2 - (sourceBox.left + sourceBox.width / 2 - Number(gsap.getProperty(source, 'x') || 0)),
+          y: featureBox.top + featureBox.height / 2 - (sourceBox.top + sourceBox.height / 2 - Number(gsap.getProperty(source, 'y') || 0)),
         }
       }
 
-      gsap.set(feature, { clipPath: 'circle(0% at 50% 50%)' })
+      // The film is already circular in CSS. Scaling its existing circular
+      // surface costs a compositor transform instead of repainting a large
+      // clipped image on every scrub frame.
+      gsap.set(feature, { scale: .01, transformOrigin: '50% 50%', willChange: 'transform' })
       gsap.set(play, { scale: 0, transformOrigin: '50% 50%' })
       gsap.set(source, { transformOrigin: '50% 50%', willChange: 'transform' })
-      gsap.set(sourceContent, { transformOrigin: '50% 50%' })
-      const shape = { progress: 0 }
+      gsap.set(sourceContent, { transformOrigin: '50% 50%', willChange: 'transform' })
 
       const handoff = gsap.timeline({
         defaults: { ease: 'none' },
@@ -1091,13 +1196,15 @@ function App() {
           trigger: impact,
           start: 'top 94%',
           end: 'top 42%',
-          scrub: .5,
+          // A short catch-up removes the perceived lag without making the
+          // incoming control jitter against a natural touch scroll.
+          scrub: .22,
           invalidateOnRefresh: true,
         },
       })
 
       handoff
-        .to(feature, { clipPath: 'circle(75% at 50% 50%)', duration: .68 }, 0)
+        .to(feature, { scale: 1, duration: .68, force3D: true }, 0)
         .to(source, {
           x: () => handoffVector().x,
           y: () => handoffVector().y,
@@ -1106,23 +1213,21 @@ function App() {
           duration: .56,
           force3D: true,
         }, .12)
-        // Let the CTA finish its journey before changing shape. Starting the
-        // non-uniform scale even a frame early makes the tablet version look
-        // as if it pulls to one side rather than resolving into a circle.
-        .to(sourceContent, { clipPath: 'inset(0% 50% 0% 50%)', duration: .12 }, .68)
+        // Let the CTA finish its journey before changing shape. Folding its
+        // text with scale keeps this entirely on the compositor too.
+        .to(sourceContent, { scaleX: .001, duration: .12, force3D: true }, .68)
         .to(source, {
           // Resolve from the measured controls rather than fixed dimensions.
           // This keeps the pill-to-play morph perfectly registered when the
           // same mobile composition scales up for tablets.
           scaleX: () => play.offsetWidth / source.offsetWidth,
           scaleY: () => play.offsetHeight / source.offsetHeight,
+          // Once its text has folded away, the pill's own surface resolves to
+          // a circle. This is a tiny element, so the radius interpolation is
+          // vastly cheaper than recalculating an SVG path every frame.
+          borderRadius: '50%',
           duration: .22,
           force3D: true,
-        }, .68)
-        .to(shape, {
-          progress: 1,
-          duration: .22,
-          onUpdate: () => sourceShape.setAttribute('d', mobileExploreMorphPath(shape.progress)),
         }, .68)
         // At the exact final circle state, swap in the real video control on
         // the same centre and dimensions. The green surface never fades or
@@ -1133,8 +1238,7 @@ function App() {
 
       return () => {
         handoff.kill()
-        gsap.set([feature, play, source, ...sourceContent], { clearProps: 'clipPath,transform,borderRadius,visibility,willChange' })
-        sourceShape.setAttribute('d', mobileExploreMorphPath())
+        gsap.set([feature, play, source, ...sourceContent], { clearProps: 'transform,borderRadius,visibility,willChange' })
       }
     })
 
@@ -1157,24 +1261,66 @@ function App() {
 
       if (!section || !backdrop || !intro || cards.length !== 4 || !cta) return undefined
 
-      const capsuleClip = () => {
-        const backdropBox = backdrop.getBoundingClientRect()
-        const boxes = cards.map((card) => card.getBoundingClientRect())
-        const top = Math.min(...boxes.map((box) => box.top))
-        const right = Math.max(...boxes.map((box) => box.right))
-        const bottom = Math.max(...boxes.map((box) => box.bottom))
-        const left = Math.min(...boxes.map((box) => box.left))
-        const gutter = Math.max(12, boxes[0].width * .075)
-        const toPercent = (value, size) => Math.max(0, Math.min(100, value / size * 100))
+      const options = cards[0].parentElement
+      let restoreBackdrop = () => {}
 
-        const rounding = usesHorizontalCapsule ? '999px' : '52px'
-        return `inset(${toPercent(top - backdropBox.top - gutter, backdropBox.height)}% ${toPercent(backdropBox.right - right - gutter, backdropBox.width)}% ${toPercent(backdropBox.bottom - bottom - gutter, backdropBox.height)}% ${toPercent(left - backdropBox.left - gutter, backdropBox.width)}% round ${rounding})`
+      /*
+       * The previous version animated a full-section clip-path plus four more
+       * circular clips on every scroll frame. On a cold phone that forced
+       * repeated paints. Build the final canvas around the cards once, then
+       * use one oversized, rounded surface that resolves with transform only.
+       * Card offset measurements intentionally ignore their animated scale,
+       * keeping refreshes stable at any scroll position.
+       */
+      const configureBackdrop = () => {
+        const sectionWidth = section.clientWidth
+        const sectionHeight = section.clientHeight
+        const optionLeft = options.offsetLeft
+        const optionTop = options.offsetTop
+        const boxes = cards.map((card) => ({
+          left: optionLeft + card.offsetLeft,
+          top: optionTop + card.offsetTop,
+          right: optionLeft + card.offsetLeft + card.offsetWidth,
+          bottom: optionTop + card.offsetTop + card.offsetHeight,
+          width: card.offsetWidth,
+        }))
+        const gutter = Math.max(12, boxes[0].width * .075)
+        const left = Math.max(0, Math.min(...boxes.map((box) => box.left)) - gutter)
+        const top = Math.max(0, Math.min(...boxes.map((box) => box.top)) - gutter)
+        const right = Math.min(sectionWidth, Math.max(...boxes.map((box) => box.right)) + gutter)
+        const bottom = Math.min(sectionHeight, Math.max(...boxes.map((box) => box.bottom)) + gutter)
+        const width = Math.max(1, right - left)
+        const height = Math.max(1, bottom - top)
+        const centreX = left + width / 2
+        const centreY = top + height / 2
+        const coverScale = Math.max(
+          centreX / (width / 2),
+          (sectionWidth - centreX) / (width / 2),
+          centreY / (height / 2),
+          (sectionHeight - centreY) / (height / 2),
+        ) * 1.4
+
+        gsap.set(backdrop, {
+          top,
+          left,
+          right: 'auto',
+          bottom: 'auto',
+          width,
+          height,
+          borderRadius: usesHorizontalCapsule ? '999px' : '52px',
+          scale: coverScale,
+          transformOrigin: '50% 50%',
+          willChange: 'transform',
+        })
       }
 
-      gsap.set(backdrop, { clipPath: 'inset(0% 0% 0% 0%)' })
-      gsap.set(intro, { clipPath: 'inset(0% 0% 100% 0%)', y: 22 })
-      gsap.set(cards, { clipPath: 'circle(0% at 50% 50%)', transformOrigin: '50% 50%' })
-      gsap.set(cta, { clipPath: 'inset(0% 50% 0% 50% round 999px)' })
+      configureBackdrop()
+      restoreBackdrop = () => gsap.set(backdrop, {
+        clearProps: 'top,left,right,bottom,width,height,borderRadius,transform,transformOrigin,willChange',
+      })
+      gsap.set(intro, { scaleY: .001, y: 22, transformOrigin: '50% 0%', willChange: 'transform' })
+      gsap.set(cards, { scale: .001, transformOrigin: '50% 50%', willChange: 'transform' })
+      gsap.set(cta, { scaleX: .001, transformOrigin: '50% 50%', willChange: 'transform' })
 
       const handoff = gsap.timeline({
         defaults: { ease: 'none' },
@@ -1182,18 +1328,23 @@ function App() {
           trigger: section,
           start: 'top 90%',
           end: 'top 22%',
-          scrub: .7,
+          scrub: .25,
           invalidateOnRefresh: true,
+          onRefreshInit: configureBackdrop,
         },
       })
 
       handoff
-        .to(backdrop, { clipPath: capsuleClip, duration: .56 }, 0)
-        .to(intro, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: .26 }, .14)
-        .to(cards, { clipPath: 'circle(75% at 50% 50%)', duration: .34, stagger: .07 }, .32)
-        .to(cta, { clipPath: 'inset(0% 0% 0% 0% round 999px)', duration: .2 }, .7)
+        .to(backdrop, { scale: 1, duration: .56, force3D: true }, 0)
+        .to(intro, { scaleY: 1, y: 0, duration: .26, force3D: true }, .14)
+        .to(cards, { scale: 1, duration: .34, stagger: .07, force3D: true }, .32)
+        .to(cta, { scaleX: 1, duration: .2, force3D: true }, .7)
 
-      return () => handoff.kill()
+      return () => {
+        handoff.kill()
+        restoreBackdrop()
+        gsap.set([intro, ...cards, cta], { clearProps: 'transform,transformOrigin,willChange' })
+      }
     })
 
     return () => media.revert()
