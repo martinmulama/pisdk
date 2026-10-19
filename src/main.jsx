@@ -526,8 +526,8 @@ function Impact() {
 
       <a className="impact-cta" href="#get-involved">Support the Rebuild <span aria-hidden="true">→</span></a>
 
-      <div className="tagline impact-tagline" aria-label="People, materials, environment, circular construction">
-        <span>People</span><b>/</b><span>Materials</span><b>/</b><span>Environment</span><b>/</b><span>Circular construction</span>
+      <div className="tagline impact-tagline" aria-label="Building dignity. Restoring resources. Transforming construction.">
+        <span>Building Dignity.</span><span>Restoring Resources.</span><span>Transforming Construction.</span>
       </div>
     </section>
   )
@@ -593,7 +593,7 @@ function SiteFooter() {
     <footer className="site-footer" id="contact">
       <div className="site-footer__wordmark" aria-label="PISDK">PISDK</div>
       <span className="site-footer__divider" aria-hidden="true" />
-      <p className="site-footer__statement">We are turning waste<br />into homes, Creating jobs<br />and building dignity.</p>
+      <p className="site-footer__statement">Building Dignity.<br />Restoring Resources.<br />Transforming Construction.</p>
 
       <nav className="site-footer__links" aria-label="Footer navigation">
         {footerLinkRows.map((row, rowIndex) => (
@@ -608,9 +608,9 @@ function SiteFooter() {
       </div>
 
       <p className="site-footer__copyright">© 2026 PISDK. All rights reserved.</p>
-      <div className="footer-principles" aria-label="People, materials, environment, circular construction">
+      <div className="footer-principles" aria-label="Building dignity. Restoring resources. Transforming construction.">
         <FooterLeaf />
-        <span>People</span><b>/</b><span>Materials</span><b>/</b><span>Environment</span><b>/</b><span>Circular construction</span>
+        <span>Building Dignity.</span><span>Restoring Resources.</span><span>Transforming Construction.</span>
       </div>
     </footer>
   )
@@ -1765,8 +1765,8 @@ function App() {
           </div>
         </section>
 
-        <div className="tagline" aria-label="People, materials, communities, circular construction">
-          People <b>/</b> Materials <b>/</b> Communities <b>/</b> Circular construction
+        <div className="tagline" aria-label="Building dignity. Restoring resources. Transforming construction.">
+          <span>Building Dignity.</span><span>Restoring Resources.</span><span>Transforming Construction.</span>
         </div>
         </section>
         <WhatWeDo />
