@@ -195,8 +195,8 @@
     height: auto;
     aspect-ratio: 6.56;
     margin: 0;
-    background-size: 284.6% auto;
-    background-position: 53.3% 2.8%;
+    background-size: 100% auto;
+    background-position: center;
     transform: none;
   }
   .mobile-menu-toggle {
@@ -446,7 +446,7 @@
     min-height: 54px;
     padding: 14px 25px;
     border-radius: 999px;
-    background: transparent;
+    background: #5e8951;
     color: #fffdf5;
     font-family: 'Montserrat', Arial, sans-serif;
     font-size: 16px;
@@ -456,8 +456,6 @@
     text-decoration: none;
     overflow: visible;
   }
-  .work-mobile-outro__morph { position: absolute; z-index: 0; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-  .work-mobile-outro__morph path { fill: #5e8951; }
   .work-mobile-outro__label,
   .work-mobile-outro__arrow { position: relative; z-index: 1; display: inline-block; }
   .work-mobile-outro__arrow { margin-left: 8px; font-size: 21px; line-height: 0; }
@@ -503,7 +501,8 @@
     width: var(--tablet-impact-film-size);
     height: var(--tablet-impact-film-size);
     margin: 0 auto 38px;
-    clip-path: circle(75% at 50% 50%);
+    /* The existing circular surface scales in via transform during the
+       Explore-to-play handoff, avoiding a large animated clip-path. */
   }
   .impact-visual--feature img { object-position: 55% 50%; }
   .impact-visual--before,
@@ -736,11 +735,11 @@
   .get-involved__backdrop {
     position: absolute;
     z-index: 0;
-    inset: 0;
+    inset: 24% 5% 19% 5%;
     width: auto;
     background: var(--deep-navy-green);
-    clip-path: inset(24% 5% 19% 5% round 52px);
-    will-change: clip-path;
+    border-radius: 52px;
+    contain: paint;
   }
   .get-involved__intro,
   .involvement-options,
@@ -1391,6 +1390,47 @@
   .work-summary { top: 48%; left: 55%; width: 36%; font-size: clamp(12px, 1.02cqw, 15px); }
 }
 
+/* Tablet navigation follows the same rhythm as the phone: it belongs to the
+   opening hero first, then becomes a persistent control surface only after
+   the hero has cleared. This deliberately excludes desktop side-nav layouts. */
+@media (min-width: 601px) and (max-width: 860px), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px), (min-width: 861px) and (max-width: 1100px) and (min-height: 901px) and (orientation: portrait) {
+  .page-shell.mobile-nav-is-sticky .mobile-hero-header {
+    position: fixed;
+    z-index: 20;
+    top: max(12px, env(safe-area-inset-top));
+    right: 18px;
+    left: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    min-height: 68px;
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: #f3f4ec;
+    box-shadow: 0 10px 26px rgba(6, 55, 37, .13);
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-hero-header .brand {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(46vw, 286px);
+    height: auto;
+    aspect-ratio: 6.56;
+    margin: 0;
+    transform: none;
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-menu-toggle {
+    top: 8px;
+    right: 8px;
+    background: #f3f4ec;
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-nav {
+    top: calc(100% + 8px);
+    background: #f3f4ec;
+  }
+}
+
 /* A 1440 × 900 laptop has less runway below the hero row than the iPad Pro
    landscape. Anchor the tagline to the lower edge rather than letting its
    desktop percentage fall outside the first screen. */
@@ -1425,9 +1465,11 @@
   .hero {
     --large-landscape-ring-size: 12.7cqw;
     --large-landscape-ring-top: 20.944cqw;
-    /* The enlarged feature ring ends at 25.537cqw. Keep exactly one shared
-       2cqw gap before the first story circle. */
-    --large-landscape-ring-left: 27.537%;
+    /* This is the viewport range reached by a 1440-class browser at 125%
+       zoom. Reserve a real editorial column between the feature artwork and
+       the ring row; this prevents the first circle reading as attached to
+       the large left ring in Chromium variants. */
+    --large-landscape-ring-left: 28.35%;
   }
   .feature-image {
     top: 7.49cqw;
@@ -1439,7 +1481,7 @@
   }
   .intro { top: 12.2svh; left: 26.3%; width: 51.5%; }
   h1 { font-size: clamp(20px, 1.8cqw, 26px); }
-  .story-images { gap: 2cqw; }
+  .story-images { gap: 1.73cqw; }
   .mission {
     left: 45.5%;
     width: 39.5%;
@@ -1447,14 +1489,14 @@
 
   .what-we-do {
     --large-landscape-work-card: 12.7cqw;
-    --large-landscape-work-gap: 2cqw;
+    --large-landscape-work-gap: 1.73cqw;
   }
   .work-top-grid {
-    /* An .8cqw inset positions the first service circle at 27.537cqw, the
+    /* An .8cqw inset positions the first service circle at 28.35cqw, the
        same left edge as the first Hero ring. */
-    left: 26.737%;
+    left: 27.55%;
     grid-template-columns: repeat(4, var(--large-landscape-work-card));
-    width: 58.4cqw;
+    width: 57.59cqw;
     height: 14.3cqw;
     gap: var(--large-landscape-work-gap);
   }
@@ -1467,16 +1509,122 @@
   .work-top-grid .work-card h3 { margin: .3cqw 0 .18cqw; font-size: clamp(11px, .82cqw, 13px); }
   .work-top-grid .work-card p { width: 80%; font-size: clamp(8px, .66cqw, 10px); line-height: 1.26; }
   .work-rail {
-    left: 26.737%;
+    left: 27.55%;
     width: 14.3cqw;
     height: 43.5cqw;
   }
-  .work-intro { left: 3.5%; width: 19.5%; }
-  .work-lower-cards { left: 27.537%; width: 12.7cqw; }
+  /* Give the editorial heading enough measure for its intentional two-line
+     copy, while keeping a clear gutter before the service canvas. */
+  .work-intro { left: 3.5%; width: 22.6%; }
+  .work-intro h2 { font-size: clamp(18px, 1.56cqw, 24px); }
+  .work-lower-cards { left: 28.35%; width: 12.7cqw; }
   .work-card--research,
   .work-card--forums { height: 12.7cqw; }
   /* The second lower card gets the same 2.25cqw breathing room as the first
      lower card receives beneath the top service circle. */
   .work-lower-cards .work-card--forums { margin-top: 2.25cqw; }
   .work-summary { left: 55%; width: 30.5%; }
+}
+
+/* Transitional desktop ----------------------------------------------------
+   The space between the 1440 laptop composition and the 1800px editorial
+   desktop is its own layout—not a partially stretched version of either.
+   This is also the range commonly reached when Chromium-based browsers are
+   zoomed to 125%. Keep one shared cadence for Hero and Work so the first
+   circle clears the large image, the nav retains its gutter, and the Work
+   heading has a protected reading column. */
+@media (min-width: 1451px) and (max-width: 1799px) and (min-height: 720px) and (orientation: landscape) and (max-aspect-ratio: 19 / 10) {
+  .desktop-nav { display: grid; }
+  .mobile-hero-header {
+    position: static;
+    display: contents;
+    height: auto;
+  }
+  .mobile-menu-toggle,
+  .mobile-nav { display: none; }
+
+  .hero {
+    --transitional-ring-size: 13.2cqw;
+    --transitional-ring-gap: 2.1cqw;
+    /* The feature's outer ring ends at 25.537cqw. Starting at 27.7cqw
+       preserves the same 2.1cqw air used between every story ring. */
+    --transitional-ring-left: 27.7%;
+  }
+  .feature-image {
+    top: 7.49cqw;
+    left: calc((100cqw - 100vw) / 2);
+    width: 25.704cqw !important;
+    height: 38.946cqw !important;
+  }
+  .intro { top: 13.2%; left: 24.2%; width: 55%; }
+  h1 { font-size: clamp(22px, 1.68cqw, 31px); }
+  .story-images {
+    top: 20.694cqw;
+    left: var(--transitional-ring-left);
+    gap: var(--transitional-ring-gap);
+    flex-wrap: nowrap;
+  }
+  .story-image {
+    width: var(--transitional-ring-size);
+    height: var(--transitional-ring-size);
+  }
+  .mission { top: 67.2%; left: 45.5%; width: 40.5%; }
+  .tagline { left: 3.5%; }
+
+  .what-we-do {
+    --transitional-work-card: 13.2cqw;
+    --transitional-work-gap: 2.1cqw;
+  }
+  .work-top-grid {
+    /* With the .8cqw inset, the first card starts at 27.7cqw: exactly the
+       Hero row's first-ring edge. The final card still stops before nav. */
+    top: 3.2%;
+    left: 26.9%;
+    grid-template-columns: repeat(4, var(--transitional-work-card));
+    align-items: center;
+    width: 60.7cqw;
+    height: 14.8cqw;
+    padding: .8cqw;
+    gap: var(--transitional-work-gap);
+    border-radius: 8.9cqw;
+  }
+  .work-top-grid .work-card {
+    width: var(--transitional-work-card);
+    height: var(--transitional-work-card);
+    padding: .9cqw .68cqw .54cqw;
+  }
+  .work-top-grid .work-card__icon { height: 1.95cqw; }
+  .work-top-grid .work-card h3 {
+    margin: .36cqw 0 .24cqw;
+    font-size: clamp(12px, .98cqw, 18px);
+  }
+  .work-top-grid .work-card p {
+    width: 81%;
+    font-size: clamp(9px, .78cqw, 14px);
+    line-height: 1.29;
+  }
+  .work-rail {
+    top: 3.2%;
+    left: 26.9%;
+    width: 14.8cqw;
+    bottom: auto;
+    height: 48.2cqw;
+    border-radius: 7.4cqw 0 7.4cqw 7.4cqw;
+  }
+  .work-intro {
+    top: 25.7%;
+    left: 3.5%;
+    width: 21.5%;
+  }
+  .work-intro h2 { font-size: clamp(20px, 1.52cqw, 30px); }
+  .work-intro__button { width: 13.8cqw; }
+  .work-lower-cards {
+    top: 31.6%;
+    left: var(--transitional-ring-left);
+    width: var(--transitional-work-card);
+  }
+  .work-card--research,
+  .work-card--forums { height: var(--transitional-work-card); }
+  .work-lower-cards .work-card--forums { margin-top: 1.45cqw; }
+  .work-summary { top: 55%; left: 54%; width: 34%; }
 }

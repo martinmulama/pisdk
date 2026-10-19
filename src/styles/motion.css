@@ -161,7 +161,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .preloader-stat,
   .brand,
   .intro,
   .desktop-nav a,

@@ -66,21 +66,55 @@
     width: 100%;
     min-height: 36px;
   }
+  /* The Hero remains completely clear of a fixed header. As soon as its
+     bottom leaves the viewport, this same header becomes the site control. */
+  .page-shell.mobile-nav-is-sticky .mobile-hero-header {
+    position: fixed;
+    z-index: 20;
+    top: max(10px, env(safe-area-inset-top));
+    right: 12px;
+    left: 12px;
+    width: auto;
+    min-height: 54px;
+    padding: 8px 12px;
+    border-radius: 14px;
+    background: #f3f4ec;
+    box-shadow: 0 8px 22px rgba(6, 55, 37, .12);
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-menu-toggle {
+    right: 6px;
+    background: #f3f4ec;
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-hero-header .brand {
+    /* The persistent control uses a slightly narrower lock-up so the menu
+       target always has a clear, fully visible edge lane on 320px phones. */
+    width: min(56vw, 204px);
+  }
+  .page-shell.mobile-nav-is-sticky .mobile-nav {
+    top: calc(100% + 8px);
+    background: #f3f4ec;
+  }
   .mobile-hero-header .brand {
     position: relative;
     top: auto;
     left: auto;
-    width: min(65vw, 224px);
+    /* Give the institute descriptor enough physical width to read on phones.
+       The small left offset preserves a visible gap before the hamburger's
+       three lines even on a 320px viewport. */
+    width: min(78vw, 260px);
     height: auto;
     aspect-ratio: 6.56;
     margin: 0;
-    background-size: 284.6% auto;
-    background-position: 53.3% 2.8%;
-    transform: none;
+    background-size: 100% auto;
+    background-position: center;
+    transform: translateX(-6px);
+  }
+  .page-shell:not(.hero-is-ready) .mobile-hero-header .brand {
+    transform: translate(-6px, -1cqw);
   }
   .mobile-menu-toggle {
     position: absolute;
-    right: -4px;
+    right: 0;
     display: grid;
     width: 46px;
     height: 46px;
@@ -102,7 +136,7 @@
     top: 52px;
     right: 0;
     display: grid;
-    width: min(212px, calc(100vw - 40px));
+    width: min(224px, calc(100vw - 40px));
     padding: 18px 20px;
     border: 1px solid rgba(12, 64, 48, .16);
     border-radius: 18px;
@@ -115,7 +149,7 @@
     transition: opacity .2s ease, transform .24s cubic-bezier(.16, 1, .3, 1);
   }
   .mobile-nav.is-open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-  .mobile-nav a { color: #155d5e; font-family: 'Montserrat', Arial, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+  .mobile-nav a { color: #155d5e; font-family: 'Montserrat', Arial, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
   .feature-image { display: none; }
   .intro { order: 2; width: min(100%, 350px); margin: 24px auto 0; text-align: left; }
   h1 { font-size: clamp(17px, 4.8vw, 20px); letter-spacing: -.035em; line-height: 1.22; }
@@ -324,7 +358,7 @@
     min-height: 48px;
     padding: 12px 22px;
     border-radius: 999px;
-    background: transparent;
+    background: #5e8951;
     color: #fffdf5;
     font-family: 'Montserrat', Arial, sans-serif;
     font-size: 13px;
@@ -334,8 +368,6 @@
     text-decoration: none;
     overflow: visible;
   }
-  .work-mobile-outro__morph { position: absolute; z-index: 0; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-  .work-mobile-outro__morph path { fill: #5e8951; }
   .work-mobile-outro__label,
   .work-mobile-outro__arrow { position: relative; z-index: 1; display: inline-block; }
   .work-mobile-outro__arrow { margin-left: 8px; font-size: 19px; line-height: 0; }
@@ -380,7 +412,8 @@
     width: calc(100vw - 20px);
     height: calc(100vw - 20px);
     margin: 0 auto 30px;
-    clip-path: circle(75% at 50% 50%);
+    /* The element is already a clipped circle through border-radius and
+       overflow. GSAP only scales it during the mobile CTA handoff. */
   }
   .impact-visual--feature img { object-position: 55% 50%; }
   .impact-visual--before,
@@ -558,11 +591,11 @@
   .get-involved__backdrop {
     position: absolute;
     z-index: 0;
-    inset: 0;
+    inset: 25% 6% 21% 6%;
     width: auto;
     background: var(--deep-navy-green);
-    clip-path: inset(25% 6% 21% 6% round 42px);
-    will-change: clip-path;
+    border-radius: 42px;
+    contain: paint;
   }
   .get-involved__intro,
   .involvement-options,

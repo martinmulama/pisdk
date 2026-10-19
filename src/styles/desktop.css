@@ -39,22 +39,16 @@ a { color: inherit; text-decoration: none; }
   container-type: inline-size;
 }
 
-.reference-crop {
-  background-image: var(--reference-image);
-  background-repeat: no-repeat;
-  background-size: 100cqw 56.44cqw;
-}
-
 .brand {
   position: absolute;
   top: 1.074cqw;
   left: calc(50% - 11.515cqw);
   width: 26.25cqw;
   height: 4cqw;
-  background-image: var(--reference-image);
+  background-image: var(--brand-image);
   background-repeat: no-repeat;
-  background-size: 74.7cqw 42.13cqw;
-  background-position: -25.83cqw -1.074cqw;
+  background-size: 100% auto;
+  background-position: center;
 }
 
 .desktop-nav {
@@ -81,22 +75,37 @@ a { color: inherit; text-decoration: none; }
   transition: color .2s ease;
 }
 .desktop-nav a:hover, .desktop-nav .active { color: #e04c30; }
-.desktop-nav__indicator {
-  position: absolute;
-  top: var(--nav-indicator-y, 0px);
-  /* The nav retains its established width and right offset. The one shared
-     indicator travels in the outer-right gutter between menu links. */
-  left: calc(100% + clamp(5px, .4cqw, 9px));
-  width: 4.55cqw;
-  height: 4.15cqw;
-  background-image: var(--reference-image);
-  background-repeat: no-repeat;
-  background-size: 100cqw 56.44cqw;
-  background-position: -94.8cqw -49.6cqw;
-  pointer-events: none;
-  transform: translateY(-50%) scale(.5);
-  transform-origin: left center;
-  transition: top .3s cubic-bezier(.16, 1, .3, 1);
+/* On full desktop layouts, one complete logo begins in the centred lock-up
+   and travels into the side panel. It settles as the PISDK mark and initials;
+   the side-nav links remain a still, centred group. */
+.desktop-nav__brand { display: none; }
+
+@media (min-width: 1200px) and (orientation: landscape) {
+  .desktop-nav {
+    /* Do not transform this fixed parent: a transformed ancestor would make
+       the travelling wordmark's fixed coordinates relative to the nav and
+       push it sideways. The measured half-height centres the link stack
+       while the nav itself remains completely still during scroll. */
+    top: calc(50% - var(--nav-half-height, 100px));
+  }
+  .desktop-nav__brand {
+    position: fixed;
+    display: flex;
+    z-index: 3;
+    border-radius: 2px;
+    background-image: var(--brand-image);
+    background-repeat: no-repeat;
+    /* JS reframes this from the full hero lock-up to emblem + PISDK. */
+    background-size: 100% auto;
+    background-position: 50% 50%;
+    cursor: pointer;
+    will-change: auto;
+    visibility: hidden;
+  }
+  .desktop-nav__brand:focus-visible {
+    outline: 2px solid #779f62;
+    outline-offset: 5px;
+  }
 }
 
 /* This wrapper becomes a true header row only on phones. `display: contents`

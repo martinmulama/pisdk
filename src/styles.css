@@ -1,6 +1,5 @@
 /* Stylesheet entry point. Import order is intentional: shared desktop rules
    establish the baseline; motion augments it; tablet and mobile override it. */
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@400;500;600;700&display=swap');
 @import './styles/desktop.css';
 @import './styles/motion.css';
 @import './styles/tablet.css';
