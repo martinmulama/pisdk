@@ -217,7 +217,6 @@ h1 {
   text-transform: uppercase;
   white-space: nowrap;
 }
-.tagline b { color: #7e9485; font-size: .75cqw; font-weight: 400; }
 
 /* What we do — desktop geometry follows the supplied 1951 × 806 reference. */
 .what-we-do {
@@ -921,11 +920,6 @@ h1 {
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
-}
-.footer-principles b {
-  color: #d7d99f;
-  font-size: 1.05em;
-  font-weight: 400;
 }
 .footer-principles__leaf {
   width: 2.75cqw;
