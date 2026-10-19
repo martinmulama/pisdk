@@ -74,7 +74,7 @@ const workServices = [
   {
     id: 'research',
     title: 'Research & Innovation',
-    copy: 'Conducting research on the structural integrity of integrating new materials and sustainable materials into construction.',
+    copy: 'Conducting research on the structural integrity of integrating waste and sustainable materials into construction.',
     icon: workResearchIcon,
   },
   {
@@ -859,6 +859,52 @@ function App() {
 
     return () => media.revert()
   }, [isPreloaderDone])
+
+  useLayoutEffect(() => {
+    if (!isHeroReady || !pageRef.current) return undefined
+
+    const compactLayout = window.matchMedia('(max-width: 860px), (min-width: 861px) and (max-width: 1100px) and (max-height: 900px)')
+    const shell = pageRef.current
+    const hero = shell.querySelector('.hero')
+    const heroNote = shell.querySelector('.hero > .tagline')
+    const impact = shell.querySelector('.impact')
+    const impactNote = impact?.querySelector('.impact-tagline')
+    if (!hero || !heroNote || !impact || !impactNote) return undefined
+
+    let frame = 0
+    const alignImpactNote = () => {
+      frame = 0
+      if (compactLayout.matches) {
+        impactNote.style.removeProperty('--hero-footer-note-left')
+        return
+      }
+      const heroLeft = heroNote.getBoundingClientRect().left
+      const impactLeft = impact.getBoundingClientRect().left
+      impactNote.style.setProperty('--hero-footer-note-left', `${Math.max(0, heroLeft - impactLeft)}px`)
+    }
+    const scheduleAlignment = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(alignImpactNote)
+    }
+    const resizeObserver = new ResizeObserver(scheduleAlignment)
+
+    resizeObserver.observe(hero)
+    resizeObserver.observe(impact)
+    window.addEventListener('resize', scheduleAlignment)
+    compactLayout.addEventListener('change', scheduleAlignment)
+    // The delayed hero entrance is complete at this point, so its temporary
+    // transform is never captured as the Impact note's reference edge.
+    const settledTimer = window.setTimeout(scheduleAlignment, 1400)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.clearTimeout(settledTimer)
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', scheduleAlignment)
+      compactLayout.removeEventListener('change', scheduleAlignment)
+      impactNote.style.removeProperty('--hero-footer-note-left')
+    }
+  }, [isHeroReady])
 
   useEffect(() => {
     if (!isPreloaderDone) return undefined
