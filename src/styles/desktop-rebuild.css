@@ -32,7 +32,9 @@
   /* Hero ------------------------------------------------------------------ */
   .hero {
     --section-footer-note-left: var(--section-gutter);
-    --hero-copy-left: clamp(16rem, 26.3cqi, 32rem);
+    /* Bring the opening statement into a more deliberate relationship with
+       the feature image, while keeping a calm clearance from its outer ring. */
+    --hero-copy-left: clamp(12rem, calc(25cqi - 3rem), 27rem);
     --story-top: clamp(15rem, 20.8cqi, 26rem);
     --hero-copy-gap: clamp(4.25rem, 5.8cqi, 7rem);
     /* The Hero artwork is deliberately independent of the service-card
@@ -45,9 +47,18 @@
     --hero-ring-size: clamp(9rem, 13.4cqi, 21rem);
     --hero-target-ring-size: clamp(10rem, 15.6cqi, 24rem);
     --hero-target-ring-gap: clamp(.7rem, 1.2cqi, 1.8rem);
-    --hero-target-ring-origin: clamp(18rem, 26.4cqi, 40rem);
+    /* Move the full Hero-to-Work route just enough toward the feature ring to
+       read as one composition. Keeping this in the shared target origin
+       preserves the four vertical handoff paths at every desktop width. */
+    --hero-work-bridge-shift: clamp(.65rem, 1.15cqi, 1.4rem);
+    --hero-target-ring-origin: calc(clamp(18rem, 26.4cqi, 40rem) - var(--hero-work-bridge-shift));
     --hero-ring-gap: calc(var(--hero-target-ring-size) + var(--hero-target-ring-gap) - var(--hero-ring-size));
     --hero-ring-origin: calc(var(--hero-target-ring-origin) + ((var(--hero-target-ring-size) - var(--hero-ring-size)) / 2));
+    /* On tall desktop viewports, a 16:9 canvas can otherwise end before the
+       first viewport does. Keeping Hero at least one stable viewport tall
+       prevents Work's scroll-triggered rail from entering (and its rings from
+       starting to travel) before the visitor has scrolled. */
+    min-height: 100svh;
   }
 
   .mobile-hero-header { display: contents; }
@@ -147,7 +158,7 @@
 
   .intro {
     position: absolute;
-    top: clamp(5rem, 12.2svh, 9.5rem);
+    top: clamp(5.5rem, 13.1svh, 10.25rem);
     left: var(--hero-copy-left);
     width: min(54%, calc(100% - var(--hero-copy-left) - clamp(11rem, 16cqi, 19rem)));
   }
@@ -164,6 +175,16 @@
   }
 
   h1 { color: #205f5b; }
+
+  /* Browser zoom can create a short-but-wide desktop viewport. Keep the
+     complete mission in the Hero by lifting the story row and tightening only
+     its vertical handoff space; the regular desktop composition is unchanged. */
+  @media (max-height: 660px) {
+    .hero {
+      --story-top: clamp(11.5rem, 30svh, 13rem);
+      --hero-copy-gap: clamp(2.5rem, 5svh, 3rem);
+    }
+  }
 
   .story-images {
     position: absolute;
@@ -249,8 +270,13 @@
     /* Work can grow independently without altering the Hero composition. */
     --service-size: clamp(10rem, 15.6cqi, 24rem);
     --service-gap: clamp(.7rem, 1.2cqi, 1.8rem);
-    --service-origin: clamp(18rem, 26.4cqi, 40rem);
-    --work-impact-runway: calc(19.6cqi + clamp(1rem, 1.5vw, 2rem));
+    /* Mirrors the Hero target origin so each travelling ring lands directly
+       above its service card while the two visual groups feel connected. */
+    --service-origin: calc(clamp(18rem, 26.4cqi, 40rem) - clamp(.65rem, 1.15cqi, 1.4rem));
+    /* The Impact film deliberately rises into this runway. Calibrating its
+       overlap against the Work rail keeps the visible pause in step with the
+       Hero-to-Work transition at desktop widths. */
+    --work-impact-runway: calc(16.8cqi + clamp(.75rem, 1.25vw, 1.25rem));
     --service-frame: clamp(.5rem, .8cqi, 1rem);
     /* The vertical stack uses the same breathing space as every neighbouring
        pair in the top service row. */
@@ -265,12 +291,26 @@
   .work-mobile-scroll-list { display: none; }
 
   .work-intro {
+    /* A quiet page-edge inset gives the display title more separation from
+       the service canvas without compromising the responsive reading column. */
+    --work-intro-left: clamp(.75rem, .85cqi, 1rem);
     position: absolute;
     z-index: 3;
     top: calc(var(--work-row-top) + var(--service-size) + var(--service-frame) + var(--service-frame) + var(--service-stack-gap));
-    left: var(--section-gutter);
-    width: clamp(12rem, 21cqi, 27rem);
+    /* Use the full reading column to the left of the service rail, rather
+       than shrinking the display heading to fit the previous narrow column. */
+    left: var(--work-intro-left);
+    width: calc(var(--service-origin) - var(--service-frame) - var(--work-intro-left) - clamp(.75rem, .9cqi, 1rem));
   }
+
+  /* The title matches the Hero display scale but scans in two composed lines.
+     Compact layouts retain the original inline text and line break. */
+  .work-intro h2 {
+    font-size: var(--display-size);
+    line-height: 1.18;
+  }
+  .work-intro h2 br { display: none; }
+  .work-intro h2 span { display: block; white-space: nowrap; }
 
   .work-intro__button {
     display: inline-flex;
@@ -377,13 +417,24 @@
     line-height: 1.32;
   }
 
-  /* The deconstruction description has materially more copy than every other
-     service. It keeps the same larger hierarchy while using its circle's
-     available vertical space instead of clipping the final lines. */
-  .work-top-grid .work-card--recovery { padding-top: clamp(.4rem, .5cqi, .7rem); }
-  .work-top-grid .work-card--recovery .work-card__icon { height: clamp(1.3rem, 1.8cqi, 2.25rem); }
-  .work-top-grid .work-card--recovery h3 { margin-top: .18em; margin-bottom: .12em; font-size: clamp(.78rem, .98cqi, 1.45rem); }
-  .work-top-grid .work-card--recovery p { font-size: clamp(.6rem, .76cqi, .94rem); line-height: 1.24; }
+  /* Recovery carries the longest service description. Quieting its supporting
+     icon and two-line title—not its message—lets the paragraph share the
+     legible body scale used by every other service circle. */
+  .work-top-grid .work-card--recovery {
+    padding: clamp(.35rem, .42cqi, .55rem) clamp(.55rem, .75cqi, .85rem) clamp(.35rem, .45cqi, .55rem);
+  }
+  .work-top-grid .work-card--recovery .work-card__icon { height: clamp(1.1rem, 1.38cqi, 1.7rem); }
+  .work-top-grid .work-card--recovery h3 {
+    margin-top: .16em;
+    margin-bottom: .22em;
+    font-size: clamp(.7rem, .88cqi, 1.2rem);
+    line-height: 1.08;
+  }
+  .work-top-grid .work-card--recovery p {
+    width: 86%;
+    font-size: clamp(.68rem, .94cqi, 1.125rem);
+    line-height: 1.27;
+  }
 
   .work-lower-cards {
     position: absolute;

@@ -248,9 +248,9 @@ function DesktopNav() {
       // One lock-up travels — it begins as the complete centred logo and
       // settles as the PISDK emblem plus initials, without the institute name.
       // This crop contains only the circular PISDK mark and its initials.
-      // It is deliberately a little wider than the link column, while its
-      // final right edge shares the links' precise reading line.
-      const targetWidth = () => Math.min(166, Math.max(148, window.innerWidth * .095))
+      // Keep it quieter than the link column so the persistent navigation and
+      // each section's artwork remain the primary visual landmarks.
+      const targetWidth = () => Math.min(132, Math.max(112, window.innerWidth * .083))
       const targetHeight = () => targetWidth() / 2.475
       const resetAtSource = () => {
         const sourceBounds = source.getBoundingClientRect()
@@ -511,7 +511,7 @@ function WhatWeDo() {
   return (
     <section className="what-we-do" id="our-work" aria-labelledby="work-heading">
       <div className="work-intro">
-        <h2 id="work-heading">What We Do: A Complete<br />Circular Ecosystem.</h2>
+        <h2 id="work-heading"><span>What We Do: A Complete</span><br /><span>Circular Ecosystem.</span></h2>
         <a className="work-intro__button" href="#current-pilots">Explore our work <span aria-hidden="true">→</span></a>
       </div>
 
