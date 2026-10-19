@@ -438,6 +438,53 @@ function HeroFeature() {
   )
 }
 
+/* The DOM hooks are intentionally stable: the preloader, entry transitions,
+ * logo travel, and desktop ring handoff all measure these elements directly.
+ * Presentation is rebuilt in desktop-rebuild.css; compact layouts retain their
+ * existing independent story treatment. */
+function Hero({ usesMobileMerge }) {
+  return (
+    <section id="home" className={`hero${usesMobileMerge ? ' hero--mobile-merge' : ''}`} aria-labelledby="hero-heading">
+      <div className="mobile-hero-header">
+        <Brand />
+        <MobileNav />
+      </div>
+
+      <DesktopNav />
+      <HeroFeature />
+
+      <div className="intro">
+        <h1 id="hero-heading">
+          <span>We are working toward a just, resilient,</span><br />
+          <span>and waste-free world where low-income communities</span><br />
+          <span>build with dignity using reclaimed resources.</span>
+        </h1>
+      </div>
+
+      {usesMobileMerge && <MobileHeroMerge />}
+
+      <div className="story-images" aria-label="Stories from PISDK communities">
+        <StoryImage className="damaged" image={storyDamagedHome} label="A damaged home in need of rebuilding" />
+        <StoryImage className="materials" image={storyReclaimedScrap} label="Reclaimed corrugated construction materials" />
+        <StoryImage className="rebuilt" image={storyRebuiltHome} label="A rebuilt home made from reclaimed materials" />
+        <StoryImage className="children" image={storyCommunityChildren} label="Children in a local community" />
+      </div>
+
+      <section className="mission" id="about-us" aria-label="About PISDK">
+        <span className="mission-rule" />
+        <div>
+          <p>At the Paragon Institute of Sustainable Development Kenya (PISDK), we advance circular economy solutions in construction and waste management. Our mission is to prove that sustainability equals affordability.</p>
+          <p>We do this by deconstructing buildings instead of demolishing them, recovering valuable materials, and channeling them back into community housing and infrastructure at prices co-created with the people we serve.</p>
+        </div>
+      </section>
+
+      <div className="tagline" aria-label="Building dignity. Restoring resources. Transforming construction.">
+        <span>Building Dignity.</span><span>Restoring Resources.</span><span>Transforming Construction.</span>
+      </div>
+    </section>
+  )
+}
+
 function WorkCard({ service }) {
   return (
     <article className={`work-card work-card--${service.id}`}>
@@ -1776,45 +1823,7 @@ function App() {
         />
       )}
       <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--brand-image': `url(${brandImage})` }}>
-        <section id="home" className={`hero${usesMobileMerge ? ' hero--mobile-merge' : ''}`} aria-labelledby="hero-heading">
-        <div className="mobile-hero-header">
-          <Brand />
-          <MobileNav />
-        </div>
-
-        <DesktopNav />
-
-        <HeroFeature />
-
-        <div className="intro">
-          <h1 id="hero-heading">
-            <span>We are working toward a just, resilient,</span><br />
-            <span>and waste-free world where low-income communities</span><br />
-            <span>build with dignity using reclaimed resources.</span>
-          </h1>
-        </div>
-
-        {usesMobileMerge && <MobileHeroMerge />}
-
-        <div className="story-images" aria-label="Stories from PISDK communities">
-          <StoryImage className="damaged" image={storyDamagedHome} label="A damaged home in need of rebuilding" />
-          <StoryImage className="materials" image={storyReclaimedScrap} label="Reclaimed corrugated construction materials" />
-          <StoryImage className="rebuilt" image={storyRebuiltHome} label="A rebuilt home made from reclaimed materials" />
-          <StoryImage className="children" image={storyCommunityChildren} label="Children in a local community" />
-        </div>
-
-        <section className="mission" id="about-us" aria-label="About PISDK">
-          <span className="mission-rule" />
-          <div>
-            <p>At the Paragon Institute of Sustainable Development Kenya (PISDK), we advance circular economy solutions in construction and waste management. Our mission is to prove that sustainability equals affordability.</p>
-            <p>We do this by deconstructing buildings instead of demolishing them, recovering valuable materials, and channeling them back into community housing and infrastructure at prices co-created with the people we serve.</p>
-          </div>
-        </section>
-
-        <div className="tagline" aria-label="Building dignity. Restoring resources. Transforming construction.">
-          <span>Building Dignity.</span><span>Restoring Resources.</span><span>Transforming Construction.</span>
-        </div>
-        </section>
+        <Hero usesMobileMerge={usesMobileMerge} />
         <WhatWeDo />
         <Impact />
         <GetInvolved />

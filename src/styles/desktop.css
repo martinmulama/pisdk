@@ -31,6 +31,10 @@ a { color: inherit; text-decoration: none; }
   background: #f3f4ec;
 }
 
+/* The original shared rules remain scoped to compact layouts so their tablet
+   and phone rendering is byte-for-byte compatible. Desktop geometry now lives
+   in desktop-rebuild.css, loaded after the responsive stylesheets. */
+@media (max-width: 1100px) {
 .hero {
   position: relative;
   width: var(--desktop-canvas-width);
@@ -431,6 +435,7 @@ h1 {
   content: '';
 }
 .hero-work-handoff__ring--1 { --handoff-ring-color: var(--ring-warm); }
+}
 
 /* Our impact — the supplied before / rebuild / after photographs remain
    independent from their CSS rings for a crisp presentation and future
@@ -948,61 +953,14 @@ h1 {
    the browser. Reclaim the outer gutter for the heading, then grow the service
    system so it still has the same visual authority as the hero artwork. */
 @media (min-aspect-ratio: 2 / 1) and (min-width: 861px) {
-  .work-intro {
-    left: calc((100cqw - 100vw) / 2 + 3.5cqw);
-    width: 31%;
-  }
-  .hero,
   .impact {
     --section-footer-note-left: calc((100cqw - 100vw) / 2 + 3.5cqw);
   }
-  .work-intro__button {
-    width: 15.4cqw;
-    height: 3.5cqw;
-    margin-top: 1.7cqw;
-    font-size: clamp(12px, 1.22cqw, 20px);
-  }
-  .work-rail {
-    left: 18.69%;
-    width: 19.44%;
-    border-radius: 9.72cqw 0 9.72cqw 9.72cqw;
-  }
-  .work-top-grid {
-    left: 18.82%;
-    width: 72.32%;
-    border-radius: 9.5cqw;
-  }
-  .work-lower-cards {
-    left: 19.6%;
-    width: 17.62%;
-  }
-  .work-card--research,
-  .work-card--forums { height: 17.62cqw; }
-  .work-top-grid .work-card__icon { height: 2.65cqw; }
-  .work-top-grid .work-card h3 { font-size: clamp(13px, 1.18cqw, 24px); }
-  .work-top-grid .work-card p { font-size: clamp(9px, .98cqw, 18px); }
-  .work-lower-cards .work-card__icon { height: 2.55cqw; }
-  .work-lower-cards .work-card h3 { font-size: clamp(13px, 1.12cqw, 23px); }
-  .work-lower-cards .work-card p { font-size: clamp(9px, .98cqw, 18px); }
 }
 
-/* A fullscreen laptop display is much taller than the supplied reference.
-   The hero photo is pinned to the viewport edge while the four story rings
-   live inside the editorial canvas; without this adjustment the two systems
-   converge and collide once the canvas reaches the full viewport width. */
-@media (min-width: 861px) and (max-aspect-ratio: 19 / 10) {
-  .feature-image {
-    width: min(25.704cqw, 19.15vw);
-    height: min(38.946cqw, 29vw);
-  }
-  .intro,
-  .story-images { left: 27%; }
-}
-
-/* Recovery carries the longest service description. On desktop, give its
-   paragraph the wide, upper portion of the circle by making its supporting
-   symbol and two-line label deliberately quieter—not the essential copy. */
-@media (min-width: 861px) {
+/* Recovery carries the longest service description. Keep the compact-layout
+   adjustment only; desktop sizing is part of the rebuilt service system. */
+@media (min-width: 861px) and (max-width: 1100px) {
   .work-top-grid .work-card--recovery { padding-top: .95cqw; }
   .work-top-grid .work-card--recovery .work-card__icon { height: 2.15cqw; }
   .work-top-grid .work-card--recovery h3 {
@@ -1010,116 +968,5 @@ h1 {
     margin-bottom: .26cqw;
     font-size: clamp(12px, 1.04cqw, 22px);
   }
-}
-
-/* Ultra-wide desktop -------------------------------------------------------
-   A 2560px desktop has enough room for the complete editorial layout and its
-   persistent side navigation.  Do not turn it into the compact laptop
-   composition.  Instead, give the Hero and the service rail one shared set
-   of circle measurements: the row has the same left edge, diameter and
-   cadence in both sections.  That keeps the handoff level and leaves a clean
-   dedicated reading column for the Work heading. */
-@media (min-width: 1800px) and (min-height: 1000px) {
-  .desktop-nav { display: grid; }
-  .mobile-hero-header { display: contents; }
-  .mobile-menu-toggle,
-  .mobile-nav { display: none; }
-
-  .hero {
-    --ultra-wide-ring-size: 14.14cqw;
-    /* Move the row clear of the enlarged feature ring, then tighten the
-       cadence by exactly the reclaimed amount so its final circle retains a
-       respectful gutter before the persistent side menu. */
-    --ultra-wide-ring-gap: 2.1cqw;
-    /* The feature ring ends at 25.368cqw on the centred wide canvas.
-       Adding the shared 2.1cqw gap puts the first story ring at 27.468cqw. */
-    --ultra-wide-ring-left: 27.468%;
-  }
-
-  /* At this canvas size the left visual has room to retain its full editorial
-     scale.  Override the safety cap used by shorter fullscreen laptops so its
-     outer ring shares the story row's 27.294cqw centreline. */
-  .feature-image {
-    width: 25.704cqw;
-    height: 38.946cqw;
-  }
-
-  /* The image's recreated outer-ring centre is at 27.294cqw.  Placing the
-     four ring centres on that same line prevents the wide composition from
-     reading as a tilted or disconnected rail. */
-  .story-images {
-    top: 20.224cqw;
-    left: var(--ultra-wide-ring-left);
-    gap: var(--ultra-wide-ring-gap);
-    flex-wrap: nowrap;
-  }
-  .story-image {
-    width: var(--ultra-wide-ring-size);
-    height: var(--ultra-wide-ring-size);
-  }
-
-  .what-we-do {
-    --ultra-wide-card-size: 14.14cqw;
-    --ultra-wide-card-gap: 2.1cqw;
-  }
-  .work-top-grid {
-    /* Its .8cqw inset makes the first service circle begin at 27.468cqw—
-       exactly the Hero row's start edge. */
-    top: 3.2%;
-    left: 26.668%;
-    grid-template-columns: repeat(4, var(--ultra-wide-card-size));
-    align-items: center;
-    width: 64.46cqw;
-    height: 15.74cqw;
-    padding: .8cqw;
-    gap: var(--ultra-wide-card-gap);
-    border-radius: 9.5cqw;
-  }
-  .work-top-grid .work-card {
-    width: var(--ultra-wide-card-size);
-    height: var(--ultra-wide-card-size);
-    padding: .96cqw .72cqw .6cqw;
-  }
-  .work-top-grid .work-card__icon { height: 2.1cqw; }
-  .work-top-grid .work-card h3 {
-    margin: .42cqw 0 .28cqw;
-    font-size: clamp(13px, 1.02cqw, 22px);
-  }
-  .work-top-grid .work-card p {
-    width: 82%;
-    font-size: clamp(10px, .82cqw, 16px);
-    line-height: 1.3;
-  }
-
-  .work-rail {
-    top: 3.2%;
-    left: 26.668%;
-    width: 15.74cqw;
-    /* End just below the final lower circle instead of extending to the
-       section's bottom edge as it does in the standard desktop rail. */
-    bottom: auto;
-    height: 47.75cqw;
-    border-radius: 7.87cqw 0 7.87cqw 7.87cqw;
-  }
-  /* Keep the heading entirely in the reading column; it no longer intrudes
-     into the orange service circle when the canvas becomes very wide. */
-  .work-intro {
-    top: 25.7%;
-    left: 3.5%;
-    width: 14%;
-  }
-  .work-intro h2 { font-size: clamp(24px, 1.5cqw, 38px); }
-  .work-intro__button { width: 13.4cqw; }
-
-  .work-lower-cards {
-    top: 31.8%;
-    left: 27.468%;
-    width: var(--ultra-wide-card-size);
-  }
-  .work-card--research,
-  .work-card--forums { height: var(--ultra-wide-card-size); }
-  /* Match the clear gap above Research with the gap before the Forums card. */
-  .work-lower-cards .work-card--forums { margin-top: 1.22cqw; }
-  .work-summary { top: 55.5%; left: 53.8%; width: 36%; }
 }
 

@@ -1,0 +1,449 @@
+/*
+ * Desktop Hero + Work rebuild
+ *
+ * These two sections share one measured editorial canvas and one service-ring
+ * scale.  The result is deliberately independent of viewport aspect-ratio
+ * patches: the geometry derives from the canvas inline size, with sensible
+ * physical limits for very small and very large desktop displays.
+ *
+ * The breakpoint mirrors the existing desktop GSAP handoff. Tablet and phone
+ * styles are kept in their own source files and never match this query.
+ */
+@media (min-width: 1101px) {
+  :root {
+    --desktop-section-inline: min(100vw, 177.18svh);
+    --desktop-section-block: min(100svh, 56.44vw);
+  }
+
+  .hero,
+  .what-we-do {
+    --section-gutter: clamp(2rem, 3.5cqi, 4rem);
+    --display-size: clamp(1.25rem, 1.78cqi, 2.375rem);
+    --body-size: clamp(.75rem, 1.05cqi, 1.125rem);
+    position: relative;
+    width: var(--desktop-section-inline);
+    height: var(--desktop-section-block);
+    margin-inline: auto;
+    container-type: inline-size;
+    overflow: visible;
+    background: #f3f4ec;
+  }
+
+  /* Hero ------------------------------------------------------------------ */
+  .hero {
+    --section-footer-note-left: var(--section-gutter);
+    --hero-copy-left: clamp(16rem, 26.3cqi, 32rem);
+    --story-top: clamp(15rem, 20.8cqi, 26rem);
+    --hero-copy-gap: clamp(4.25rem, 5.8cqi, 7rem);
+    /* The Hero artwork is deliberately independent of the service-card
+       sizing. Its established ring scale and cadence must not move when the
+       Work section is adjusted. */
+    /* A slightly quieter Hero row leaves the mission statement a generous
+       lower viewport margin at standard desktop heights. Its ring centres
+       align with the service-card centres below, making the handoff read as
+       four direct vertical paths rather than a diagonal shuffle. */
+    --hero-ring-size: clamp(9rem, 13.4cqi, 21rem);
+    --hero-target-ring-size: clamp(10rem, 15.6cqi, 24rem);
+    --hero-target-ring-gap: clamp(.7rem, 1.2cqi, 1.8rem);
+    --hero-target-ring-origin: clamp(18rem, 26.4cqi, 40rem);
+    --hero-ring-gap: calc(var(--hero-target-ring-size) + var(--hero-target-ring-gap) - var(--hero-ring-size));
+    --hero-ring-origin: calc(var(--hero-target-ring-origin) + ((var(--hero-target-ring-size) - var(--hero-ring-size)) / 2));
+  }
+
+  .mobile-hero-header { display: contents; }
+  .mobile-menu-toggle,
+  .mobile-nav { display: none; }
+
+  .brand {
+    position: absolute;
+    top: min(1.074cqi, 1.25rem);
+    left: calc(50% - min(13.125cqi, 15rem));
+    width: min(26.25cqi, 30rem);
+    height: min(4cqi, 4.6rem);
+    background-image: var(--brand-image);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+  }
+
+  .desktop-nav {
+    position: fixed;
+    z-index: 2;
+    top: calc(50% - var(--nav-half-height, 100px));
+    right: clamp(1.7rem, 3.2vw, 3.625rem);
+    display: grid;
+    width: 8.125rem;
+    gap: clamp(.56rem, 1.32vw, 1.375rem);
+    text-align: right;
+  }
+
+  .desktop-nav a {
+    position: relative;
+    display: block;
+    color: inherit;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(.4375rem, .68vw, .8125rem);
+    font-weight: 500;
+    letter-spacing: .21em;
+    text-transform: uppercase;
+    transition: color .2s ease;
+  }
+
+  .desktop-nav a:hover,
+  .desktop-nav .active { color: #e04c30; }
+
+  .desktop-nav__brand { display: none; }
+
+  @media (min-width: 1200px) and (orientation: landscape) {
+    .desktop-nav__brand {
+      position: fixed;
+      z-index: 3;
+      display: flex;
+      border-radius: 2px;
+      visibility: hidden;
+      cursor: pointer;
+      background-image: var(--brand-image);
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
+      background-size: 100% auto;
+    }
+
+    .desktop-nav__brand:focus-visible {
+      outline: 2px solid #779f62;
+      outline-offset: 5px;
+    }
+  }
+
+  .feature-image {
+    position: absolute;
+    top: 7.49cqi;
+    left: calc((100cqi - 100vw) / 2);
+    display: block;
+    width: min(25.704cqi, 31rem);
+    height: min(38.946cqi, 47rem);
+  }
+
+  .feature-image > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    clip-path: ellipse(76.69% 50.62% at 22.66% 50.85%);
+  }
+
+  .feature-image::after {
+    position: absolute;
+    top: .23%;
+    left: -54.03%;
+    width: 153.38%;
+    height: 101.24%;
+    box-sizing: border-box;
+    border: min(1.02cqi, 1.2rem) solid var(--ring-warm);
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+  }
+
+  .intro {
+    position: absolute;
+    top: clamp(5rem, 12.2svh, 9.5rem);
+    left: var(--hero-copy-left);
+    width: min(54%, calc(100% - var(--hero-copy-left) - clamp(11rem, 16cqi, 19rem)));
+  }
+
+  h1,
+  .work-intro h2 {
+    margin: 0;
+    color: #0c4030;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: var(--display-size);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.18;
+  }
+
+  h1 { color: #205f5b; }
+
+  .story-images {
+    position: absolute;
+    top: var(--story-top);
+    left: var(--hero-ring-origin);
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--hero-ring-gap);
+  }
+
+  .story-image {
+    position: relative;
+    width: var(--hero-ring-size);
+    height: var(--hero-ring-size);
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: 50%;
+    background-color: #d8dfca;
+    background-image: var(--story-image);
+    background-position: center;
+    background-size: cover;
+  }
+
+  .story-image.damaged { background-position: 57% 52%; }
+  .story-image.materials { background-position: 50% 50%; }
+  .story-image.rebuilt { background-position: 54% 50%; }
+  .story-image.children { background-position: 53% 47%; }
+
+  .story-image::after {
+    position: absolute;
+    inset: 0;
+    border: min(.78cqi, .94rem) solid var(--ring-green);
+    border-radius: inherit;
+    content: '';
+    pointer-events: none;
+  }
+
+  .damaged::after { border-color: var(--ring-warm); }
+
+  .mission {
+    position: absolute;
+    top: calc(var(--story-top) + var(--hero-ring-size) + var(--hero-copy-gap));
+    left: 45.5%;
+    display: grid;
+    grid-template-columns: 1px minmax(0, 1fr);
+    width: min(40.5%, calc(100% - 45.5% - var(--section-gutter)));
+    column-gap: clamp(1rem, 2cqi, 2.5rem);
+  }
+
+  .mission-rule {
+    width: 1px;
+    height: clamp(9.5rem, 11cqi, 13.5rem);
+    background: #9ba885;
+  }
+
+  .mission p {
+    margin: min(.22cqi, .3rem) 0 min(1.3cqi, 1.5rem);
+    color: #3d7474;
+    font-size: var(--body-size);
+    line-height: 1.62;
+  }
+
+  .mission p + p { margin-top: 0; }
+
+  .tagline {
+    position: absolute;
+    bottom: clamp(1.5rem, 3.7cqi, 3.5rem);
+    left: var(--section-footer-note-left);
+    display: flex;
+    align-items: center;
+    gap: clamp(.5rem, .82cqi, .8rem);
+    color: #3e7778;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(.375rem, .63cqi, .6875rem);
+    font-weight: 500;
+    letter-spacing: .24em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* What we do ----------------------------------------------------------- */
+  .what-we-do {
+    /* Work can grow independently without altering the Hero composition. */
+    --service-size: clamp(10rem, 15.6cqi, 24rem);
+    --service-gap: clamp(.7rem, 1.2cqi, 1.8rem);
+    --service-origin: clamp(18rem, 26.4cqi, 40rem);
+    --work-impact-runway: calc(19.6cqi + clamp(1rem, 1.5vw, 2rem));
+    --service-frame: clamp(.5rem, .8cqi, 1rem);
+    /* The vertical stack uses the same breathing space as every neighbouring
+       pair in the top service row. */
+    --service-stack-gap: var(--service-gap);
+    --work-row-top: clamp(2rem, 3.6cqi, 4rem);
+    --work-row-left: calc(var(--service-origin) - var(--service-frame));
+    --work-lower-top: calc(var(--work-row-top) + var(--service-size) + var(--service-frame) + var(--service-frame) + var(--service-stack-gap));
+    margin: 0 auto var(--work-impact-runway);
+  }
+
+  .work-mobile-stage { display: contents; }
+  .work-mobile-scroll-list { display: none; }
+
+  .work-intro {
+    position: absolute;
+    z-index: 3;
+    top: calc(var(--work-row-top) + var(--service-size) + var(--service-frame) + var(--service-frame) + var(--service-stack-gap));
+    left: var(--section-gutter);
+    width: clamp(12rem, 21cqi, 27rem);
+  }
+
+  .work-intro__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .45em;
+    width: clamp(10.75rem, 11.3cqi, 13.5rem);
+    height: clamp(2.5rem, 2.54cqi, 3rem);
+    margin-top: clamp(1rem, 1.35cqi, 1.5rem);
+    border-radius: 999px;
+    background: linear-gradient(110deg, #779f62, #588d4d);
+    color: #f7f7ef;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(.75rem, .94cqi, 1.25rem);
+    font-weight: 500;
+    letter-spacing: -.035em;
+    transition: transform .24s ease, background .24s ease;
+  }
+
+  .work-intro__button span { font-size: 1.25em; line-height: 1; }
+  .work-intro__button:hover { transform: translateX(4px); background: #4c833f; }
+
+  .work-rail {
+    position: absolute;
+    z-index: 0;
+    top: var(--work-row-top);
+    left: var(--work-row-left);
+    width: calc(var(--service-size) + var(--service-frame) + var(--service-frame));
+    /* End with the same dark-green edge that frames the right-most circle. */
+    height: calc(var(--service-size) + var(--service-frame) + var(--service-frame) + var(--service-stack-gap) + var(--service-size) + var(--service-stack-gap) + var(--service-size) + var(--service-frame));
+    border-radius: 999px 0 999px 999px;
+    background: radial-gradient(circle at 85% 17%, #174b2e 0%, #0d4027 42%, #08341e 100%);
+  }
+
+  .work-top-grid {
+    position: absolute;
+    z-index: 2;
+    top: var(--work-row-top);
+    left: var(--work-row-left);
+    display: grid;
+    grid-template-columns: repeat(4, var(--service-size));
+    align-items: center;
+    width: max-content;
+    height: calc(var(--service-size) + var(--service-frame) + var(--service-frame));
+    padding: var(--service-frame);
+    gap: var(--service-gap);
+    overflow: hidden;
+    border-radius: 999px;
+    background: radial-gradient(circle at 36% 25%, #174b2e 0%, #0d4027 44%, #08341e 100%);
+  }
+
+  .work-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    color: #0b3f2b;
+    text-align: center;
+  }
+
+  .work-top-grid .work-card,
+  .work-lower-cards .work-card {
+    width: var(--service-size);
+    height: var(--service-size);
+    border-radius: 50%;
+  }
+
+  .work-top-grid .work-card { padding: clamp(.7rem, .85cqi, 1.05rem) clamp(.65rem, .9cqi, 1rem) clamp(.45rem, .55cqi, .7rem); }
+
+  .work-card--recovery { background: var(--ring-warm); }
+  .work-card--community { background: radial-gradient(circle at 43% 31%, #d5e8bd, #bdd9a3 72%, #a8ca91); }
+  .work-card--training { background: radial-gradient(circle at 40% 30%, #fffdf3, #edf1df 78%, #dce6ca); }
+  .work-card--consultation { background: radial-gradient(circle at 42% 30%, #d6e9bc, #bbd89e 70%, #a7c98b); }
+  .work-card--research { background: radial-gradient(circle at 41% 26%, #f8f9ed, #e9efd9 73%, #d6e2c2); }
+  .work-card--forums { background: radial-gradient(circle at 43% 28%, #d3e9b4, #badb9b 70%, #a3c889); }
+
+  .work-card__icon {
+    display: block;
+    width: auto;
+    height: clamp(1.6rem, 1.95cqi, 2.75rem);
+    flex: 0 0 auto;
+    object-fit: contain;
+  }
+
+  .work-card h3 {
+    margin: clamp(.24rem, .32cqi, .42rem) 0 clamp(.16rem, .22cqi, .32rem);
+    color: #0b3f2b;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: clamp(.78rem, 1.04cqi, 1.5rem);
+    font-weight: 600;
+    letter-spacing: -.055em;
+    line-height: 1.12;
+  }
+
+  .work-card p {
+    width: 82%;
+    margin: 0;
+    color: #164d36;
+    font-family: 'Lora', Georgia, serif;
+    font-size: clamp(.68rem, .94cqi, 1.125rem);
+    font-weight: 400;
+    letter-spacing: -.02em;
+    line-height: 1.32;
+  }
+
+  /* The deconstruction description has materially more copy than every other
+     service. It keeps the same larger hierarchy while using its circle's
+     available vertical space instead of clipping the final lines. */
+  .work-top-grid .work-card--recovery { padding-top: clamp(.4rem, .5cqi, .7rem); }
+  .work-top-grid .work-card--recovery .work-card__icon { height: clamp(1.3rem, 1.8cqi, 2.25rem); }
+  .work-top-grid .work-card--recovery h3 { margin-top: .18em; margin-bottom: .12em; font-size: clamp(.78rem, .98cqi, 1.45rem); }
+  .work-top-grid .work-card--recovery p { font-size: clamp(.6rem, .76cqi, .94rem); line-height: 1.24; }
+
+  .work-lower-cards {
+    position: absolute;
+    z-index: 2;
+    top: var(--work-lower-top);
+    left: var(--service-origin);
+    width: var(--service-size);
+  }
+
+  .work-lower-cards .work-card { padding: clamp(.75rem, .9cqi, 1.1rem) clamp(.65rem, .86cqi, 1rem) clamp(.55rem, .7cqi, .85rem); }
+  .work-lower-cards .work-card + .work-card { margin-top: var(--service-stack-gap); }
+  .work-lower-cards .work-card__icon { height: clamp(1.55rem, 2.05cqi, 2.8rem); }
+  .work-lower-cards .work-card h3 { margin: clamp(.24rem, .32cqi, .42rem) 0 clamp(.32rem, .42cqi, .54rem); font-size: clamp(.78rem, 1.04cqi, 1.5rem); }
+  .work-lower-cards .work-card p { width: 81%; font-size: clamp(.68rem, .94cqi, 1.1rem); line-height: 1.32; }
+
+  .work-summary {
+    position: absolute;
+    z-index: 3;
+    top: calc(var(--work-lower-top) + clamp(8rem, 11.3cqi, 14.5rem));
+    left: 54%;
+    width: min(37%, 32rem);
+    margin: 0;
+    color: #3d7474;
+    font-family: 'Lora', Georgia, serif;
+    font-size: var(--body-size);
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.62;
+  }
+
+  /* The handoff layer is the sole visual owner only during the existing GSAP
+     scrub. Its desktop rules must live with the rebuilt desktop canvas;
+     otherwise the source rings are hidden without a positioned replacement. */
+  .hero-work-handoff {
+    position: fixed;
+    z-index: 4;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-work-handoff__ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    overflow: hidden;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    backface-visibility: hidden;
+    will-change: transform, clip-path;
+  }
+
+  .hero-work-handoff__ring::after {
+    position: absolute;
+    inset: 0;
+    border: clamp(6px, .78vw, 15px) solid var(--handoff-ring-color, var(--ring-green));
+    border-radius: inherit;
+    content: '';
+  }
+
+  .hero-work-handoff__ring--1 { --handoff-ring-color: var(--ring-warm); }
+}
