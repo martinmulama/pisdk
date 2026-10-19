@@ -4,21 +4,21 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './styles.css'
-import referenceImage from './assets/pisdk-hero-reference.png'
-import storyDamagedHome from './assets/story-damaged-home.png'
-import storyReclaimedScrap from './assets/story-reclaimed-scrap.png'
-import storyRebuiltHome from './assets/story-rebuilt-home.png'
-import storyCommunityChildren from './assets/story-community-children.png'
-import heroFeature from './assets/hero-building-hope-hero-crop.png'
+import brandImage from './assets/pisdk-brand-lockup.webp'
+import storyDamagedHome from './assets/story-damaged-home.webp'
+import storyReclaimedScrap from './assets/story-reclaimed-scrap.webp'
+import storyRebuiltHome from './assets/story-rebuilt-home.webp'
+import storyCommunityChildren from './assets/story-community-children.webp'
+import heroFeature from './assets/hero-building-hope-hero-crop.webp'
 import workRecoveryIcon from './assets/work-icon-recovery.png'
 import workCommunityIcon from './assets/work-icon-community.png'
 import workTrainingIcon from './assets/work-icon-training.png'
 import workConsultationIcon from './assets/work-icon-consultation.png'
 import workResearchIcon from './assets/work-icon-research.png'
 import workForumsIcon from './assets/work-icon-forums.png'
-import impactBeforeRuins from './assets/impact-before-ruins.png'
-import impactRebuildWorker from './assets/impact-rebuild-worker.png'
-import impactFoundationOfHope from './assets/impact-foundation-of-hope.png'
+import impactBeforeRuins from './assets/impact-before-ruins.webp'
+import impactRebuildWorker from './assets/impact-rebuild-worker.webp'
+import impactFoundationOfHope from './assets/impact-foundation-of-hope.webp'
 import getInvolvedPartnerIcon from './assets/get-involved-icon-partner.png'
 import getInvolvedVisitIcon from './assets/get-involved-icon-visit.png'
 
@@ -247,8 +247,11 @@ function DesktopNav() {
 
       // One lock-up travels — it begins as the complete centred logo and
       // settles as the PISDK emblem plus initials, without the institute name.
-      const targetWidth = () => Math.min(154, Math.max(136, window.innerWidth * .09))
-      const targetHeight = () => targetWidth() / 3.43
+      // This crop contains only the circular PISDK mark and its initials.
+      // It is deliberately a little wider than the link column, while its
+      // final right edge shares the links' precise reading line.
+      const targetWidth = () => Math.min(166, Math.max(148, window.innerWidth * .095))
+      const targetHeight = () => targetWidth() / 2.475
       const resetAtSource = () => {
         const sourceBounds = source.getBoundingClientRect()
         gsap.set(destination, {
@@ -257,8 +260,8 @@ function DesktopNav() {
           top: sourceBounds.top,
           width: sourceBounds.width,
           height: sourceBounds.height,
-          backgroundSize: '284.57% auto',
-          backgroundPosition: '53.31% 2.82%',
+          backgroundSize: '100% auto',
+          backgroundPosition: '50% 50%',
           clipPath: 'inset(0 0 0 0)',
           x: 0,
           y: 0,
@@ -266,9 +269,42 @@ function DesktopNav() {
       }
       const targetLeft = () => {
         const navBounds = nav.getBoundingClientRect()
-        return navBounds.left + (navBounds.width - targetWidth()) / 2
+        return navBounds.right - targetWidth()
       }
       const targetTop = () => Math.max(22, Math.min(34, window.innerHeight * .032))
+      const restoreAtHeroTop = (trigger) => {
+        // The trigger begins at scroll position zero, so ScrollTrigger cannot
+        // always emit `onLeaveBack` (there is no negative scroll range to
+        // cross). Reset explicitly at progress zero to make rapid reverse
+        // scrolls return to the exact centred lock-up every time.
+        if (!trigger || trigger.progress <= .001) resetAtSource()
+      }
+
+      let firstResizeFrame = 0
+      let settledResizeFrame = 0
+      let timeline
+      const syncGeometryAfterResize = () => {
+        cancelAnimationFrame(firstResizeFrame)
+        cancelAnimationFrame(settledResizeFrame)
+        // Browsers expose the new viewport before container-query layout has
+        // necessarily committed. Two frames ensure this travelling logo is
+        // measured only after its source, nav, and canvas have all settled.
+        firstResizeFrame = requestAnimationFrame(() => {
+          settledResizeFrame = requestAnimationFrame(() => {
+            const trigger = timeline?.scrollTrigger
+            if (!trigger) return
+            trigger.refresh()
+            if (trigger.progress <= .001) {
+              resetAtSource()
+            } else {
+              // A refresh recalculates the start/end positions but does not
+              // replay the tween. Reapply the exact current scroll state so a
+              // live resize never strands the logo at old coordinates.
+              timeline.invalidate().progress(trigger.progress, false)
+            }
+          })
+        })
+      }
 
       // Hiding the source immediately—not by fading it—makes the overlay the
       // sole visible logo for the whole journey and prevents a double-logo
@@ -276,14 +312,22 @@ function DesktopNav() {
       resetAtSource()
       gsap.set(source, { visibility: 'hidden' })
 
-      const timeline = gsap.timeline({
+      timeline = gsap.timeline({
         scrollTrigger: {
           trigger: hero,
           start: 'top top',
           end: '35% top',
-          scrub: .35,
+          scrub: .2,
           invalidateOnRefresh: true,
           onRefreshInit: resetAtSource,
+          onRefresh: (trigger) => {
+            if (trigger.progress <= .001) {
+              resetAtSource()
+            } else {
+              timeline?.invalidate().progress(trigger.progress, false)
+            }
+          },
+          onUpdate: restoreAtHeroTop,
         },
       })
 
@@ -292,12 +336,23 @@ function DesktopNav() {
         top: targetTop,
         width: targetWidth,
         height: targetHeight,
-        backgroundSize: '547.2% auto',
-        backgroundPosition: '63.4% 2.1%',
+        // Crop out the institute descriptor and its divider at rest. The
+        // remaining emblem plus PISDK initials fills this destination cleanly.
+        backgroundSize: '265.41% auto',
+        backgroundPosition: '81.78% 50%',
         ease: 'none',
       }, 0)
 
+      const sizeObserver = new ResizeObserver(syncGeometryAfterResize)
+      sizeObserver.observe(hero)
+      sizeObserver.observe(nav)
+      window.addEventListener('resize', syncGeometryAfterResize)
+
       return () => {
+        cancelAnimationFrame(firstResizeFrame)
+        cancelAnimationFrame(settledResizeFrame)
+        sizeObserver.disconnect()
+        window.removeEventListener('resize', syncGeometryAfterResize)
         gsap.set(source, { clearProps: 'visibility' })
         gsap.set(destination, { clearProps: 'all' })
       }
@@ -335,7 +390,7 @@ function DesktopNav() {
           className="desktop-nav__brand"
           href="#top"
           aria-label="Back to the PISDK homepage"
-          style={{ '--reference-image': `url(${referenceImage})` }}
+          style={{ '--brand-image': `url(${brandImage})` }}
         />,
         document.body
       )}
@@ -378,7 +433,7 @@ function MobileNav() {
 function HeroFeature() {
   return (
     <div className="feature-image">
-      <img src={heroFeature} alt="A craftsperson building with reclaimed materials" />
+      <img src={heroFeature} alt="A craftsperson building with reclaimed materials" width="429" height="650" decoding="async" fetchPriority="high" />
     </div>
   )
 }
@@ -441,7 +496,7 @@ function WhatWeDo() {
 function ImpactVisual({ className, label, image, showPlay = false }) {
   return (
     <div className={`impact-visual ${className}`}>
-      <img src={image} alt={label} loading="lazy" decoding="async" />
+      <img src={image} alt={label} width="1280" height="720" loading="lazy" decoding="async" />
       <span className="impact-visual__ring" aria-hidden="true" />
       {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
     </div>
@@ -844,16 +899,24 @@ function App() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     // Four quiet, readable statistics—one state per dot—prepare the story
     // without delaying the actual page with image decoding.
-    const duration = reducedMotion ? 80 : 7200
+    const duration = reducedMotion ? 80 : 4800
     let frame
     let exitTimer
+    let lastRender = 0
     const startedAt = performance.now()
 
     const updateProgress = (now) => {
       // Keep the conic-gradient angle fractional. Whole-percent steps create
       // visible ticks around a large loading ring.
       const nextProgress = Math.min(100, ((now - startedAt) / duration) * 100)
-      setProgress(nextProgress)
+      // The visual sequence is GSAP-driven; React only needs enough updates
+      // to advance its four statistics and accessible progress value. Limiting
+      // this to 30fps avoids repeatedly re-rendering the full page while the
+      // preloader is covering it, without changing the perceived motion.
+      if (now - lastRender >= 33 || nextProgress === 100) {
+        lastRender = now
+        setProgress(nextProgress)
+      }
 
       if (nextProgress < 100) {
         frame = requestAnimationFrame(updateProgress)
@@ -1666,8 +1729,8 @@ function App() {
           onExitComplete={completePreloader}
         />
       )}
-      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--reference-image': `url(${referenceImage})` }}>
-        <section className={`hero${usesMobileMerge ? ' hero--mobile-merge' : ''}`} aria-labelledby="hero-heading">
+      <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--brand-image': `url(${brandImage})` }}>
+        <section id="home" className={`hero${usesMobileMerge ? ' hero--mobile-merge' : ''}`} aria-labelledby="hero-heading">
         <div className="mobile-hero-header">
           <Brand />
           <MobileNav />
@@ -1694,7 +1757,7 @@ function App() {
           <StoryImage className="children" image={storyCommunityChildren} label="Children in a local community" />
         </div>
 
-        <section className="mission" aria-label="About PISDK">
+        <section className="mission" id="about-us" aria-label="About PISDK">
           <span className="mission-rule" />
           <div>
             <p>At the Paragon Institute of Sustainable Development Kenya (PISDK), we advance circular economy solutions in construction and waste management. Our mission is to prove that sustainability equals affordability.</p>

@@ -39,22 +39,16 @@ a { color: inherit; text-decoration: none; }
   container-type: inline-size;
 }
 
-.reference-crop {
-  background-image: var(--reference-image);
-  background-repeat: no-repeat;
-  background-size: 100cqw 56.44cqw;
-}
-
 .brand {
   position: absolute;
   top: 1.074cqw;
   left: calc(50% - 11.515cqw);
   width: 26.25cqw;
   height: 4cqw;
-  background-image: var(--reference-image);
+  background-image: var(--brand-image);
   background-repeat: no-repeat;
-  background-size: 74.7cqw 42.13cqw;
-  background-position: -25.83cqw -1.074cqw;
+  background-size: 100% auto;
+  background-position: center;
 }
 
 .desktop-nav {
@@ -99,13 +93,13 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     z-index: 3;
     border-radius: 2px;
-    background-image: var(--reference-image);
+    background-image: var(--brand-image);
     background-repeat: no-repeat;
     /* JS reframes this from the full hero lock-up to emblem + PISDK. */
-    background-size: 284.57% auto;
-    background-position: 53.31% 2.82%;
+    background-size: 100% auto;
+    background-position: 50% 50%;
     cursor: pointer;
-    will-change: left, top, width, height;
+    will-change: auto;
     visibility: hidden;
   }
   .desktop-nav__brand:focus-visible {

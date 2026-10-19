@@ -1,3 +1,16 @@
 node_modules/
 dist/
 .vite/
+
+# Local configuration and credentials must never be committed. Keep a checked-in
+# `.env.example` only if the project later needs documented non-secret values.
+.env
+.env.*
+!.env.example
+
+# Private certificates / keys and operating-system metadata.
+*.pem
+*.key
+*.p12
+*.pfx
+.DS_Store
