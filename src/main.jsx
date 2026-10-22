@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import VideoModal from './VideoModal.jsx'
 import './styles.css'
 import brandImage from './assets/pisdk-brand-lockup.webp'
 import storyDamagedHome from './assets/story-damaged-home.webp'
@@ -31,7 +32,7 @@ const footerLinkRows = [
     ['About', '#top'],
     ['Our work', '#our-work'],
     ['Join us', '#get-involved'],
-    ['Contact', '#contact'],
+    ['Contact', 'contact-modal'],
   ],
   [
     ['Media Center', '#current-pilots'],
@@ -215,7 +216,7 @@ function Brand() {
   return <a className="brand" href="#top" aria-label="PISDK — Paragon Institute of Sustainable Development Kenya" />
 }
 
-function DesktopNav() {
+function DesktopNav({ onContact }) {
   const navRef = useRef(null)
   const navBrandRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
@@ -372,16 +373,20 @@ function DesktopNav() {
         }}
       >
         {menu.map((item, index) => (
-          <a
-            className={index === activeIndex ? 'active' : ''}
-            data-nav-index={index}
-            href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
-            key={item}
-            aria-current={index === activeIndex ? 'page' : undefined}
-            onClick={() => setActiveIndex(index)}
-          >
-            {item}
-          </a>
+          item === 'Contact' ? (
+            <button className="desktop-nav__contact" type="button" key={item} onClick={onContact}>{item}</button>
+          ) : (
+            <a
+              className={index === activeIndex ? 'active' : ''}
+              data-nav-index={index}
+              href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
+              key={item}
+              aria-current={index === activeIndex ? 'page' : undefined}
+              onClick={() => setActiveIndex(index)}
+            >
+              {item}
+            </a>
+          )
         ))}
       </nav>
       {createPortal(
@@ -398,7 +403,7 @@ function DesktopNav() {
   )
 }
 
-function MobileNav() {
+function MobileNav({ onContact }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -417,13 +422,11 @@ function MobileNav() {
       </button>
       <nav id="mobile-navigation" className={`mobile-nav${isOpen ? ' is-open' : ''}`} aria-label="Mobile navigation">
         {menu.map((item) => (
-          <a
-            href={`#${item.toLowerCase().replaceAll(' ', '-')}`}
-            key={item}
-            onClick={() => setIsOpen(false)}
-          >
-            {item}
-          </a>
+          item === 'Contact' ? (
+            <button className="mobile-nav__contact" type="button" key={item} onClick={() => { setIsOpen(false); onContact() }}>{item}</button>
+          ) : (
+            <a href={`#${item.toLowerCase().replaceAll(' ', '-')}`} key={item} onClick={() => setIsOpen(false)}>{item}</a>
+          )
         ))}
       </nav>
     </>
@@ -442,15 +445,15 @@ function HeroFeature() {
  * logo travel, and desktop ring handoff all measure these elements directly.
  * Presentation is rebuilt in desktop-rebuild.css; compact layouts retain their
  * existing independent story treatment. */
-function Hero({ usesMobileMerge }) {
+function Hero({ usesMobileMerge, onContact }) {
   return (
     <section id="home" className={`hero${usesMobileMerge ? ' hero--mobile-merge' : ''}`} aria-labelledby="hero-heading">
       <div className="mobile-hero-header">
         <Brand />
-        <MobileNav />
+        <MobileNav onContact={onContact} />
       </div>
 
-      <DesktopNav />
+      <DesktopNav onContact={onContact} />
       <HeroFeature />
 
       <div className="intro">
@@ -540,21 +543,29 @@ function WhatWeDo() {
   )
 }
 
-function ImpactVisual({ className, label, image, showPlay = false }) {
+function ImpactVisual({ className, label, image, showPlay = false, onPlay }) {
+  const Element = showPlay ? 'button' : 'div'
   return (
-    <div className={`impact-visual ${className}`}>
+    <Element
+      className={`impact-visual ${className}`}
+      type={showPlay ? 'button' : undefined}
+      tabIndex={showPlay ? 0 : undefined}
+      aria-label={showPlay ? 'Play the Foundation of Hope rebuild documentary' : undefined}
+      aria-haspopup={showPlay ? 'dialog' : undefined}
+      onClick={showPlay ? onPlay : undefined}
+    >
       <img src={image} alt={label} width="1280" height="720" loading="lazy" decoding="async" />
       <span className="impact-visual__ring" aria-hidden="true" />
       {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
-    </div>
+    </Element>
   )
 }
 
-function Impact() {
+function Impact({ onPlayVideo }) {
   return (
     <section className="impact" id="current-pilots" aria-labelledby="impact-heading">
       <ImpactVisual className="impact-visual--before" image={impactBeforeRuins} label="A collapsed adobe home before the rebuild" />
-      <ImpactVisual className="impact-visual--feature" image={impactRebuildWorker} label="A craftsperson rebuilding with earth blocks" showPlay />
+      <ImpactVisual className="impact-visual--feature" image={impactRebuildWorker} label="A craftsperson rebuilding with earth blocks" showPlay onPlay={onPlayVideo} />
       <ImpactVisual className="impact-visual--after" image={impactFoundationOfHope} label="The rebuilt Foundation of Hope Youth Centre" />
 
       <p className="impact-label impact-label--before">Before</p>
@@ -590,7 +601,7 @@ function InvolvementCard({ way }) {
   )
 }
 
-function GetInvolved() {
+function GetInvolved({ onContact }) {
   return (
     <section className="get-involved" id="get-involved" aria-labelledby="get-involved-heading">
       <div className="get-involved__backdrop" aria-hidden="true" />
@@ -603,22 +614,19 @@ function GetInvolved() {
         {involvementWays.map((way) => <InvolvementCard key={way.id} way={way} />)}
       </div>
 
-      <a className="get-involved__cta" href="#contact">Start a conversation <span aria-hidden="true">→</span></a>
+      <button className="get-involved__cta" type="button" onClick={onContact}>Start a conversation <span aria-hidden="true">→</span></button>
     </section>
   )
 }
 
-function FooterSocialIcon({ name }) {
+function FooterSocialIcon({ name, href }) {
   const icons = {
-    Facebook: <path d="M14.2 23v-9h3.1l.5-3.5h-3.6V8.3c0-1 .3-1.7 1.8-1.7H18V3.5c-.4-.1-1.4-.2-2.7-.2-2.7 0-4.5 1.6-4.5 4.6v2.6H7.7V14h3.1v9h3.4Z" />,
-    X: <path d="m7 6 10.5 12M17 6 6.5 18" />,
     LinkedIn: <><path d="M7.2 9.5v8.8M7.2 6.5h.1" /><path d="M11.1 18.3v-5c0-1.8 1.1-3 2.8-3 1.8 0 2.9 1.2 2.9 3v5M11.1 12.9v-2.5" /></>,
-    Instagram: <><rect x="5.5" y="5.5" width="13" height="13" rx="3.4" /><circle cx="12" cy="12" r="3" /><path d="M16.2 7.9h.1" /></>,
-    YouTube: <><rect x="4.7" y="7" width="14.6" height="10" rx="3" /><path d="m10.5 10 4 2-4 2v-4Z" fill="currentColor" stroke="none" /></>,
+    Vimeo: <><path d="M20 7.4c-.1 2.5-1.9 5.9-5.3 10.1-1.8 2.3-3.4 3.4-4.7 3.4-.8 0-1.5-.7-2-2.2L6.2 12c-.7-2.4-1.4-3.6-2.2-3.6-.2 0-.8.4-1.7 1.2L1.3 8.1l3.1-2.8c1.4-1.2 2.5-1.8 3.3-1.9 1.7-.2 2.7 1 3.1 3.5.4 2.7.7 4.3.8 5 .4 2.2.9 3.3 1.5 3.3.5 0 1.2-.7 2.1-2.1.9-1.4 1.4-2.5 1.5-3.2.1-1.2-.3-1.8-1.5-1.8-.5 0-1 .1-1.5.3 1-3.2 2.8-4.7 5.4-4.6 1.9.1 2.8 1.4 2.7 3.6Z" /></>,
   }
 
   return (
-    <a className="footer-social__link" href="#contact" aria-label={name}>
+    <a className="footer-social__link" href={href} aria-label={`${name} — PISDK`} target="_blank" rel="noopener noreferrer">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">{icons[name]}</svg>
     </a>
   )
@@ -635,7 +643,11 @@ function FooterLeaf() {
   )
 }
 
-function SiteFooter() {
+function SiteFooter({ onContact }) {
+  const socialLinks = [
+    { name: 'LinkedIn', href: 'https://www.linkedin.com/company/paragon-institute-of-sustainable-development-kenya/' },
+    { name: 'Vimeo', href: 'https://vimeo.com/1091366405' },
+  ]
   return (
     <footer className="site-footer" id="contact">
       <div className="site-footer__wordmark" aria-label="PISDK">PISDK</div>
@@ -645,13 +657,15 @@ function SiteFooter() {
       <nav className="site-footer__links" aria-label="Footer navigation">
         {footerLinkRows.map((row, rowIndex) => (
           <div className="site-footer__link-row" key={rowIndex}>
-            {row.map(([label, href]) => <a href={href} key={label}>{label}</a>)}
+            {row.map(([label, href]) => href === 'contact-modal'
+              ? <button className="site-footer__contact" type="button" onClick={onContact} key={label}>{label}</button>
+              : <a href={href} key={label}>{label}</a>)}
           </div>
         ))}
       </nav>
 
       <div className="footer-social" aria-label="Social media">
-        {['Facebook', 'X', 'LinkedIn', 'Instagram', 'YouTube'].map((name) => <FooterSocialIcon key={name} name={name} />)}
+        {socialLinks.map((social) => <FooterSocialIcon key={social.name} {...social} />)}
       </div>
 
       <p className="site-footer__copyright">© 2026 PISDK. All rights reserved.</p>
@@ -839,12 +853,113 @@ function Preloader({ isLeaving, progress, onExitComplete }) {
   )
 }
 
+function ContactModal({ onClose }) {
+  const dialogRef = useRef(null)
+  const [status, setStatus] = useState('idle')
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    const previousFocus = document.activeElement
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    dialog?.querySelector('input[name="fullName"]')?.focus()
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onClose()
+        return
+      }
+      if (event.key !== 'Tab' || !dialog) return
+
+      const focusable = [...dialog.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = previousOverflow
+      previousFocus?.focus?.()
+    }
+  }, [onClose])
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    if (status === 'submitting') return
+    setStatus('submitting')
+    const formData = new FormData(event.currentTarget)
+    const subject = `PISDK inquiry: ${formData.get('inquiryType')}`
+    const body = [
+      `Name: ${formData.get('fullName')}`,
+      `Email: ${formData.get('email')}`,
+      `Inquiry type: ${formData.get('inquiryType')}`,
+      '',
+      formData.get('message'),
+    ].join('\n')
+    const mailto = `mailto:info@paragoninstituteofinnovation.org?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.setTimeout(() => {
+      setStatus('success')
+      window.location.href = mailto
+    }, 120)
+  }
+
+  return createPortal(
+    <div className="contact-modal__backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
+      <section className="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title" aria-describedby="contact-modal-description" ref={dialogRef}>
+        <button className="contact-modal__close" type="button" aria-label="Close contact form" onClick={onClose}>×</button>
+        <p className="contact-modal__eyebrow">Paragon Institute of Sustainable Development Kenya</p>
+        <h2 id="contact-modal-title">Start a conversation</h2>
+        <p id="contact-modal-description" className="contact-modal__description">Tell us what you have in mind. Your email app will open with your message ready to send.</p>
+        {status === 'success' ? (
+          <div className="contact-modal__feedback" role="status">
+            <p>Your message is ready in your email app. Send it there to reach our team.</p>
+            <button className="contact-modal__submit" type="button" onClick={onClose}>Done</button>
+          </div>
+        ) : (
+          <form className="contact-modal__form" onSubmit={handleSubmit}>
+            <label>Full Name<input autoFocus name="fullName" autoComplete="name" required /></label>
+            <label>Email Address<input name="email" type="email" autoComplete="email" required /></label>
+            <label>Inquiry Type
+              <select name="inquiryType" defaultValue="General Inquiry" required>
+                <option>Donate Materials</option>
+                <option>Partner With Us</option>
+                <option>Volunteer / Research</option>
+                <option>General Inquiry</option>
+              </select>
+            </label>
+            <label>Message<textarea name="message" rows="4" required /></label>
+            <button className="contact-modal__submit" type="submit" disabled={status === 'submitting'}>
+              {status === 'submitting' ? 'Preparing email…' : 'Continue to email'}
+            </button>
+            <p className="contact-modal__direct">Or email <a href="mailto:info@paragoninstituteofinnovation.org">info@paragoninstituteofinnovation.org</a></p>
+          </form>
+        )}
+      </section>
+    </div>,
+    document.body
+  )
+}
+
 function App() {
   const [progress, setProgress] = useState(0)
   const [isLeaving, setIsLeaving] = useState(false)
   const [isPreloaderDone, setIsPreloaderDone] = useState(false)
   const [isHeroReady, setIsHeroReady] = useState(false)
   const [isRingsReady, setIsRingsReady] = useState(false)
+  const [isContactOpen, setIsContactOpen] = useState(false)
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const openVideo = useCallback(() => setIsVideoOpen(true), [])
+  const closeVideo = useCallback(() => setIsVideoOpen(false), [])
   const [usesMobileMerge, setUsesMobileMerge] = useState(() => (
     typeof window !== 'undefined'
     && window.matchMedia('(max-width: 860px), (max-width: 1100px) and (max-height: 900px)').matches
@@ -1823,12 +1938,14 @@ function App() {
         />
       )}
       <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--brand-image': `url(${brandImage})` }}>
-        <Hero usesMobileMerge={usesMobileMerge} />
+        <Hero usesMobileMerge={usesMobileMerge} onContact={() => setIsContactOpen(true)} />
         <WhatWeDo />
-        <Impact />
-        <GetInvolved />
-        <SiteFooter />
+        <Impact onPlayVideo={openVideo} />
+        <GetInvolved onContact={() => setIsContactOpen(true)} />
+        <SiteFooter onContact={() => setIsContactOpen(true)} />
       </main>
+      {isContactOpen && <ContactModal onClose={() => setIsContactOpen(false)} />}
+      {isVideoOpen && <VideoModal onClose={closeVideo} />}
     </>
   )
 }

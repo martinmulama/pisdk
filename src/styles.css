@@ -7,6 +7,8 @@
 /* Desktop is intentionally loaded last. It owns only the desktop canvas,
    leaving the independently art-directed tablet and phone compositions intact. */
 @import './styles/desktop-rebuild.css';
+@import './styles/contact-modal.css';
+@import './styles/video-modal.css';
 /* Introduced for the mobile Work conclusion; desktop and tablet retain their
    existing summary treatment without a duplicate call to action. */
 .work-mobile-outro { display: none; }
