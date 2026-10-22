@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import VideoModal from './VideoModal.jsx'
 import './styles.css'
 import brandImage from './assets/pisdk-brand-lockup.webp'
 import storyDamagedHome from './assets/story-damaged-home.webp'
@@ -542,21 +543,29 @@ function WhatWeDo() {
   )
 }
 
-function ImpactVisual({ className, label, image, showPlay = false }) {
+function ImpactVisual({ className, label, image, showPlay = false, onPlay }) {
+  const Element = showPlay ? 'button' : 'div'
   return (
-    <div className={`impact-visual ${className}`}>
+    <Element
+      className={`impact-visual ${className}`}
+      type={showPlay ? 'button' : undefined}
+      tabIndex={showPlay ? 0 : undefined}
+      aria-label={showPlay ? 'Play the Foundation of Hope rebuild documentary' : undefined}
+      aria-haspopup={showPlay ? 'dialog' : undefined}
+      onClick={showPlay ? onPlay : undefined}
+    >
       <img src={image} alt={label} width="1280" height="720" loading="lazy" decoding="async" />
       <span className="impact-visual__ring" aria-hidden="true" />
       {showPlay && <span className="impact-visual__play" aria-hidden="true" />}
-    </div>
+    </Element>
   )
 }
 
-function Impact() {
+function Impact({ onPlayVideo }) {
   return (
     <section className="impact" id="current-pilots" aria-labelledby="impact-heading">
       <ImpactVisual className="impact-visual--before" image={impactBeforeRuins} label="A collapsed adobe home before the rebuild" />
-      <ImpactVisual className="impact-visual--feature" image={impactRebuildWorker} label="A craftsperson rebuilding with earth blocks" showPlay />
+      <ImpactVisual className="impact-visual--feature" image={impactRebuildWorker} label="A craftsperson rebuilding with earth blocks" showPlay onPlay={onPlayVideo} />
       <ImpactVisual className="impact-visual--after" image={impactFoundationOfHope} label="The rebuilt Foundation of Hope Youth Centre" />
 
       <p className="impact-label impact-label--before">Before</p>
@@ -948,6 +957,9 @@ function App() {
   const [isHeroReady, setIsHeroReady] = useState(false)
   const [isRingsReady, setIsRingsReady] = useState(false)
   const [isContactOpen, setIsContactOpen] = useState(false)
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const openVideo = useCallback(() => setIsVideoOpen(true), [])
+  const closeVideo = useCallback(() => setIsVideoOpen(false), [])
   const [usesMobileMerge, setUsesMobileMerge] = useState(() => (
     typeof window !== 'undefined'
     && window.matchMedia('(max-width: 860px), (max-width: 1100px) and (max-height: 900px)').matches
@@ -1928,11 +1940,12 @@ function App() {
       <main ref={pageRef} id="top" className={`page-shell${isHeroReady ? ' hero-is-ready' : ''}${isRingsReady ? ' rings-are-ready' : ''}`} style={{ '--brand-image': `url(${brandImage})` }}>
         <Hero usesMobileMerge={usesMobileMerge} onContact={() => setIsContactOpen(true)} />
         <WhatWeDo />
-        <Impact />
+        <Impact onPlayVideo={openVideo} />
         <GetInvolved onContact={() => setIsContactOpen(true)} />
         <SiteFooter onContact={() => setIsContactOpen(true)} />
       </main>
       {isContactOpen && <ContactModal onClose={() => setIsContactOpen(false)} />}
+      {isVideoOpen && <VideoModal onClose={closeVideo} />}
     </>
   )
 }
